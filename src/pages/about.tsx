@@ -1,5 +1,6 @@
 import { ExternalLink } from "lucide-react";
 
+import { CountryFlag } from "@/components/country-flag";
 import { Separator } from "@/components/ui/separator";
 import { wages } from "@/data/wages";
 
@@ -40,8 +41,8 @@ export function About() {
             <li key={entry.countryCode}>
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <p className="text-base font-medium">
-                    <span className="mr-2 text-lg">{countryFlag(entry.countryCode)}</span>
+                  <p className="flex items-center gap-2 text-base font-medium">
+                    <CountryFlag className="h-5 w-5" countryCode={entry.countryCode} />
                     {entry.country}
                   </p>
                   <p className="mt-0.5 text-xs text-muted-foreground">{entry.source}</p>
@@ -71,11 +72,5 @@ export function About() {
         </p>
       </section>
     </div>
-  );
-}
-
-function countryFlag(code: string): string {
-  return String.fromCodePoint(
-    ...[...code.toUpperCase()].map(c => 127_397 + c.codePointAt(0)!),
   );
 }

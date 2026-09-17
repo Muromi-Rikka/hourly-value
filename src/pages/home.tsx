@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import * as React from "react";
 
+import { CountryFlag } from "@/components/country-flag";
 import { Button } from "@/components/ui/button";
 import { WageBarChart } from "@/components/wage-bar-chart";
 import { sortedByWage, wages } from "@/data/wages";
@@ -88,22 +89,22 @@ export function Home() {
               <span className="text-[0.4em] text-muted-foreground">×</span>
             </p>
             <div className="mt-4 flex items-baseline gap-3">
-              <div>
-                <span className="mr-1 text-base">{countryFlag(highest.countryCode)}</span>
+              <div className="inline-flex items-center gap-1.5">
+                <CountryFlag className="h-5 w-5" countryCode={highest.countryCode} />
                 <span className="font-display text-xl">
                   ¥
                   {highest.cnyEquivalent}
                 </span>
-                <span className="ml-1 text-xs text-muted-foreground">{highest.country}</span>
+                <span className="text-xs text-muted-foreground">{highest.country}</span>
               </div>
               <span className="text-muted-foreground">—</span>
-              <div>
-                <span className="mr-1 text-base">{countryFlag(lowest.countryCode)}</span>
+              <div className="inline-flex items-center gap-1.5">
+                <CountryFlag className="h-5 w-5" countryCode={lowest.countryCode} />
                 <span className="font-display text-xl">
                   ¥
                   {lowest.cnyEquivalent}
                 </span>
-                <span className="ml-1 text-xs text-muted-foreground">{lowest.country}</span>
+                <span className="text-xs text-muted-foreground">{lowest.country}</span>
               </div>
             </div>
             <div className="relative mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
@@ -149,11 +150,11 @@ export function Home() {
               <div className="flex flex-wrap gap-1">
                 {wages.map(w => (
                   <span
-                    className="flex h-7 w-7 items-center justify-center rounded-sm text-sm transition-transform hover:scale-110"
+                    className="flex h-7 w-7 items-center justify-center rounded-sm transition-transform hover:scale-110"
                     key={w.countryCode}
                     title={`${w.country} · ¥${w.cnyEquivalent}`}
                   >
-                    {countryFlag(w.countryCode)}
+                    <CountryFlag className="h-5 w-5" countryCode={w.countryCode} />
                   </span>
                 ))}
               </div>
@@ -172,12 +173,6 @@ export function Home() {
         </Button>
       </section>
     </div>
-  );
-}
-
-function countryFlag(code: string): string {
-  return String.fromCodePoint(
-    ...[...code.toUpperCase()].map(c => 127_397 + c.codePointAt(0)!),
   );
 }
 

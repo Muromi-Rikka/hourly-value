@@ -12,6 +12,7 @@ import * as React from "react";
 
 import type { WageEntry } from "@/data/wages";
 
+import { CountryFlag } from "@/components/country-flag";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,12 +20,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WageBarChart } from "@/components/wage-bar-chart";
 import { regions, wages } from "@/data/wages";
-
-function countryFlag(code: string): string {
-  return String.fromCodePoint(
-    ...[...code.toUpperCase()].map(c => 127_397 + c.codePointAt(0)!),
-  );
-}
 
 function regionBg(region: string): string {
   if (region === "北美") {
@@ -56,9 +51,8 @@ const columns: ColumnDef<typeof stockFeatures, WageEntry>[] = [
   {
     accessorFn: row => row.country,
     cell: ({ row }) => (
-      <span className="font-medium">
-        {countryFlag(row.original.countryCode)}
-        {" "}
+      <span className="inline-flex items-center gap-2 font-medium">
+        <CountryFlag className="h-4 w-4" countryCode={row.original.countryCode} />
         {row.original.country}
       </span>
     ),

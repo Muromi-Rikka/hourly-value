@@ -11,7 +11,6 @@ import {
 } from "recharts";
 
 import type { WageEntry } from "@/data/wages";
-
 import { WageTooltip } from "@/components/wage-tooltip";
 
 interface WageBarChartProperties {
@@ -143,7 +142,10 @@ function regionKey(region: string): string {
 }
 
 function ValueLabel(properties: Record<string, unknown>) {
-  const { value, width, x, y } = properties as { value: number; width: number; x: number; y: number };
+  const { value, width, x, y } = properties as Record<string, unknown>;
+  if (typeof value !== "number" || typeof width !== "number" || typeof x !== "number" || typeof y !== "number") {
+    return null;
+  }
   return (
     <text
       className="fill-muted-foreground text-xs tabular-nums"

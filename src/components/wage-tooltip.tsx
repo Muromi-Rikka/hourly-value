@@ -1,4 +1,5 @@
 import type { WageEntry } from "@/data/wages";
+import { CountryFlag } from "@/components/country-flag";
 import { sortedByWage } from "@/data/wages";
 
 interface WageTooltipProperties {
@@ -16,7 +17,7 @@ export function WageTooltip({ active, payload }: WageTooltipProperties) {
   return (
     <div className="rounded-lg border bg-background p-3 shadow-md">
       <div className="flex items-center gap-2">
-        <span className="text-base">{countryFlag(entry.countryCode)}</span>
+        <CountryFlag className="h-4 w-4" countryCode={entry.countryCode} />
         <span className="font-semibold text-foreground">{entry.country}</span>
         <span
           className="ml-auto rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white"
@@ -55,12 +56,6 @@ export function WageTooltip({ active, payload }: WageTooltipProperties) {
         </span>
       </div>
     </div>
-  );
-}
-
-function countryFlag(code: string): string {
-  return String.fromCodePoint(
-    ...[...code.toUpperCase()].map(c => 127_397 + c.codePointAt(0)!),
   );
 }
 
