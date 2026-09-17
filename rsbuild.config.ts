@@ -2,6 +2,7 @@ import { defineConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
 import { RsdoctorRspackPlugin } from "@rsdoctor/rspack-plugin";
 import tailwind from "@tailwindcss/postcss";
+import path from "node:path";
 import process from "node:process";
 import TurboConsole from "unplugin-turbo-console/rspack";
 
@@ -29,6 +30,9 @@ export default defineConfig({
     ...(isEnableRsdoctor && { buildCache: false }),
   },
   plugins: [pluginReact()],
+  resolve: {
+    alias: { "@": path.resolve(__dirname, "src") },
+  },
   tools: {
     postcss: {
       postcssOptions: {

@@ -5,9 +5,11 @@
     "lib": ["DOM", "ES2020"],
     "useDefineForClassFields": true,
 
+    "baseUrl": ".",
     /* modules */
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "paths": { "@/*": ["./src/*"] },
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
 
