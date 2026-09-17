@@ -1,11 +1,10 @@
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import {
-  createCoreRowModel,
+  coreFeatures,
   createExpandedRowModel,
   createSortedRowModel,
-  FlexRender,
-  rowExpandingFeature,
-  rowSortingFeature,
+  flexRender,
+  stockFeatures,
   useTable,
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
@@ -27,16 +26,19 @@ function countryFlag(code: string): string {
 }
 
 function sortIcon(direction: "asc" | "desc" | false, canSort: boolean) {
-  if (direction === "asc")
+  if (direction === "asc") {
     return <ChevronUp className="ml-1 h-3 w-3" />;
-  if (direction === "desc")
+  }
+  if (direction === "desc") {
     return <ChevronDown className="ml-1 h-3 w-3" />;
-  if (canSort)
+  }
+  if (canSort) {
     return <ArrowUpDown className="ml-1 h-3 w-3" />;
+  }
   return null;
 }
 
-const columns: ColumnDef<Record<string, unknown>, WageEntry>[] = [
+const columns: ColumnDef<typeof stockFeatures, WageEntry>[] = [
   {
     accessorFn: row => row.country,
     cell: ({ row }) => (
@@ -116,13 +118,9 @@ export function Explore() {
   );
 
   const table = useTable({
-    columns: columns as ColumnDef<WageEntry, unknown>[],
+    columns,
     data,
-    features: {
-      rowExpandingFeature,
-      rowSortingFeature,
-    },
-    getCoreRowModel: createCoreRowModel(),
+    features: { ...coreFeatures, ...stockFeatures },
     getExpandedRowModel: createExpandedRowModel(),
     getRowCanExpand: () => true,
     getSortedRowModel: createSortedRowModel(),
@@ -187,10 +185,7 @@ export function Explore() {
                                   onClick={header.column.getToggleSortingHandler()}
                                   variant="ghost"
                                 >
-                                  {FlexRender({
-                                    content: header.column.columnDef.header,
-                                    context: header.getContext(),
-                                  })}
+                                  {flexRender(header.column.columnDef.header, header.getContext())}
                                   {sortIcon(header.column.getIsSorted(), header.column.getCanSort())}
                                 </Button>
                               )}
@@ -209,10 +204,7 @@ export function Explore() {
                       >
                         {row.getVisibleCells().map(cell => (
                           <TableCell key={cell.id}>
-                            {FlexRender({
-                              content: cell.column.columnDef.cell,
-                              context: cell.getContext(),
-                            })}
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
                           </TableCell>
                         ))}
                         <TableCell>
@@ -263,8 +255,7 @@ export function Explore() {
             <CardHeader>
               <CardTitle className="text-sm text-muted-foreground">
                 {region === "全部" ? "全部国家" : region}
-                {" "}
-                · 人民币时薪排名
+                {" · 人民币时薪排名"}
               </CardTitle>
             </CardHeader>
             <CardContent>
