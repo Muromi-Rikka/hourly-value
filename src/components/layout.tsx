@@ -8,6 +8,7 @@ import { cn } from "@/lib/utilities";
 const navItems = [
   { href: "/", label: "首页" },
   { href: "/explore", label: "数据探索" },
+  { href: "/iphone", label: "iPhone指数" },
   { href: "/about", label: "关于" },
 ];
 
@@ -15,7 +16,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const location = useLocation();
 
-  const mainMaxWidth = location.pathname === "/explore" ? "max-w-6xl" : "max-w-5xl";
+  const mainMaxWidth = location.pathname === "/explore" || location.pathname === "/iphone-explore" ? "max-w-6xl" : "max-w-5xl";
 
   return (
     <div className="min-h-dvh bg-background font-sans text-foreground antialiased">
