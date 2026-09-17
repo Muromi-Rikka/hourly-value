@@ -1,4 +1,5 @@
 import { ExternalLink } from "lucide-react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { wages } from "@/data/wages";
@@ -7,7 +8,9 @@ export function About() {
   return (
     <div className="space-y-8">
       <div className="space-y-1">
-        <h1 className="font-display text-2xl font-normal tracking-tight sm:text-3xl">关于本项目</h1>
+        <h1 className="font-display text-[clamp(1.5rem,3vw,2.25rem)] font-normal tracking-tight">
+          关于本项目
+        </h1>
         <p className="text-sm text-muted-foreground">
           数据来源、折算方法与使用说明
         </p>
@@ -38,16 +41,16 @@ export function About() {
           <CardTitle>数据来源</CardTitle>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-3">
+          <ul className="space-y-4">
             {wages.map(entry => (
               <li key={entry.countryCode}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="text-sm font-medium">
-                      <span className="mr-2">{countryFlag(entry.countryCode)}</span>
+                    <p className="text-base font-medium">
+                      <span className="mr-2 text-lg">{countryFlag(entry.countryCode)}</span>
                       {entry.country}
                     </p>
-                    <p className="text-xs text-muted-foreground">{entry.source}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">{entry.source}</p>
                   </div>
                   <a
                     className="inline-flex shrink-0 items-center gap-1 text-xs text-primary underline underline-offset-2 hover:text-primary/80"
@@ -59,18 +62,18 @@ export function About() {
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
-                <Separator className="mt-3" />
+                <Separator className="mt-4" />
               </li>
             ))}
           </ul>
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="mt-12">
         <CardHeader>
-          <CardTitle>免责声明</CardTitle>
+          <CardTitle className="text-sm">免责声明</CardTitle>
         </CardHeader>
-        <CardContent className="text-sm leading-relaxed text-muted-foreground">
+        <CardContent className="pb-6 text-xs leading-relaxed text-muted-foreground">
           <p>
             本项目仅用于信息展示和学习目的，不构成任何法律、劳动或投资建议。
             各国最低工资标准可能因地区、行业、年龄等因素存在差异。
@@ -83,6 +86,7 @@ export function About() {
 }
 
 function countryFlag(code: string): string {
-  const points = [...code.toUpperCase()].map(c => 127397 + c.codePointAt(0)!);
-  return String.fromCodePoint(...points);
+  return String.fromCodePoint(
+    ...[...code.toUpperCase()].map(c => 127_397 + c.codePointAt(0)!),
+  );
 }

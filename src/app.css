@@ -7,6 +7,7 @@
   --font-display: "Instrument Serif", ui-serif, Georgia, serif;
   --font-sans: "Outfit", system-ui, sans-serif;
 
+  /* ── Palette ── */
   --color-background: oklch(1 0 0);
   --color-foreground: oklch(0.145 0.014 286);
   --color-card: oklch(1 0 0);
@@ -27,16 +28,23 @@
   --color-input: oklch(0.922 0.007 286);
   --color-ring: oklch(0.55 0.16 25);
 
+  /* ── Region colors ── */
+  --color-region-asia: oklch(0.65 0.15 55);
+  --color-region-europe: oklch(0.60 0.14 265);
+  --color-region-oceania: oklch(0.62 0.16 155);
+  --color-region-north-america: oklch(0.60 0.15 30);
+
   --radius-lg: 0.75rem;
   --radius-md: 0.5rem;
   --radius-sm: 0.25rem;
 }
 
+/* ── Dark mode ── */
 @media (prefers-color-scheme: dark) {
   :root {
     --color-background: oklch(0.145 0.014 286);
     --color-foreground: oklch(0.985 0.002 286);
-    --color-card: oklch(0.145 0.014 286);
+    --color-card: oklch(0.18 0.014 286);
     --color-card-foreground: oklch(0.985 0.002 286);
     --color-popover: oklch(0.145 0.014 286);
     --color-popover-foreground: oklch(0.985 0.002 286);
@@ -53,9 +61,31 @@
     --color-border: oklch(0.269 0.014 286);
     --color-input: oklch(0.269 0.014 286);
     --color-ring: oklch(0.439 0.014 286);
+
+    /* Region colors — boosted lightness for dark bg */
+    --color-region-asia: oklch(0.75 0.15 55);
+    --color-region-europe: oklch(0.70 0.14 265);
+    --color-region-oceania: oklch(0.72 0.16 155);
+    --color-region-north-america: oklch(0.70 0.15 30);
   }
 }
 
+/* ── Browser surface ── */
+::selection {
+  background: oklch(0.55 0.16 25 / 0.25);
+}
+
+html {
+  scrollbar-color: oklch(0.7 0.01 286) oklch(0.95 0.003 286);
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    scrollbar-color: oklch(0.4 0.01 286) oklch(0.2 0.014 286);
+  }
+}
+
+/* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -65,3 +95,38 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ── Entrance animations ── */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-up-lg {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-up-lg {
+  animation: fade-up-lg 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }

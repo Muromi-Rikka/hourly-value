@@ -7,3 +7,5 @@ dist
 
 .eslintcache
 docs
+.agents
+skills-lock.json
