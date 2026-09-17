@@ -1,0 +1,66 @@
+{
+  "name": "@trapar-waves/react-tailwind",
+  "type": "module",
+  "version": "2.0.0",
+  "packageManager": "pnpm@12.4.2",
+  "description": "A modern UI development template integrating React and Tailwind CSS, with Rsbuild, TypeScript, ESLint (Antfu config), and Iconify support.",
+  "author": {
+    "email": "admin@rikka.cc",
+    "name": "Rikka",
+    "url": "https://github.com/Muromi-Rikka"
+  },
+  "homepage": "https://github.com/Trapar-waves/react-tailwind",
+  "licence": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Trapar-waves/react-tailwind.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Trapar-waves/react-tailwind/issues"
+  },
+  "keywords": [
+    "react",
+    "tailwindcss",
+    "rsbuild",
+    "typescript",
+    "eslint",
+    "iconify"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "rsbuild dev --open",
+    "build": "rsbuild build",
+    "build:rsdoctor": "cross-env RSDOCTOR=true rsbuild build",
+    "preview": "rsbuild preview",
+    "lint": "eslint . --cache --max-warnings=0 --no-warn-ignored",
+    "postinstall": "husky"
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@eslint-react/eslint-plugin": "^5.19.1",
+    "@iconify/json": "^2.2.529",
+    "@iconify/tailwind4": "^1.2.3",
+    "@renton/eslint-config-react": "^1.1.0",
+    "@rsbuild/core": "^2.2.7",
+    "@rsbuild/plugin-react": "^2.1.0",
+    "@rsdoctor/rspack-plugin": "^1.6.4",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "cross-env": "^10.1.0",
+    "eslint": "^10.10.0",
+    "eslint-plugin-format": "^2.0.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.5.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3",
+    "unplugin-turbo-console": "^2.3.3"
+  }
+}

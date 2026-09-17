@@ -1,0 +1,9 @@
+minimumReleaseAge: 0
+
+shellEmulator: true
+
+trustPolicy: off
+
+onlyBuiltDependencies:
+  - "@tailwindcss/oxide"
+  - core-js
