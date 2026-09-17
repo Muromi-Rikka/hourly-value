@@ -157,7 +157,7 @@ export function Explore() {
         </Select>
 
         <Badge className="ml-auto" variant="secondary">
-          {table.getRowCount()}
+          {table.getRowModel().rows.length}
           {" "}
           条记录
         </Badge>
