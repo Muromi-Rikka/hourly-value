@@ -98,12 +98,12 @@ export function Home() {
                       </div>
                     </CardContent>
                     <CardFooter>
-                      <Button asChild className="group" size="sm" variant="ghost">
-                        <Link to={stat.link}>
+                      <Link className="group" to={stat.link}>
+                        <Button size="sm" variant="ghost">
                           {stat.linkLabel}
                           <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                        </Link>
-                      </Button>
+                        </Button>
+                      </Link>
                     </CardFooter>
                   </Card>
                 </SpotlightCard>
@@ -164,12 +164,12 @@ export function Home() {
       {/* CTA */}
       <AnimatedContent delay={0.1} distance={30} duration={0.6}>
         <section className="mt-12 pb-4 sm:mt-16">
-          <Button asChild className="group" size="lg">
-            <Link to="/explore">
+          <Link className="group" to="/explore">
+            <Button size="lg">
               探索最低工资数据
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </Button>
+            </Button>
+          </Link>
         </section>
       </AnimatedContent>
     </div>
@@ -239,7 +239,7 @@ function getIndexStats(): IndexStat[] {
       icon: "DollarSign",
       id: "wages",
       link: "/explore",
-      linkLabel: "查看工资数据 →",
+      linkLabel: "查看工资数据",
       metrics: [
         { detail: wageHigh.country, label: "最高", value: `¥${wageHigh.cnyEquivalent}/h` },
         { detail: wageLow.country, label: "最低", value: `¥${wageLow.cnyEquivalent}/h` },
@@ -251,7 +251,7 @@ function getIndexStats(): IndexStat[] {
       icon: "Smartphone",
       id: "iphone",
       link: "/iphone",
-      linkLabel: "查看 iPhone 指数 →",
+      linkLabel: "查看 iPhone 指数",
       metrics: [
         { detail: iphoneCheapest.country, label: "最少", value: `${iphoneCheapest.hoursToBuy}h` },
         { detail: iphoneMost.country, label: "最多", value: `${iphoneMost.hoursToBuy}h` },
@@ -263,7 +263,7 @@ function getIndexStats(): IndexStat[] {
       icon: "Beef",
       id: "bigmac",
       link: "/bigmac",
-      linkLabel: "查看巨无霸指数 →",
+      linkLabel: "查看巨无霸指数",
       metrics: [
         { detail: over.country, label: "最高估", value: `${over.valuationPct}%` },
         { detail: under.country, label: "最低估", value: `${under.valuationPct}%` },
@@ -275,7 +275,7 @@ function getIndexStats(): IndexStat[] {
       icon: "ShoppingBasket",
       id: "commodity",
       link: "/commodity",
-      linkLabel: "查看物资指数 →",
+      linkLabel: "查看物资指数",
       metrics: [
         { detail: commodityCheapest.country, label: "最少", value: `${commodityCheapest.hoursToBuy}h` },
         { detail: commodityMost.country, label: "最多", value: `${commodityMost.hoursToBuy}h` },
@@ -287,7 +287,7 @@ function getIndexStats(): IndexStat[] {
       icon: "Car",
       id: "modely",
       link: "/modely",
-      linkLabel: "查看 Model Y 指数 →",
+      linkLabel: "查看 Model Y 指数",
       metrics: [
         { detail: modelyCheapest.country, label: "最少", value: `${modelyCheapest.daysToBuy}天` },
         { detail: modelyMost.country, label: "最多", value: `${modelyMost.daysToBuy}天` },
