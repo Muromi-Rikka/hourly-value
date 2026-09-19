@@ -8,6 +8,11 @@ import {
   Smartphone,
 } from "lucide-react";
 
+import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
+import { CountUp } from "@/components/react-bits/CountUp/CountUp";
+import { Silk } from "@/components/react-bits/Silk/Silk";
+import { SplitText } from "@/components/react-bits/SplitText/SplitText";
+import { SpotlightCard } from "@/components/react-bits/SpotlightCard/SpotlightCard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { sortedByValuation } from "@/data/bigmac";
@@ -41,113 +46,132 @@ export function Home() {
   return (
     <div>
       {/* Hero */}
-      <section className="pb-10 pt-6 sm:pb-14 sm:pt-8">
-        <h1 className="animate-fade-up max-w-3xl font-display text-[clamp(2.5rem,5.5vw,4.5rem)] font-normal leading-[1.05] tracking-[-0.03em]">
-          全球购买力对比
-        </h1>
-        <p className="animate-fade-up delay-100 mt-4 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-          从最低工资到日常消费品，以人民币为统一基准，直观展示全球购买力差异。覆盖 5 大指数，涵盖多个经济体。
-        </p>
+      <section className="relative overflow-hidden pb-10 pt-6 sm:pb-14 sm:pt-8">
+        <div className="absolute inset-0 -z-10 opacity-15">
+          <Silk color="#C54E2B" lightMode noiseIntensity={0.8} scale={1.2} speed={3} />
+        </div>
+        <SplitText
+          className="max-w-3xl font-display text-[clamp(2.5rem,5.5vw,4.5rem)] font-normal leading-[1.05] tracking-[-0.03em]"
+          delay={80}
+          duration={1}
+          ease="power3.out"
+          splitType="words"
+          tag="h1"
+          text="全球购买力对比"
+        />
+        <AnimatedContent delay={0.15} distance={30} duration={0.6}>
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+            从最低工资到日常消费品，以人民币为统一基准，直观展示全球购买力差异。覆盖 5 大指数，涵盖多个经济体。
+          </p>
+        </AnimatedContent>
       </section>
 
       {/* Index cards */}
-      <section className="animate-fade-up delay-200">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {stats.map((stat) => {
-            const Icon = ICONS[stat.icon];
-            return (
-              <Card className="flex flex-col" key={stat.id}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Icon className="h-5 w-5 text-muted-foreground" />
-                    {stat.title}
-                  </CardTitle>
-                  <CardDescription>{stat.description}</CardDescription>
-                </CardHeader>
-                <CardContent className="flex-1">
-                  <div className="space-y-3">
-                    {stat.metrics.map(metric => (
-                      <div className="flex items-baseline justify-between" key={metric.label}>
-                        <span className="text-sm text-muted-foreground">{metric.label}</span>
-                        <div className="flex items-baseline gap-2">
-                          <span className="font-display text-lg">{metric.value}</span>
-                          {metric.detail
-                            ? <span className="text-xs text-muted-foreground">{metric.detail}</span>
-                            : null}
-                        </div>
+      <AnimatedContent delay={0.1} distance={60} duration={0.8} threshold={0.15}>
+        <section>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {stats.map((stat) => {
+              const Icon = ICONS[stat.icon];
+              return (
+                <SpotlightCard key={stat.id} spotlightColor="rgba(197, 78, 43, 0.12)">
+                  <Card className="flex flex-col border-0 bg-transparent shadow-none">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <Icon className="h-5 w-5 text-muted-foreground" />
+                        {stat.title}
+                      </CardTitle>
+                      <CardDescription>{stat.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-1">
+                      <div className="space-y-3">
+                        {stat.metrics.map(metric => (
+                          <div className="flex items-baseline justify-between" key={metric.label}>
+                            <span className="text-sm text-muted-foreground">{metric.label}</span>
+                            <div className="flex items-baseline gap-2">
+                              <span className="font-display text-lg">{metric.value}</span>
+                              {metric.detail
+                                ? <span className="text-xs text-muted-foreground">{metric.detail}</span>
+                                : null}
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button asChild className="group" size="sm" variant="ghost">
-                    <Link to={stat.link}>
-                      {stat.linkLabel}
-                      <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                    </Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            );
-          })}
-        </div>
-      </section>
+                    </CardContent>
+                    <CardFooter>
+                      <Button asChild className="group" size="sm" variant="ghost">
+                        <Link to={stat.link}>
+                          {stat.linkLabel}
+                          <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                        </Link>
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </SpotlightCard>
+              );
+            })}
+          </div>
+        </section>
+      </AnimatedContent>
 
       {/* Highlights */}
-      <section className="mt-10 sm:mt-12">
-        <p className="mb-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">数据亮点</p>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-xl border p-5">
-            <p className="font-display text-3xl leading-none tracking-tight">
-              {highlights.countryCount}
-              <span className="ml-1 text-sm text-muted-foreground">国家/地区</span>
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {highlights.regionCount}
-              {" 个区域 · 5 大指数"}
-            </p>
+      <AnimatedContent delay={0.15} distance={40} duration={0.6} threshold={0.1}>
+        <section className="mt-10 sm:mt-12">
+          <p className="mb-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">数据亮点</p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-xl border p-5">
+              <p className="font-display text-3xl leading-none tracking-tight">
+                <CountUp duration={1.5} to={highlights.countryCount} />
+                <span className="ml-1 text-sm text-muted-foreground">国家/地区</span>
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {highlights.regionCount}
+                {" 个区域 · 5 大指数"}
+              </p>
+            </div>
+            {highlights.topCountry[1] >= 3
+              ? (
+                  <div className="rounded-xl border p-5">
+                    <p className="font-display text-3xl leading-none tracking-tight">
+                      {highlights.topCountry[0]}
+                    </p>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      在
+                      <CountUp duration={1} to={highlights.topCountry[1]} />
+                      {" 个指数中排名前三"}
+                    </p>
+                  </div>
+                )
+              : (
+                  <div className="rounded-xl border p-5">
+                    <p className="font-display text-3xl leading-none tracking-tight">5 大指数</p>
+                    <p className="mt-2 text-sm text-muted-foreground">从工资到消费品，多维对比</p>
+                  </div>
+                )}
+            <div className="rounded-xl border p-5">
+              <p className="font-display text-3xl leading-none tracking-tight">
+                <CountUp duration={2} to={highlights.maxGap.ratio} />
+                <span className="text-[0.4em] text-muted-foreground">×</span>
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {highlights.maxGap.index}
+                {" 指数最大差距"}
+              </p>
+            </div>
           </div>
-          {highlights.topCountry[1] >= 3
-            ? (
-                <div className="rounded-xl border p-5">
-                  <p className="font-display text-3xl leading-none tracking-tight">
-                    {highlights.topCountry[0]}
-                  </p>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    在
-                    {highlights.topCountry[1]}
-                    {" 个指数中排名前三"}
-                  </p>
-                </div>
-              )
-            : (
-                <div className="rounded-xl border p-5">
-                  <p className="font-display text-3xl leading-none tracking-tight">5 大指数</p>
-                  <p className="mt-2 text-sm text-muted-foreground">从工资到消费品，多维对比</p>
-                </div>
-              )}
-          <div className="rounded-xl border p-5">
-            <p className="font-display text-3xl leading-none tracking-tight">
-              {highlights.maxGap.ratio.toFixed(1)}
-              <span className="text-[0.4em] text-muted-foreground">×</span>
-            </p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {highlights.maxGap.index}
-              {" 指数最大差距"}
-            </p>
-          </div>
-        </div>
-      </section>
+        </section>
+      </AnimatedContent>
 
       {/* CTA */}
-      <section className="mt-12 pb-4 sm:mt-16">
-        <Button asChild className="animate-fade-up delay-300 group" size="lg">
-          <Link to="/explore">
-            探索最低工资数据
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        </Button>
-      </section>
+      <AnimatedContent delay={0.1} distance={30} duration={0.6}>
+        <section className="mt-12 pb-4 sm:mt-16">
+          <Button asChild className="group" size="lg">
+            <Link to="/explore">
+              探索最低工资数据
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </Button>
+        </section>
+      </AnimatedContent>
     </div>
   );
 }
