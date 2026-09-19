@@ -1,4 +1,4 @@
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Info } from "lucide-react";
 
 import { CountryFlag } from "@/components/country-flag";
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
@@ -12,6 +12,7 @@ export function About() {
     <div>
       {/* Header */}
       <div className="pb-8">
+        <div className="gradient-accent mb-6" />
         <BlurText
           animateBy="words"
           className="font-display text-[clamp(2rem,4vw,3rem)] font-normal leading-[1.1] tracking-[-0.02em]"
@@ -48,18 +49,23 @@ export function About() {
         <section className="border-t pt-8">
           <h2 className="mb-5 font-display text-xl font-normal tracking-tight">数据来源</h2>
           <ul className="space-y-4">
-            {wages.map(entry => (
+            {wages.map((entry, index) => (
               <li key={entry.countryCode}>
                 <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-2 text-base font-medium">
-                      <CountryFlag className="h-5 w-5" countryCode={entry.countryCode} />
-                      {entry.country}
-                    </p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">{entry.source}</p>
+                  <div className="min-w-0 flex items-start gap-3">
+                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+                      {index + 1}
+                    </span>
+                    <div>
+                      <p className="flex items-center gap-2 text-base font-medium">
+                        <CountryFlag className="h-5 w-5" countryCode={entry.countryCode} />
+                        {entry.country}
+                      </p>
+                      <p className="mt-0.5 text-xs text-muted-foreground">{entry.source}</p>
+                    </div>
                   </div>
                   <a
-                    className="inline-flex shrink-0 items-center gap-1 text-xs text-primary underline underline-offset-2 hover:text-primary/80"
+                    className="inline-flex shrink-0 items-center gap-1 text-xs text-primary hover:underline decoration-primary/50 underline-offset-2 hover:text-primary/80"
                     href={entry.sourceUrl}
                     rel="noopener noreferrer"
                     target="_blank"
@@ -78,11 +84,14 @@ export function About() {
       {/* Disclaimer */}
       <FadeContent duration={800}>
         <section className="mt-12 max-w-prose border-t pt-6 pb-4">
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            本项目仅用于信息展示和学习目的，不构成任何法律、劳动或投资建议。
-            各国最低工资标准可能因地区、行业、年龄等因素存在差异。
-            请以各国政府官方发布为准。
-          </p>
+          <div className="rounded-xl bg-muted/50 p-5 flex gap-3">
+            <Info className="h-4 w-4 shrink-0 mt-0.5 text-muted-foreground" />
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              本项目仅用于信息展示和学习目的，不构成任何法律、劳动或投资建议。
+              各国最低工资标准可能因地区、行业、年龄等因素存在差异。
+              请以各国政府官方发布为准。
+            </p>
+          </div>
         </section>
       </FadeContent>
     </div>

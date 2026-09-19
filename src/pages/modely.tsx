@@ -25,6 +25,7 @@ export function ModelY() {
     <div>
       {/* Hero — editorial statement */}
       <section className="pb-12 pt-6 sm:pb-16 sm:pt-8">
+        <div className="gradient-accent mb-6" />
         <SplitText
           className="max-w-3xl font-display text-[clamp(2.8rem,6vw,5rem)] font-normal leading-[1.05] tracking-[-0.03em]"
           delay={80}
@@ -108,9 +109,8 @@ export function ModelY() {
                       <span className="w-10 shrink-0 text-right text-xs text-muted-foreground">{r.region}</span>
                       <div className="relative h-5 flex-1 overflow-hidden rounded-sm bg-muted">
                         <div
-                          className="absolute inset-y-0 left-0 rounded-sm transition-all duration-700"
+                          className="absolute inset-y-0 left-0 rounded-sm bg-gradient-to-r from-primary to-accent-warm transition-all duration-700"
                           style={{
-                            background: `var(--color-region-${regionVariableName(r.region)})`,
                             width: `${(r.avg / maxRegionAvg) * 100}%`,
                           }}
                         />
@@ -153,7 +153,7 @@ export function ModelY() {
       <AnimatedContent delay={0.1} distance={30} duration={0.6}>
         <section className="mt-12 pb-4 sm:mt-16">
           <Link className="group" to="/modely-explore">
-            <Button size="lg">
+            <Button className="rounded-full shadow-lg shadow-primary/20" size="lg">
               开始探索数据
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Button>
@@ -181,17 +181,4 @@ function regionAverages(): Array<{ avg: number; count: number; region: string }>
     .map(([region, vals]) => ({ avg: Math.round(vals.reduce((a, b) => a + b, 0) / vals.length * 10) / 10, count: vals.length, region }))
     .toArray()
     .toSorted((a, b) => a.avg - b.avg);
-}
-
-function regionVariableName(region: string): string {
-  if (region === "北美") {
-    return "north-america";
-  }
-  if (region === "亚洲") {
-    return "asia";
-  }
-  if (region === "欧洲") {
-    return "europe";
-  }
-  return "oceania";
 }

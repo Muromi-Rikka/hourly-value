@@ -15,7 +15,7 @@ export function CommodityTooltip({ active, payload }: CommodityTooltipProperties
   const rank = sortedByHours.findIndex(w => w.countryCode === entry.countryCode) + 1;
 
   return (
-    <div className="rounded-lg border bg-background p-3 shadow-md">
+    <div className="rounded-xl border bg-background p-3 shadow-lg backdrop-blur-md">
       <div className="flex items-center gap-2">
         <CountryFlag className="h-4 w-4" countryCode={entry.countryCode} />
         <span className="font-semibold text-foreground">{entry.country}</span>

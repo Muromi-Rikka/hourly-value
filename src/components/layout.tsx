@@ -1,8 +1,9 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { ArrowUp, BarChart3, Globe, Menu, X } from "lucide-react";
+import { ArrowUp, BarChart3, Globe, Info, Menu, X } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
+import { wages } from "@/data/wages";
 import { cn } from "@/lib/utilities";
 
 const navItems = [
@@ -31,21 +32,26 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link className="flex items-center gap-2 font-semibold" to="/">
-            <Globe className="h-5 w-5 animate-[spin_12s_linear_infinite] text-primary" />
-            <span className="text-sm">全球最低工资对比</span>
+            <span className="rounded-full bg-primary/10 p-1.5">
+              <Globe className="h-5 w-5 animate-[spin_12s_linear_infinite] text-primary" />
+            </span>
+            <span className="font-display text-base">全球最低工资对比</span>
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
             {navItems.map(item => (
               <Link
                 className={cn(
-                  "rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
-                  location.pathname === item.href && "bg-accent font-medium text-accent-foreground",
+                  "relative rounded-md px-3 py-2 text-sm transition-colors hover:text-primary",
+                  location.pathname === item.href && "font-medium text-primary",
                 )}
                 key={item.href}
                 to={item.href}
               >
                 {item.label}
+                {location.pathname === item.href && (
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-primary" />
+                )}
               </Link>
             ))}
           </nav>
@@ -65,8 +71,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
             {navItems.map(item => (
               <Link
                 className={cn(
-                  "block px-4 py-3 text-sm transition-colors hover:bg-accent",
-                  location.pathname === item.href && "bg-accent font-medium",
+                  "block px-4 py-4 text-sm transition-colors hover:text-primary",
+                  location.pathname === item.href && "border-l-2 border-primary bg-primary/5 font-medium text-primary pl-3.5",
                 )}
                 key={item.href}
                 onClick={() => setMobileOpen(false)}
@@ -83,25 +89,67 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      <footer className="border-t bg-muted/50 py-6 text-center text-sm text-muted-foreground">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
-            <span>数据来源：各国政府官方机构 · 2025-2026</span>
-            <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1">
-                <BarChart3 className="h-4 w-4" />
-                全球最低工资购买力可视化
-              </span>
-              <Button
-                className="h-7 w-7 rounded-full"
-                onClick={() => scrollTo({ behavior: "smooth", top: 0 })}
-                size="icon"
-                variant="outline"
-              >
-                <ArrowUp className="h-3.5 w-3.5" />
-                <span className="sr-only">回到顶部</span>
-              </Button>
+      <footer className="border-t bg-muted/50 text-sm text-muted-foreground">
+        <div className="gradient-accent" />
+        <div className="mx-auto max-w-6xl px-4 py-10">
+          <div className="grid gap-8 sm:grid-cols-3">
+            {/* Left — Logo & description */}
+            <div>
+              <div className="flex items-center gap-2 font-semibold text-foreground">
+                <span className="rounded-full bg-primary/10 p-1.5">
+                  <Globe className="h-4 w-4 text-primary" />
+                </span>
+                <span className="font-display text-base">全球最低工资对比</span>
+              </div>
+              <p className="mt-3 text-xs leading-relaxed">
+                数据来源：各国政府官方机构 · 2025-2026
+              </p>
+              <div className="mt-3 flex items-center gap-1 text-xs">
+                <BarChart3 className="h-3.5 w-3.5" />
+                <span>购买力可视化</span>
+              </div>
             </div>
+
+            {/* Center — Data sources */}
+            <div>
+              <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-foreground">数据来源</h3>
+              <ul className="space-y-1.5 text-xs">
+                {wages.slice(0, 4).map(entry => (
+                  <li className="flex items-center gap-1.5" key={entry.countryCode}>
+                    <Info className="h-3 w-3 shrink-0 text-muted-foreground/60" />
+                    <span>{entry.source}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Right — Quick links */}
+            <div>
+              <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-foreground">快速导航</h3>
+              <ul className="space-y-1.5 text-xs">
+                {navItems.slice(0, 5).map(item => (
+                  <li key={item.href}>
+                    <Link className="transition-colors hover:text-primary" to={item.href}>
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="mt-8 flex flex-col items-center gap-3 border-t border-border/50 pt-5 sm:flex-row sm:justify-between">
+            <span className="text-xs">© 2025 · Built with React + Tailwind</span>
+            <Button
+              className="h-7 w-7 rounded-full"
+              onClick={() => scrollTo({ behavior: "smooth", top: 0 })}
+              size="icon"
+              variant="outline"
+            >
+              <ArrowUp className="h-3.5 w-3.5" />
+              <span className="sr-only">回到顶部</span>
+            </Button>
           </div>
         </div>
       </footer>

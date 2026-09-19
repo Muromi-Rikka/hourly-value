@@ -47,6 +47,7 @@ export function Home() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden pb-10 pt-6 sm:pb-14 sm:pt-8">
+        <div className="gradient-accent mb-6" />
         <div className="absolute inset-0 -z-10 opacity-15">
           <Silk color="#C54E2B" lightMode noiseIntensity={0.8} scale={1.2} speed={3} />
         </div>
@@ -63,6 +64,7 @@ export function Home() {
           <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
             从最低工资到日常消费品，以人民币为统一基准，直观展示全球购买力差异。覆盖 5 大指数，涵盖多个经济体。
           </p>
+          <div className="mt-4 border-t border-border/50 w-16" />
         </AnimatedContent>
       </section>
 
@@ -76,8 +78,10 @@ export function Home() {
                 <SpotlightCard key={stat.id} spotlightColor="rgba(197, 78, 43, 0.12)">
                   <Card className="flex flex-col border-0 bg-transparent shadow-none">
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-base">
-                        <Icon className="h-5 w-5 text-muted-foreground" />
+                      <CardTitle className="flex items-center gap-2 text-lg font-display">
+                        <span className="rounded-full bg-primary/10 p-2">
+                          <Icon className="h-5 w-5 text-primary" />
+                        </span>
                         {stat.title}
                       </CardTitle>
                       <CardDescription>{stat.description}</CardDescription>
@@ -88,7 +92,7 @@ export function Home() {
                           <div className="flex items-baseline justify-between" key={metric.label}>
                             <span className="text-sm text-muted-foreground">{metric.label}</span>
                             <div className="flex items-baseline gap-2">
-                              <span className="font-display text-lg">{metric.value}</span>
+                              <span className="stat-number text-lg">{metric.value}</span>
                               {metric.detail
                                 ? <span className="text-xs text-muted-foreground">{metric.detail}</span>
                                 : null}
@@ -97,7 +101,7 @@ export function Home() {
                         ))}
                       </div>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter className="border-t border-border/30 mt-auto pt-4">
                       <Link className="group" to={stat.link}>
                         <Button size="sm" variant="ghost">
                           {stat.linkLabel}
@@ -118,8 +122,8 @@ export function Home() {
         <section className="mt-10 sm:mt-12">
           <p className="mb-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">数据亮点</p>
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-xl border p-5">
-              <p className="font-display text-3xl leading-none tracking-tight">
+            <div className="rounded-2xl border bg-gradient-to-br from-surface to-surface-raised p-5">
+              <p className="stat-number text-4xl leading-none tracking-tight">
                 <CountUp duration={1.5} to={highlights.countryCount} />
                 <span className="ml-1 text-sm text-muted-foreground">国家/地区</span>
               </p>
@@ -130,8 +134,8 @@ export function Home() {
             </div>
             {highlights.topCountry[1] >= 3
               ? (
-                  <div className="rounded-xl border p-5">
-                    <p className="font-display text-3xl leading-none tracking-tight">
+                  <div className="rounded-2xl border bg-gradient-to-br from-surface to-surface-raised p-5">
+                    <p className="stat-number text-4xl leading-none tracking-tight">
                       {highlights.topCountry[0]}
                     </p>
                     <p className="mt-2 text-sm text-muted-foreground">
@@ -142,13 +146,13 @@ export function Home() {
                   </div>
                 )
               : (
-                  <div className="rounded-xl border p-5">
-                    <p className="font-display text-3xl leading-none tracking-tight">5 大指数</p>
+                  <div className="rounded-2xl border bg-gradient-to-br from-surface to-surface-raised p-5">
+                    <p className="stat-number text-4xl leading-none tracking-tight">5 大指数</p>
                     <p className="mt-2 text-sm text-muted-foreground">从工资到消费品，多维对比</p>
                   </div>
                 )}
-            <div className="rounded-xl border p-5">
-              <p className="font-display text-3xl leading-none tracking-tight">
+            <div className="rounded-2xl border bg-gradient-to-br from-surface to-surface-raised p-5">
+              <p className="stat-number text-4xl leading-none tracking-tight">
                 <CountUp duration={2} to={highlights.maxGap.ratio} />
                 <span className="text-[0.4em] text-muted-foreground">×</span>
               </p>
@@ -165,7 +169,7 @@ export function Home() {
       <AnimatedContent delay={0.1} distance={30} duration={0.6}>
         <section className="mt-12 pb-4 sm:mt-16">
           <Link className="group" to="/explore">
-            <Button size="lg">
+            <Button className="rounded-full shadow-lg shadow-primary/20" size="lg">
               探索最低工资数据
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Button>

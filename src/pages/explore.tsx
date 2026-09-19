@@ -20,6 +20,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WageBarChart } from "@/components/wage-bar-chart";
 import { wages } from "@/data/wages";
+import { cn } from "@/lib/utilities";
 
 function regionBg(region: string): string {
   if (region === "北美") {
@@ -138,6 +139,7 @@ export function Explore() {
     <div>
       {/* Header */}
       <div className="pb-6">
+        <div className="gradient-accent mb-6" />
         <BlurText
           animateBy="words"
           className="font-display text-[clamp(2rem,4vw,3rem)] font-normal leading-[1.1] tracking-[-0.02em]"
@@ -167,14 +169,17 @@ export function Explore() {
               <Table>
                 <TableHeader>
                   {table.getHeaderGroups().map(headerGroup => (
-                    <TableRow key={headerGroup.id}>
+                    <TableRow className="bg-muted/30" key={headerGroup.id}>
                       {headerGroup.headers.map(header => (
-                        <TableHead colSpan={header.colSpan} key={header.id}>
+                        <TableHead className="text-xs uppercase tracking-wider" colSpan={header.colSpan} key={header.id}>
                           {header.isPlaceholder
                             ? null
                             : (
                                 <Button
-                                  className="-ml-3 h-auto p-0 text-muted-foreground hover:text-foreground"
+                                  className={cn(
+                                    "-ml-3 h-auto p-0 text-muted-foreground hover:text-foreground",
+                                    header.column.getIsSorted() && "text-primary font-semibold",
+                                  )}
                                   disabled={!header.column.getCanSort()}
                                   onClick={header.column.getToggleSortingHandler()}
                                   variant="ghost"
@@ -193,7 +198,7 @@ export function Explore() {
                   {table.getRowModel().rows.map(row => (
                     <React.Fragment key={row.id}>
                       <TableRow
-                        className="cursor-pointer transition-colors hover:bg-muted/50"
+                        className="cursor-pointer transition-colors even:bg-muted/20 hover:bg-primary/5"
                         onClick={() => row.toggleExpanded()}
                       >
                         {row.getVisibleCells().map(cell => (
@@ -210,27 +215,29 @@ export function Explore() {
                       {row.getIsExpanded() && (
                         <TableRow>
                           <TableCell className="bg-muted/30 p-4" colSpan={columns.length + 1}>
-                            <div className="grid gap-3 sm:grid-cols-2">
-                              <div>
-                                <p className="text-xs font-medium text-muted-foreground">来源机构</p>
-                                <p className="text-sm">{row.original.source}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs font-medium text-muted-foreground">来源链接</p>
-                                <a
-                                  className="inline-flex items-center gap-1 break-all text-sm text-primary underline underline-offset-2"
-                                  href={row.original.sourceUrl}
-                                  onClick={event => event.stopPropagation()}
-                                  rel="noopener noreferrer"
-                                  target="_blank"
-                                >
-                                  {row.original.sourceUrl}
-                                  <ExternalLink className="h-3 w-3 shrink-0" />
-                                </a>
-                              </div>
-                              <div className="sm:col-span-2">
-                                <p className="text-xs font-medium text-muted-foreground">备注</p>
-                                <p className="text-sm">{row.original.note}</p>
+                            <div className="border-l-2 border-primary/30 pl-4">
+                              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                <div>
+                                  <p className="text-xs font-medium text-muted-foreground">来源机构</p>
+                                  <p className="text-sm">{row.original.source}</p>
+                                </div>
+                                <div>
+                                  <p className="text-xs font-medium text-muted-foreground">来源链接</p>
+                                  <a
+                                    className="inline-flex items-center gap-1 break-all text-sm text-primary underline underline-offset-2"
+                                    href={row.original.sourceUrl}
+                                    onClick={event => event.stopPropagation()}
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                  >
+                                    {row.original.sourceUrl}
+                                    <ExternalLink className="h-3 w-3 shrink-0" />
+                                  </a>
+                                </div>
+                                <div className="sm:col-span-2 lg:col-span-3">
+                                  <p className="text-xs font-medium text-muted-foreground">备注</p>
+                                  <p className="text-sm">{row.original.note}</p>
+                                </div>
                               </div>
                             </div>
                           </TableCell>
@@ -244,7 +251,7 @@ export function Explore() {
           </TabsContent>
 
           <TabsContent className="mt-4" value="chart">
-            <div>
+            <div className="rounded-2xl border bg-card p-6">
               <p className="mb-3 text-sm text-muted-foreground">
                 全部国家 · 人民币时薪排名
               </p>
