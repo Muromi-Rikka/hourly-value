@@ -7,7 +7,7 @@ import {
   stockFeatures,
   useTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, ChevronUp, ExternalLink, Inbox } from "lucide-react";
+import { ArrowUpDown, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import * as React from "react";
 
 import type { IPhoneIndexEntry } from "@/data/iphone-index";
@@ -16,12 +16,10 @@ import { CountryFlag } from "@/components/country-flag";
 import { IPhoneBarChart } from "@/components/iphone-bar-chart";
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
 import { BlurText } from "@/components/react-bits/BlurText/BlurText";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { iphoneIndex, regions } from "@/data/iphone-index";
+import { iphoneIndex } from "@/data/iphone-index";
 
 function regionBg(region: string): string {
   if (region === "北美") {
@@ -134,20 +132,14 @@ const columns: ColumnDef<typeof stockFeatures, IPhoneIndexEntry>[] = [
 ];
 
 export function IPhoneExplore() {
-  const [region, setRegion] = React.useState("全部");
   const [sorting, setSorting] = React.useState<SortingState>([
     { desc: false, id: "hoursToBuy" },
   ]);
   const [expanded, setExpanded] = React.useState<Record<string, boolean>>({});
 
-  const data = React.useMemo<IPhoneIndexEntry[]>(
-    () => (region === "全部" ? iphoneIndex : iphoneIndex.filter(w => w.region === region)),
-    [region],
-  );
-
   const table = useTable({
     columns,
-    data,
+    data: iphoneIndex,
     features: { ...coreFeatures, ...stockFeatures },
     getExpandedRowModel: createExpandedRowModel(),
     getRowCanExpand: () => true,
@@ -169,34 +161,13 @@ export function IPhoneExplore() {
         />
         <AnimatedContent delay={0.1} distance={20} duration={0.5}>
           <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">
-            筛选、排序并深入查看
+            排序并深入查看
             {" "}
             {iphoneIndex.length}
             {" 个国家/地区的 iPhone 18 Pro 购买力数据"}
           </p>
         </AnimatedContent>
       </div>
-
-      {/* Controls */}
-      <AnimatedContent delay={0.15} direction="vertical" distance={30} duration={0.5}>
-        <div className="flex flex-wrap items-center gap-3 border-b pb-4">
-          <Select onValueChange={setRegion} value={region}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="按地区筛选" />
-            </SelectTrigger>
-            <SelectContent>
-              {regions.map(r => (
-                <SelectItem key={r} value={r}>{r}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Badge className="ml-auto" variant="secondary">
-            {table.getRowModel().rows.length}
-            {" 条记录"}
-          </Badge>
-        </div>
-      </AnimatedContent>
 
       {/* Views */}
       <AnimatedContent delay={0.1} distance={40} duration={0.6} threshold={0.05}>
@@ -207,125 +178,106 @@ export function IPhoneExplore() {
           </TabsList>
 
           <TabsContent className="mt-4" value="table">
-            {data.length === 0
-              ? (
-                  <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-                    <Inbox className="mb-3 h-8 w-8" />
-                    <p className="text-sm">该区域暂无数据</p>
-                  </div>
-                )
-              : (
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        {table.getHeaderGroups().map(headerGroup => (
-                          <TableRow key={headerGroup.id}>
-                            {headerGroup.headers.map(header => (
-                              <TableHead colSpan={header.colSpan} key={header.id}>
-                                {header.isPlaceholder
-                                  ? null
-                                  : (
-                                      <Button
-                                        className="-ml-3 h-auto p-0 text-muted-foreground hover:text-foreground"
-                                        disabled={!header.column.getCanSort()}
-                                        onClick={header.column.getToggleSortingHandler()}
-                                        variant="ghost"
-                                      >
-                                        {flexRender(header.column.columnDef.header, header.getContext())}
-                                        {sortIcon(header.column.getIsSorted(), header.column.getCanSort())}
-                                      </Button>
-                                    )}
-                              </TableHead>
-                            ))}
-                            <TableHead className="w-8" />
-                          </TableRow>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  {table.getHeaderGroups().map(headerGroup => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map(header => (
+                        <TableHead colSpan={header.colSpan} key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : (
+                                <Button
+                                  className="-ml-3 h-auto p-0 text-muted-foreground hover:text-foreground"
+                                  disabled={!header.column.getCanSort()}
+                                  onClick={header.column.getToggleSortingHandler()}
+                                  variant="ghost"
+                                >
+                                  {flexRender(header.column.columnDef.header, header.getContext())}
+                                  {sortIcon(header.column.getIsSorted(), header.column.getCanSort())}
+                                </Button>
+                              )}
+                        </TableHead>
+                      ))}
+                      <TableHead className="w-8" />
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows.map(row => (
+                    <React.Fragment key={row.id}>
+                      <TableRow
+                        className="cursor-pointer transition-colors hover:bg-muted/50"
+                        onClick={() => row.toggleExpanded()}
+                      >
+                        {row.getVisibleCells().map(cell => (
+                          <TableCell key={cell.id}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
                         ))}
-                      </TableHeader>
-                      <TableBody>
-                        {table.getRowModel().rows.map(row => (
-                          <React.Fragment key={row.id}>
-                            <TableRow
-                              className="cursor-pointer transition-colors hover:bg-muted/50"
-                              onClick={() => row.toggleExpanded()}
-                            >
-                              {row.getVisibleCells().map(cell => (
-                                <TableCell key={cell.id}>
-                                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </TableCell>
-                              ))}
-                              <TableCell>
-                                {row.getIsExpanded()
-                                  ? <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                                  : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
-                              </TableCell>
-                            </TableRow>
-                            {row.getIsExpanded() && (
-                              <TableRow>
-                                <TableCell className="bg-muted/30 p-4" colSpan={columns.length + 1}>
-                                  <div className="grid gap-3 sm:grid-cols-2">
-                                    <div>
-                                      <p className="text-xs font-medium text-muted-foreground">iPhone 价格来源</p>
+                        <TableCell>
+                          {row.getIsExpanded()
+                            ? <ChevronUp className="h-4 w-4 text-muted-foreground" />
+                            : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+                        </TableCell>
+                      </TableRow>
+                      {row.getIsExpanded() && (
+                        <TableRow>
+                          <TableCell className="bg-muted/30 p-4" colSpan={columns.length + 1}>
+                            <div className="grid gap-3 sm:grid-cols-2">
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground">iPhone 价格来源</p>
+                                <a
+                                  className="inline-flex items-center gap-1 break-all text-sm text-primary underline underline-offset-2"
+                                  href={row.original.iphoneSourceUrl}
+                                  onClick={event => event.stopPropagation()}
+                                  rel="noopener noreferrer"
+                                  target="_blank"
+                                >
+                                  {row.original.iphoneSource}
+                                  <ExternalLink className="h-3 w-3 shrink-0" />
+                                </a>
+                              </div>
+                              <div>
+                                <p className="text-xs font-medium text-muted-foreground">工资数据来源</p>
+                                {row.original.wageSource
+                                  ? (
                                       <a
                                         className="inline-flex items-center gap-1 break-all text-sm text-primary underline underline-offset-2"
-                                        href={row.original.iphoneSourceUrl}
+                                        href={row.original.wageSourceUrl}
                                         onClick={event => event.stopPropagation()}
                                         rel="noopener noreferrer"
                                         target="_blank"
                                       >
-                                        {row.original.iphoneSource}
+                                        {row.original.wageSource}
                                         <ExternalLink className="h-3 w-3 shrink-0" />
                                       </a>
-                                    </div>
-                                    <div>
-                                      <p className="text-xs font-medium text-muted-foreground">工资数据来源</p>
-                                      {row.original.wageSource
-                                        ? (
-                                            <a
-                                              className="inline-flex items-center gap-1 break-all text-sm text-primary underline underline-offset-2"
-                                              href={row.original.wageSourceUrl}
-                                              onClick={event => event.stopPropagation()}
-                                              rel="noopener noreferrer"
-                                              target="_blank"
-                                            >
-                                              {row.original.wageSource}
-                                              <ExternalLink className="h-3 w-3 shrink-0" />
-                                            </a>
-                                          )
-                                        : <p className="text-sm text-muted-foreground">暂无数据</p>}
-                                    </div>
-                                    <div className="sm:col-span-2">
-                                      <p className="text-xs font-medium text-muted-foreground">税费说明</p>
-                                      <p className="text-sm">{row.original.taxNote}</p>
-                                    </div>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            )}
-                          </React.Fragment>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
+                                    )
+                                  : <p className="text-sm text-muted-foreground">暂无数据</p>}
+                              </div>
+                              <div className="sm:col-span-2">
+                                <p className="text-xs font-medium text-muted-foreground">税费说明</p>
+                                <p className="text-sm">{row.original.taxNote}</p>
+                              </div>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </TabsContent>
 
           <TabsContent className="mt-4" value="chart">
-            {data.length === 0
-              ? (
-                  <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
-                    <Inbox className="mb-3 h-8 w-8" />
-                    <p className="text-sm">该区域暂无数据</p>
-                  </div>
-                )
-              : (
-                  <div>
-                    <p className="mb-3 text-sm text-muted-foreground">
-                      {region === "全部" ? "全部国家" : region}
-                      {" · 购买 iPhone 18 Pro 所需工时"}
-                    </p>
-                    <IPhoneBarChart data={data} layout="horizontal" />
-                  </div>
-                )}
+            <div>
+              <p className="mb-3 text-sm text-muted-foreground">
+                全部国家 · 购买 iPhone 18 Pro 所需工时
+              </p>
+              <IPhoneBarChart data={iphoneIndex} layout="horizontal" />
+            </div>
           </TabsContent>
         </Tabs>
       </AnimatedContent>
