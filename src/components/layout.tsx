@@ -11,6 +11,7 @@ const navItems = [
   { href: "/iphone", label: "iPhone指数" },
   { href: "/bigmac", label: "巨无霸指数" },
   { href: "/commodity", label: "物资指数" },
+  { href: "/modely", label: "Model Y指数" },
   { href: "/about", label: "关于" },
 ];
 
@@ -18,7 +19,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const location = useLocation();
 
-  const wideRoutes = ["/explore", "/iphone-explore", "/bigmac-explore", "/commodity-explore"];
+  const wideRoutes = ["/explore", "/iphone-explore", "/bigmac-explore", "/commodity-explore", "/modely-explore"];
   const mainMaxWidth = wideRoutes.includes(location.pathname) ? "max-w-6xl" : "max-w-5xl";
 
   return (

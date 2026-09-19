@@ -9,8 +9,10 @@ import { exploreRoute } from "@/routes/explore";
 import { indexRoute } from "@/routes/index";
 import { iphoneRoute } from "@/routes/iphone";
 import { iphoneExploreRoute } from "@/routes/iphone-explore";
+import { modelyRoute } from "@/routes/modely";
+import { modelyExploreRoute } from "@/routes/modely-explore";
 
-const routeTree = rootRoute.addChildren([indexRoute, exploreRoute, aboutRoute, iphoneRoute, iphoneExploreRoute, bigmacRoute, bigmacExploreRoute, commodityRoute, commodityExploreRoute]);
+const routeTree = rootRoute.addChildren([indexRoute, exploreRoute, aboutRoute, iphoneRoute, iphoneExploreRoute, bigmacRoute, bigmacExploreRoute, commodityRoute, commodityExploreRoute, modelyRoute, modelyExploreRoute]);
 
 const router = createRouter({ routeTree });
 
