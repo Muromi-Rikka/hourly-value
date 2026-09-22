@@ -22,6 +22,9 @@ const isEnableRsdoctor = Boolean(process.env.RSDOCTOR);
 const isEnableTurboConsole = process.env.NODE_ENV === "development";
 
 export default defineConfig({
+  html: {
+    template: "./index.html",
+  },
   ...(isUseSubpath && {
     output: { assetPrefix: basePath },
     server: { base: basePath },

@@ -1,34 +1,30 @@
 {
-  "name": "@trapar-waves/react-tailwind",
+  "name": "hourly-value",
   "type": "module",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "packageManager": "pnpm@12.4.2",
-  "description": "A modern UI development template integrating React and Tailwind CSS, with Rsbuild, TypeScript, ESLint (Antfu config), and Iconify support.",
+  "description": "全球最低工资标准购买力可视化 — 以人民币为基准的交互式数据探索",
   "author": {
-    "email": "admin@rikka.cc",
-    "name": "Rikka",
+    "name": "rikka",
     "url": "https://github.com/Muromi-Rikka"
   },
-  "homepage": "https://github.com/Trapar-waves/react-tailwind",
+  "homepage": "https://github.com/Muromi-Rikka/hourly-value",
   "licence": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Trapar-waves/react-tailwind.git"
+    "url": "git+https://github.com/Muromi-Rikka/hourly-value.git"
   },
   "bugs": {
-    "url": "https://github.com/Trapar-waves/react-tailwind/issues"
+    "url": "https://github.com/Muromi-Rikka/hourly-value/issues"
   },
   "keywords": [
+    "minimum-wage",
+    "purchasing-power",
+    "global-comparison",
+    "visualization",
     "react",
-    "tailwindcss",
-    "rsbuild",
-    "typescript",
-    "eslint",
-    "iconify"
+    "recharts"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "scripts": {
     "dev": "rsbuild dev --open",
     "build": "rsbuild build",

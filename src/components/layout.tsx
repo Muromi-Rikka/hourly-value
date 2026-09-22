@@ -140,7 +140,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
           {/* Bottom bar */}
           <div className="mt-8 flex flex-col items-center gap-3 border-t border-border/50 pt-5 sm:flex-row sm:justify-between">
-            <span className="text-xs">© 2025 · Built with React + Tailwind</span>
+            <span className="text-xs">© 2025 Muromi-Rikka · 数据来源：各国政府官方机构</span>
             <Button
               className="h-7 w-7 rounded-full"
               onClick={() => scrollTo({ behavior: "smooth", top: 0 })}
