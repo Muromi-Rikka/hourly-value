@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import * as React from "react";
 
+import type { IPhoneIndexEntry } from "@/data/iphone-index";
 import { CountryFlag } from "@/components/country-flag";
 import { IPhoneBarChart } from "@/components/iphone-bar-chart";
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
@@ -9,16 +10,39 @@ import { CountUp } from "@/components/react-bits/CountUp/CountUp";
 import { FadeContent } from "@/components/react-bits/FadeContent/FadeContent";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { iphoneDuoIndex, sortedByHoursDuo } from "@/data/iphone-duo-index";
 import { iphoneIndex, sortedByHours } from "@/data/iphone-index";
 
+type ModelKey = "duo" | "pro18";
+
+const MODEL_CONFIG: Record<ModelKey, { data: IPhoneIndexEntry[]; label: string; sorted: IPhoneIndexEntry[]; sub: string }> = {
+  duo: {
+    data: iphoneDuoIndex,
+    label: "iPhone Duo",
+    sorted: sortedByHoursDuo,
+    sub: "iPhone Duo",
+  },
+  pro18: {
+    data: iphoneIndex,
+    label: "iPhone 18 Pro",
+    sorted: sortedByHours,
+    sub: "iPhone 18 Pro (256GB)",
+  },
+};
+
 export function IPhone() {
+  const [model, setModel] = React.useState<ModelKey>("pro18");
+  const config = MODEL_CONFIG[model];
+  const { data, sorted, sub } = config;
+
   // Only entries with actual hours data
-  const withHours = sortedByHours.filter(entry => entry.hoursToBuy !== null);
+  const withHours = sorted.filter(entry => entry.hoursToBuy !== null);
   const cheapest = withHours[0];
   const mostExpensive = withHours[withHours.length - 1];
   const count = withHours.length;
   const ratio = Number((mostExpensive.hoursToBuy! / cheapest.hoursToBuy!).toFixed(1));
-  const regionData = regionAverages();
+  const regionData = regionAverages(data);
   const maxRegionAvg = Math.max(...regionData.map(r => r.avg));
 
   return (
@@ -37,12 +61,24 @@ export function IPhone() {
         />
         <AnimatedContent delay={0.1} distance={30} duration={0.6}>
           <p className="mt-4 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
-            以各国最低时薪计算购买一台 iPhone 18 Pro (256GB) 所需的工作小时数，
+            以各国最低时薪计算购买一台
+            {" "}
+            {sub}
+            {" "}
+            所需的工作小时数，
             {" "}
             {count}
             {" "}
             个国家/地区横向对比，直观呈现全球购买力差异。
           </p>
+        </AnimatedContent>
+        <AnimatedContent delay={0.15} distance={20} duration={0.5}>
+          <Tabs className="mt-5" onValueChange={v => setModel(v as ModelKey)} value={model}>
+            <TabsList>
+              <TabsTrigger value="pro18">iPhone 18 Pro</TabsTrigger>
+              <TabsTrigger value="duo">iPhone Duo</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </AnimatedContent>
       </section>
 
@@ -50,7 +86,7 @@ export function IPhone() {
       <AnimatedContent direction="vertical" distance={40} duration={0.8}>
         <section className="-mx-4 border-y sm:-mx-6">
           <div className="px-4 py-5 sm:px-6">
-            <IPhoneBarChart data={sortedByHours} layout="horizontal" />
+            <IPhoneBarChart data={sorted} key={model} layout="horizontal" />
           </div>
         </section>
       </AnimatedContent>
@@ -164,8 +200,8 @@ export function IPhone() {
   );
 }
 
-function regionAverages(): Array<{ avg: number; count: number; region: string }> {
-  const entries = iphoneIndex.filter(entry => entry.hoursToBuy !== null);
+function regionAverages(data: IPhoneIndexEntry[]): Array<{ avg: number; count: number; region: string }> {
+  const entries = data.filter(entry => entry.hoursToBuy !== null);
   const map = new Map<string, number[]>();
   for (const w of entries) {
     const array = map.get(w.region);

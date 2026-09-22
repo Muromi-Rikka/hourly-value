@@ -19,7 +19,15 @@ import { BlurText } from "@/components/react-bits/BlurText/BlurText";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { iphoneDuoIndex } from "@/data/iphone-duo-index";
 import { iphoneIndex } from "@/data/iphone-index";
+
+type ModelKey = "duo" | "pro18";
+
+const MODEL_DATA: Record<ModelKey, { data: IPhoneIndexEntry[]; label: string }> = {
+  duo: { data: iphoneDuoIndex, label: "iPhone Duo" },
+  pro18: { data: iphoneIndex, label: "iPhone 18 Pro" },
+};
 
 function regionBg(region: string): string {
   if (region === "北美") {
@@ -132,6 +140,9 @@ const columns: ColumnDef<typeof stockFeatures, IPhoneIndexEntry>[] = [
 ];
 
 export function IPhoneExplore() {
+  const [model, setModel] = React.useState<ModelKey>("pro18");
+  const activeData = MODEL_DATA[model].data;
+  const activeLabel = MODEL_DATA[model].label;
   const [sorting, setSorting] = React.useState<SortingState>([
     { desc: false, id: "hoursToBuy" },
   ]);
@@ -139,7 +150,7 @@ export function IPhoneExplore() {
 
   const table = useTable({
     columns,
-    data: iphoneIndex,
+    data: activeData,
     features: { ...coreFeatures, ...stockFeatures },
     getExpandedRowModel: createExpandedRowModel(),
     getRowCanExpand: () => true,
@@ -163,9 +174,19 @@ export function IPhoneExplore() {
           <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">
             排序并深入查看
             {" "}
-            {iphoneIndex.length}
-            {" 个国家/地区的 iPhone 18 Pro 购买力数据"}
+            {activeData.length}
+            {" 个国家/地区的 "}
+            {activeLabel}
+            {" 购买力数据"}
           </p>
+        </AnimatedContent>
+        <AnimatedContent delay={0.15} distance={20} duration={0.5}>
+          <Tabs className="mt-4" onValueChange={v => setModel(v as ModelKey)} value={model}>
+            <TabsList>
+              <TabsTrigger value="pro18">iPhone 18 Pro</TabsTrigger>
+              <TabsTrigger value="duo">iPhone Duo</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </AnimatedContent>
       </div>
 
@@ -274,9 +295,13 @@ export function IPhoneExplore() {
           <TabsContent className="mt-4" value="chart">
             <div>
               <p className="mb-3 text-sm text-muted-foreground">
-                全部国家 · 购买 iPhone 18 Pro 所需工时
+                全部国家 · 购买
+                {" "}
+                {activeLabel}
+                {" "}
+                所需工时
               </p>
-              <IPhoneBarChart data={iphoneIndex} layout="horizontal" />
+              <IPhoneBarChart data={activeData} key={model} layout="horizontal" />
             </div>
           </TabsContent>
         </Tabs>
