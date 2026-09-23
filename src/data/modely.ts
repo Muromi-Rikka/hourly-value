@@ -1,3 +1,11 @@
+import { cnyPerUnit } from "@/data/exchange-rates";
+
+export const MODELY_SOURCE = {
+  name: "Tesla 各国官网",
+  note: "Model Y 后驱版标价取自 13 个国家/地区的特斯拉官网，各地区含税口径不同",
+  url: "https://www.tesla.com/model-y",
+};
+
 export interface ModelYEntry {
   cnyEquivalent: number;
   country: string;
@@ -10,23 +18,18 @@ export interface ModelYEntry {
   taxNote: string;
 }
 
-// 汇率从 wages.ts 推导（cnyEquivalent / localWage）
-// EUR 7.87~7.92, GBP 9.09, USD 7.18, CAD 5.25, AUD 4.73, NZD 4.32, JPY 0.0468, KRW 0.00477
-
-export const modelys: ModelYEntry[] = [
+const rawModelys: Omit<ModelYEntry, "cnyEquivalent">[] = [
   {
-    cnyEquivalent: 249_900,
     country: "中国",
     countryCode: "CN",
     localCurrency: "人民币",
     localPrice: 249_900,
     region: "亚洲",
     source: "特斯拉中国官网",
-    sourceUrl: "https://www.tesla.cn/model-y",
+    sourceUrl: "https://www.tesla.cn/modely",
     taxNote: "含13%增值税",
   },
   {
-    cnyEquivalent: 323_604,
     country: "美国",
     countryCode: "US",
     localCurrency: "美元",
@@ -37,7 +40,6 @@ export const modelys: ModelYEntry[] = [
     taxNote: "不含州税",
   },
   {
-    cnyEquivalent: 262_448,
     country: "加拿大",
     countryCode: "CA",
     localCurrency: "加元",
@@ -48,7 +50,6 @@ export const modelys: ModelYEntry[] = [
     taxNote: "不含省税",
   },
   {
-    cnyEquivalent: 322_591,
     country: "德国",
     countryCode: "DE",
     localCurrency: "欧元",
@@ -59,7 +60,6 @@ export const modelys: ModelYEntry[] = [
     taxNote: "含19%增值税",
   },
   {
-    cnyEquivalent: 323_447,
     country: "法国",
     countryCode: "FR",
     localCurrency: "欧元",
@@ -70,7 +70,6 @@ export const modelys: ModelYEntry[] = [
     taxNote: "含20%增值税",
   },
   {
-    cnyEquivalent: 322_798,
     country: "荷兰",
     countryCode: "NL",
     localCurrency: "欧元",
@@ -81,7 +80,6 @@ export const modelys: ModelYEntry[] = [
     taxNote: "含21%增值税",
   },
   {
-    cnyEquivalent: 322_711,
     country: "卢森堡",
     countryCode: "LU",
     localCurrency: "欧元",
@@ -92,7 +90,6 @@ export const modelys: ModelYEntry[] = [
     taxNote: "含17%增值税",
   },
   {
-    cnyEquivalent: 324_641,
     country: "西班牙",
     countryCode: "ES",
     localCurrency: "欧元",
@@ -103,7 +100,6 @@ export const modelys: ModelYEntry[] = [
     taxNote: "含21%增值税",
   },
   {
-    cnyEquivalent: 409_089,
     country: "英国",
     countryCode: "GB",
     localCurrency: "英镑",
@@ -114,7 +110,6 @@ export const modelys: ModelYEntry[] = [
     taxNote: "含20%增值税",
   },
   {
-    cnyEquivalent: 264_407,
     country: "澳大利亚",
     countryCode: "AU",
     localCurrency: "澳元",
@@ -125,7 +120,6 @@ export const modelys: ModelYEntry[] = [
     taxNote: "含10% GST",
   },
   {
-    cnyEquivalent: 284_619,
     country: "新西兰",
     countryCode: "NZ",
     localCurrency: "新西兰元",
@@ -136,7 +130,6 @@ export const modelys: ModelYEntry[] = [
     taxNote: "含15% GST",
   },
   {
-    cnyEquivalent: 263_811,
     country: "日本",
     countryCode: "JP",
     localCurrency: "日元",
@@ -147,7 +140,6 @@ export const modelys: ModelYEntry[] = [
     taxNote: "含10%消费税",
   },
   {
-    cnyEquivalent: 252_797,
     country: "韩国",
     countryCode: "KR",
     localCurrency: "韩元",
@@ -158,6 +150,14 @@ export const modelys: ModelYEntry[] = [
     taxNote: "含增值税，不含地方电动车补贴",
   },
 ];
+
+/**
+ * 人民币折算使用构建时拉取的最新汇率（scripts/fetch-rates.mjs）。
+ */
+export const modelys: ModelYEntry[] = rawModelys.map(entry => ({
+  ...entry,
+  cnyEquivalent: Math.round(entry.localPrice * cnyPerUnit[entry.localCurrency]),
+}));
 
 export const sortedByPrice = modelys.toSorted((a, b) => b.cnyEquivalent - a.cnyEquivalent);
 

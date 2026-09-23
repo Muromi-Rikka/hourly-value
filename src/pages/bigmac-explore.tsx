@@ -8,7 +8,7 @@ import { ExploreView } from "@/components/explore-view";
 import { BigMacTooltip } from "@/components/index-tooltips";
 import { RankBarChart } from "@/components/rank-bar-chart";
 import { RegionBadge } from "@/components/region-badge";
-import { bigmac } from "@/data/bigmac";
+import { bigmac, BIGMAC_SOURCE } from "@/data/bigmac";
 import { cn } from "@/lib/utilities";
 
 const columns: DataTableColumn<BigMacEntry>[] = [
@@ -126,11 +126,11 @@ export function BigMacExplore() {
             <p className="text-xs font-medium text-muted-foreground">数据来源</p>
             <a
               className="inline-flex items-center gap-1 break-all text-sm text-primary underline underline-offset-2"
-              href="https://github.com/TheEconomist/big-mac-data"
+              href={BIGMAC_SOURCE.url}
               rel="noopener noreferrer"
               target="_blank"
             >
-              The Economist Big Mac Data (GitHub)
+              {BIGMAC_SOURCE.name}
               <ExternalLink className="h-3 w-3 shrink-0" />
             </a>
           </div>

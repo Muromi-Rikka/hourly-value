@@ -1,3 +1,9 @@
+export const BIGMAC_SOURCE = {
+  name: "The Economist Big Mac Data (GitHub)",
+  note: "美元价与估值偏差沿用来源数据集发布值，不按构建时汇率重算",
+  url: "https://github.com/TheEconomist/big-mac-data",
+};
+
 export interface BigMacEntry {
   country: string;
   countryCode: string;

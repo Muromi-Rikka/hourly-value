@@ -8,6 +8,7 @@ import { ExploreView } from "@/components/explore-view";
 import { CommodityTooltip } from "@/components/index-tooltips";
 import { RankBarChart } from "@/components/rank-bar-chart";
 import { RegionBadge } from "@/components/region-badge";
+import { COMMODITY_SOURCE } from "@/data/commodity";
 import { commodityIndex } from "@/data/commodity-index";
 
 const columns: DataTableColumn<CommodityIndexEntry>[] = [
@@ -116,7 +117,7 @@ export function CommodityExplore() {
             <p className="text-xs font-medium text-muted-foreground">物资价格来源</p>
             <a
               className="inline-flex items-center gap-1 break-all text-sm text-primary underline underline-offset-2"
-              href="https://www.globalproductprices.com/indicators_list.php"
+              href={COMMODITY_SOURCE.url}
               rel="noopener noreferrer"
               target="_blank"
             >

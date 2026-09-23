@@ -8,7 +8,9 @@ import { AnimatedContent } from "@/components/react-bits/AnimatedContent/Animate
 import { CountUp } from "@/components/react-bits/CountUp/CountUp";
 import { FadeContent } from "@/components/react-bits/FadeContent/FadeContent";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
+import { SourceBlock } from "@/components/source-block";
 import { Button } from "@/components/ui/button";
+import { COMMODITY_SOURCE } from "@/data/commodity";
 import { commodityIndex, sortedByHours } from "@/data/commodity-index";
 import { regionAverages } from "@/lib/region";
 
@@ -150,6 +152,17 @@ export function Commodity() {
             </div>
           </div>
         </section>
+      </AnimatedContent>
+
+      {/* Source */}
+      <AnimatedContent delay={0.05} distance={25} duration={0.6}>
+        <div className="mt-12 sm:mt-16">
+          <SourceBlock
+            note={COMMODITY_SOURCE.note ? `${COMMODITY_SOURCE.date}数据。${COMMODITY_SOURCE.note}。篮子构成：5kg面粉 · 5kg大米 · 1kg食糖 · 1kg食盐 · 2L牛奶 · 24个鸡蛋 · 5L食用油 · 1kg牛肉 · 1kg鸡肉` : undefined}
+            sourceName={COMMODITY_SOURCE.name}
+            sourceUrl={COMMODITY_SOURCE.url}
+          />
+        </div>
       </AnimatedContent>
 
       {/* CTA */}

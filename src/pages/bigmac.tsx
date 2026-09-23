@@ -8,8 +8,9 @@ import { AnimatedContent } from "@/components/react-bits/AnimatedContent/Animate
 import { CountUp } from "@/components/react-bits/CountUp/CountUp";
 import { FadeContent } from "@/components/react-bits/FadeContent/FadeContent";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
+import { SourceBlock } from "@/components/source-block";
 import { Button } from "@/components/ui/button";
-import { bigmac, sortedByUsdPrice, sortedByValuation } from "@/data/bigmac";
+import { bigmac, BIGMAC_SOURCE, sortedByUsdPrice, sortedByValuation } from "@/data/bigmac";
 import { sortedByBigMacPerHour } from "@/data/bigmac-ppp";
 import { regionAverages } from "@/lib/region";
 
@@ -249,6 +250,17 @@ export function BigMac() {
             </div>
           </div>
         </section>
+      </AnimatedContent>
+
+      {/* Source */}
+      <AnimatedContent delay={0.05} distance={25} duration={0.6}>
+        <div className="mt-12 sm:mt-16">
+          <SourceBlock
+            note={`${BIGMAC_SOURCE.note}。美国基准价 $6.22。`}
+            sourceName={BIGMAC_SOURCE.name}
+            sourceUrl={BIGMAC_SOURCE.url}
+          />
+        </div>
       </AnimatedContent>
 
       {/* CTA */}

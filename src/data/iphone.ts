@@ -1,3 +1,11 @@
+import { cnyPerUnit } from "@/data/exchange-rates";
+
+export const IPHONE_SOURCE = {
+  name: "Apple Store 各国官方商城",
+  note: "iPhone 18 Pro 与 iPhone Duo 价格均取自 13 个国家/地区的 Apple 官方商城标价，各地区含税口径不同",
+  url: "https://www.apple.com/shop/buy-iphone",
+};
+
 export interface IPhoneEntry {
   cnyEquivalent: number;
   country: string;
@@ -10,12 +18,8 @@ export interface IPhoneEntry {
   taxNote: string;
 }
 
-// 汇率参考：2026年9月近似值
-// USD 7.25, CAD 5.35, JPY 0.048, KRW 0.0053, AUD 4.75, NZD 4.35, GBP 9.25, EUR 7.85
-
-export const iphones: IPhoneEntry[] = [
+const rawIphones: Omit<IPhoneEntry, "cnyEquivalent">[] = [
   {
-    cnyEquivalent: 8693,
     country: "美国",
     countryCode: "US",
     localCurrency: "美元",
@@ -26,7 +30,6 @@ export const iphones: IPhoneEntry[] = [
     taxNote: "不含税",
   },
   {
-    cnyEquivalent: 9357,
     country: "加拿大",
     countryCode: "CA",
     localCurrency: "加元",
@@ -37,7 +40,6 @@ export const iphones: IPhoneEntry[] = [
     taxNote: "不含税",
   },
   {
-    cnyEquivalent: 9999,
     country: "中国",
     countryCode: "CN",
     localCurrency: "人民币",
@@ -48,7 +50,6 @@ export const iphones: IPhoneEntry[] = [
     taxNote: "含13%增值税",
   },
   {
-    cnyEquivalent: 9970,
     country: "澳大利亚",
     countryCode: "AU",
     localCurrency: "澳元",
@@ -59,7 +60,6 @@ export const iphones: IPhoneEntry[] = [
     taxNote: "含10% GST",
   },
   {
-    cnyEquivalent: 10550,
     country: "日本",
     countryCode: "JP",
     localCurrency: "日元",
@@ -70,7 +70,6 @@ export const iphones: IPhoneEntry[] = [
     taxNote: "含10%消费税",
   },
   {
-    cnyEquivalent: 10547,
     country: "韩国",
     countryCode: "KR",
     localCurrency: "韩元",
@@ -81,7 +80,6 @@ export const iphones: IPhoneEntry[] = [
     taxNote: "含10%增值税",
   },
   {
-    cnyEquivalent: 11088,
     country: "新西兰",
     countryCode: "NZ",
     localCurrency: "新西兰元",
@@ -92,7 +90,6 @@ export const iphones: IPhoneEntry[] = [
     taxNote: "含15% GST",
   },
   {
-    cnyEquivalent: 11091,
     country: "英国",
     countryCode: "GB",
     localCurrency: "英镑",
@@ -103,7 +100,6 @@ export const iphones: IPhoneEntry[] = [
     taxNote: "含20% VAT",
   },
   {
-    cnyEquivalent: 11226,
     country: "卢森堡",
     countryCode: "LU",
     localCurrency: "欧元",
@@ -114,7 +110,6 @@ export const iphones: IPhoneEntry[] = [
     taxNote: "含17% VAT",
   },
   {
-    cnyEquivalent: 11375,
     country: "德国",
     countryCode: "DE",
     localCurrency: "欧元",
@@ -125,7 +120,6 @@ export const iphones: IPhoneEntry[] = [
     taxNote: "含19% VAT",
   },
   {
-    cnyEquivalent: 11610,
     country: "法国",
     countryCode: "FR",
     localCurrency: "欧元",
@@ -136,7 +130,6 @@ export const iphones: IPhoneEntry[] = [
     taxNote: "含20% VAT",
   },
   {
-    cnyEquivalent: 11532,
     country: "西班牙",
     countryCode: "ES",
     localCurrency: "欧元",
@@ -147,7 +140,6 @@ export const iphones: IPhoneEntry[] = [
     taxNote: "含21% VAT",
   },
   {
-    cnyEquivalent: 11610,
     country: "荷兰",
     countryCode: "NL",
     localCurrency: "欧元",
@@ -158,6 +150,14 @@ export const iphones: IPhoneEntry[] = [
     taxNote: "含21% VAT",
   },
 ];
+
+/**
+ * 人民币折算使用构建时拉取的最新汇率（scripts/fetch-rates.mjs）。
+ */
+export const iphones: IPhoneEntry[] = rawIphones.map(entry => ({
+  ...entry,
+  cnyEquivalent: Math.round(entry.localPrice * cnyPerUnit[entry.localCurrency]),
+}));
 
 export const sortedByPrice = iphones.toSorted((a, b) => b.cnyEquivalent - a.cnyEquivalent);
 

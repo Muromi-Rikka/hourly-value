@@ -5,6 +5,13 @@
  * 注意：卢森堡（LU）在该网站无数据，已排除。
  */
 
+export const COMMODITY_SOURCE = {
+  date: "2026年1月",
+  name: "GlobalProductPrices.com",
+  note: "卢森堡（LU）在该站无数据，已排除",
+  url: "https://www.globalproductprices.com/indicators_list.php",
+};
+
 export interface CommodityItem {
   beef1kg: number;
   chicken1kg: number;

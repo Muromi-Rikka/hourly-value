@@ -10,8 +10,10 @@ import { AnimatedContent } from "@/components/react-bits/AnimatedContent/Animate
 import { CountUp } from "@/components/react-bits/CountUp/CountUp";
 import { FadeContent } from "@/components/react-bits/FadeContent/FadeContent";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
+import { SourceBlock } from "@/components/source-block";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { IPHONE_SOURCE } from "@/data/iphone";
 import { sortedByHoursDuo } from "@/data/iphone-duo-index";
 import { sortedByHours } from "@/data/iphone-index";
 import { regionAverages } from "@/lib/region";
@@ -189,6 +191,17 @@ export function IPhone() {
             </div>
           </div>
         </section>
+      </AnimatedContent>
+
+      {/* Source */}
+      <AnimatedContent delay={0.05} distance={25} duration={0.6}>
+        <div className="mt-12 sm:mt-16">
+          <SourceBlock
+            note={IPHONE_SOURCE.note}
+            sourceName={IPHONE_SOURCE.name}
+            sourceUrl={IPHONE_SOURCE.url}
+          />
+        </div>
       </AnimatedContent>
 
       {/* CTA */}

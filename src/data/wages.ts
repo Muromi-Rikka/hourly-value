@@ -1,3 +1,5 @@
+import { cnyPerUnit } from "@/data/exchange-rates";
+
 export interface WageEntry {
   cnyEquivalent: number;
   country: string;
@@ -12,9 +14,8 @@ export interface WageEntry {
   sourceUrl: string;
 }
 
-export const wages: WageEntry[] = [
+const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
   {
-    cnyEquivalent: 114,
     country: "澳大利亚",
     countryCode: "AU",
     effectiveDate: "2026-07-01",
@@ -27,7 +28,6 @@ export const wages: WageEntry[] = [
     sourceUrl: "https://www.fwc.gov.au",
   },
   {
-    cnyEquivalent: 117,
     country: "卢森堡",
     countryCode: "LU",
     effectiveDate: "2026-01-01",
@@ -40,7 +40,6 @@ export const wages: WageEntry[] = [
     sourceUrl: "https://ec.europa.eu/eurostat/web/labour-market/earnings/minimum-wages",
   },
   {
-    cnyEquivalent: 101,
     country: "德国",
     countryCode: "DE",
     effectiveDate: "2025-01-01",
@@ -53,7 +52,6 @@ export const wages: WageEntry[] = [
     sourceUrl: "https://ec.europa.eu/eurostat/web/labour-market/earnings/minimum-wages",
   },
   {
-    cnyEquivalent: 92,
     country: "法国",
     countryCode: "FR",
     effectiveDate: "2026-01-01",
@@ -66,7 +64,6 @@ export const wages: WageEntry[] = [
     sourceUrl: "https://www.economie.gouv.fr",
   },
   {
-    cnyEquivalent: 116,
     country: "荷兰",
     countryCode: "NL",
     effectiveDate: "2026-01-01",
@@ -79,7 +76,6 @@ export const wages: WageEntry[] = [
     sourceUrl: "https://www.government.nl",
   },
   {
-    cnyEquivalent: 104,
     country: "英国",
     countryCode: "GB",
     effectiveDate: "2025-04-01",
@@ -92,7 +88,6 @@ export const wages: WageEntry[] = [
     sourceUrl: "https://www.gov.uk/national-minimum-wage-rates",
   },
   {
-    cnyEquivalent: 100,
     country: "新西兰",
     countryCode: "NZ",
     effectiveDate: "2026-04-01",
@@ -105,7 +100,6 @@ export const wages: WageEntry[] = [
     sourceUrl: "https://www.employment.govt.nz",
   },
   {
-    cnyEquivalent: 84,
     country: "加拿大",
     countryCode: "CA",
     effectiveDate: "2025-01-01",
@@ -118,7 +112,6 @@ export const wages: WageEntry[] = [
     sourceUrl: "https://www.canada.ca",
   },
   {
-    cnyEquivalent: 79,
     country: "美国",
     countryCode: "US",
     effectiveDate: "2025-01-01",
@@ -131,7 +124,6 @@ export const wages: WageEntry[] = [
     sourceUrl: "https://www.dol.gov",
   },
   {
-    cnyEquivalent: 47,
     country: "韩国",
     countryCode: "KR",
     effectiveDate: "2026-01-01",
@@ -144,7 +136,6 @@ export const wages: WageEntry[] = [
     sourceUrl: "https://www.moel.go.kr",
   },
   {
-    cnyEquivalent: 47,
     country: "日本",
     countryCode: "JP",
     effectiveDate: "2025-01-01",
@@ -157,7 +148,6 @@ export const wages: WageEntry[] = [
     sourceUrl: "https://www.mhlw.go.jp",
   },
   {
-    cnyEquivalent: 56,
     country: "西班牙",
     countryCode: "ES",
     effectiveDate: "2026-01-01",
@@ -170,7 +160,6 @@ export const wages: WageEntry[] = [
     sourceUrl: "https://ec.europa.eu/eurostat/web/labour-market/earnings/minimum-wages",
   },
   {
-    cnyEquivalent: 23,
     country: "中国",
     countryCode: "CN",
     effectiveDate: "2026-01-01",
@@ -183,6 +172,14 @@ export const wages: WageEntry[] = [
     sourceUrl: "https://www.mohrss.gov.cn/SYrlzyhshbzb/laodongguanxi_/fwyd/202601/t20260112_565296.html",
   },
 ];
+
+/**
+ * 人民币折算使用构建时拉取的最新汇率（scripts/fetch-rates.mjs）。
+ */
+export const wages: WageEntry[] = rawWages.map(entry => ({
+  ...entry,
+  cnyEquivalent: Math.round(entry.localWage * cnyPerUnit[entry.localCurrency]),
+}));
 
 export const sortedByWage = wages.toSorted((a, b) => b.cnyEquivalent - a.cnyEquivalent);
 

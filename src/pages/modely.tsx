@@ -8,7 +8,9 @@ import { AnimatedContent } from "@/components/react-bits/AnimatedContent/Animate
 import { CountUp } from "@/components/react-bits/CountUp/CountUp";
 import { FadeContent } from "@/components/react-bits/FadeContent/FadeContent";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
+import { SourceBlock } from "@/components/source-block";
 import { Button } from "@/components/ui/button";
+import { MODELY_SOURCE } from "@/data/modely";
 import { modelyIndex, sortedByDays } from "@/data/modely-index";
 import { regionAverages } from "@/lib/region";
 
@@ -159,6 +161,17 @@ export function ModelY() {
             </div>
           </div>
         </section>
+      </AnimatedContent>
+
+      {/* Source */}
+      <AnimatedContent delay={0.05} distance={25} duration={0.6}>
+        <div className="mt-12 sm:mt-16">
+          <SourceBlock
+            note={MODELY_SOURCE.note}
+            sourceName={MODELY_SOURCE.name}
+            sourceUrl={MODELY_SOURCE.url}
+          />
+        </div>
       </AnimatedContent>
 
       {/* CTA */}

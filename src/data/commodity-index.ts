@@ -1,5 +1,6 @@
 import type { CommodityItem } from "@/data/commodity";
-import { commodities } from "@/data/commodity";
+import { commodities, COMMODITY_SOURCE } from "@/data/commodity";
+import { cnyPerUnit } from "@/data/exchange-rates";
 import { wages } from "@/data/wages";
 
 /**
@@ -37,11 +38,10 @@ export interface CommodityIndexEntry {
 const wageByCode = new Map(wages.map(w => [w.countryCode, w]));
 
 /**
- * Derive USD→CNY exchange rate from US wage data.
- * US: localWage = 11 USD/h, cnyEquivalent = 79 CNY/h → rate = 79/11 ≈ 7.18
+ * Derive USD→CNY exchange rate from the latest fetched rates.
+ * 构建时拉取的最新汇率（scripts/fetch-rates.mjs）。
  */
-const usWage = wageByCode.get("US")!;
-const usdToCny = usWage.cnyEquivalent / usWage.localWage;
+const usdToCny = cnyPerUnit["美元"];
 
 function basketUSD(item: CommodityItem): number {
   return (
@@ -70,7 +70,7 @@ export const commodityIndex: CommodityIndexEntry[] = commodities
     return {
       basketCNY: bCNY,
       basketUSD: bUSD,
-      commoditySource: "GlobalProductPrices.com",
+      commoditySource: COMMODITY_SOURCE.name,
       country: item.country,
       countryCode: item.countryCode,
       hourlyWage,

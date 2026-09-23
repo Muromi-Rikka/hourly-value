@@ -6,6 +6,11 @@ import { AnimatedContent } from "@/components/react-bits/AnimatedContent/Animate
 import { BlurText } from "@/components/react-bits/BlurText/BlurText";
 import { FadeContent } from "@/components/react-bits/FadeContent/FadeContent";
 import { Separator } from "@/components/ui/separator";
+import { BIGMAC_SOURCE } from "@/data/bigmac";
+import { COMMODITY_SOURCE } from "@/data/commodity";
+import { ratesProvider, ratesUpdatedAt } from "@/data/exchange-rates";
+import { IPHONE_SOURCE, iphones } from "@/data/iphone";
+import { MODELY_SOURCE, modelys } from "@/data/modely";
 import { wages } from "@/data/wages";
 
 const ABOUT_INDEXES = [
@@ -36,6 +41,16 @@ const ABOUT_INDEXES = [
   },
 ];
 
+const IPHONE_SOURCE_NOTE = `${IPHONE_SOURCE.note}。iPhone Duo 与 iPhone 18 Pro 使用同一组官方商城链接，逐条含税口径差异见「探索」页展开行。`;
+const MODELY_SOURCE_NOTE = `${MODELY_SOURCE.note}。美国不含州销售税、欧洲含 VAT、亚太含 GST/消费税。`;
+
+interface SourceItem {
+  countryCode: string;
+  name: string;
+  source: string;
+  sourceUrl: string;
+}
+
 export function About() {
   return (
     <div>
@@ -63,17 +78,50 @@ export function About() {
             对于按月设定最低工资的国家（如西班牙、中国），按法定月工作小时数折算为时薪。
           </p>
           <p>
-            人民币折算使用各国货币对人民币的即期汇率（查询时间点约为 2025 年中），
+            人民币折算使用构建时自动拉取的最新市场参考汇率（详见下方「汇率来源与更新」），
             旨在提供一个直观的购买力参考，而非精确的购买力平价（PPP）计算。
           </p>
           <p>
             各国数据生效日期不同，部分为 2025 年已执行标准，部分为 2026 年已公告标准。
-            所有数据均可通过下方来源链接追溯至官方文件。
+            所有数据均可通过下方来源清单追溯至官方文件。
           </p>
           <p>
             其余指数中的商品价格（iPhone、生活物资篮子、巨无霸汉堡、Tesla Model Y）
-            来自公开的全球价格数据，逐条出处可在对应指数页与「探索」页中查看。
+            来自公开的全球价格数据，逐条出处见下方各指数数据来源，
+            也可在各指数「探索」页的展开行中查看。
           </p>
+        </section>
+      </AnimatedContent>
+
+      {/* Exchange rates */}
+      <AnimatedContent delay={0.05} distance={25} duration={0.6}>
+        <section className="border-t pt-8 pb-10">
+          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">汇率来源与更新</h2>
+          <div className="max-w-prose space-y-2 rounded-xl bg-muted/50 p-5 text-xs leading-relaxed text-muted-foreground">
+            <p>
+              人民币折算所用汇率于每次构建与开发启动时自动拉取，当前生效汇率更新于
+              {" "}
+              <span className="font-medium text-foreground">{ratesUpdatedAt}</span>
+              ，来源
+              {" "}
+              <a
+                className="text-primary underline decoration-primary/50 underline-offset-2 hover:text-primary/80"
+                href="https://frankfurter.app"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                {ratesProvider}
+              </a>
+              ，备用源 open.er-api.com。
+            </p>
+            <p>
+              欧洲央行每个工作日 16:00 CET 更新参考汇率，周末与节假日沿用上一工作日数据；
+              若拉取失败则沿用上次成功获取的汇率，构建不会中断。
+            </p>
+            <p>
+              巨无霸指数例外：其美元价与估值偏差沿用来源数据集发布时的快照值，不随实时汇率变动。
+            </p>
+          </div>
         </section>
       </AnimatedContent>
 
@@ -98,38 +146,95 @@ export function About() {
         </section>
       </AnimatedContent>
 
-      {/* Sources */}
+      {/* Sources — wages */}
       <AnimatedContent delay={0.1} distance={20} duration={0.5}>
         <section className="border-t pt-8">
           <h2 className="mb-5 font-display text-xl font-normal tracking-tight">最低工资数据来源</h2>
           <ul className="space-y-4">
             {wages.map((entry, index) => (
-              <li key={entry.countryCode}>
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0 flex items-start gap-3">
-                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                      {index + 1}
-                    </span>
-                    <div>
-                      <p className="flex items-center gap-2 text-base font-medium">
-                        <CountryFlag className="h-5 w-5" countryCode={entry.countryCode} />
-                        {entry.country}
-                      </p>
-                      <p className="mt-0.5 text-xs text-muted-foreground">{entry.source}</p>
-                    </div>
-                  </div>
-                  <a
-                    className="inline-flex shrink-0 items-center gap-1 text-xs text-primary hover:underline decoration-primary/50 underline-offset-2 hover:text-primary/80"
-                    href={entry.sourceUrl}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    访问来源
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                </div>
-                <Separator className="mt-4" />
-              </li>
+              <SourceRow
+                index={index}
+                item={{
+                  countryCode: entry.countryCode,
+                  name: entry.country,
+                  source: entry.source,
+                  sourceUrl: entry.sourceUrl,
+                }}
+                key={entry.countryCode}
+              />
+            ))}
+          </ul>
+        </section>
+      </AnimatedContent>
+
+      {/* Sources — iPhone */}
+      <AnimatedContent delay={0.1} distance={20} duration={0.5}>
+        <section className="border-t pt-8">
+          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">iPhone 指数数据来源</h2>
+          <p className="mb-5 max-w-prose text-xs leading-relaxed text-muted-foreground">
+            {IPHONE_SOURCE_NOTE}
+          </p>
+          <ul className="space-y-4">
+            {iphones.map((entry, index) => (
+              <SourceRow
+                index={index}
+                item={{
+                  countryCode: entry.countryCode,
+                  name: entry.country,
+                  source: entry.source,
+                  sourceUrl: entry.sourceUrl,
+                }}
+                key={entry.countryCode}
+              />
+            ))}
+          </ul>
+        </section>
+      </AnimatedContent>
+
+      {/* Sources — commodity */}
+      <AnimatedContent delay={0.1} distance={20} duration={0.5}>
+        <section className="border-t pt-8">
+          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">物资篮子指数数据来源</h2>
+          <SourceCard
+            date={COMMODITY_SOURCE.date}
+            name={COMMODITY_SOURCE.name}
+            note={`${COMMODITY_SOURCE.note}。篮子构成：5kg面粉 · 5kg大米 · 1kg食糖 · 1kg食盐 · 2L牛奶 · 24个鸡蛋 · 5L食用油 · 1kg牛肉 · 1kg鸡肉。`}
+            url={COMMODITY_SOURCE.url}
+          />
+        </section>
+      </AnimatedContent>
+
+      {/* Sources — Big Mac */}
+      <AnimatedContent delay={0.1} distance={20} duration={0.5}>
+        <section className="border-t pt-8">
+          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">巨无霸指数数据来源</h2>
+          <SourceCard
+            name={BIGMAC_SOURCE.name}
+            note={`${BIGMAC_SOURCE.note}。估值以美国基准价 $6.22 为锚。`}
+            url={BIGMAC_SOURCE.url}
+          />
+        </section>
+      </AnimatedContent>
+
+      {/* Sources — Model Y */}
+      <AnimatedContent delay={0.1} distance={20} duration={0.5}>
+        <section className="border-t pt-8">
+          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">Model Y 指数数据来源</h2>
+          <p className="mb-5 max-w-prose text-xs leading-relaxed text-muted-foreground">
+            {MODELY_SOURCE_NOTE}
+          </p>
+          <ul className="space-y-4">
+            {modelys.map((entry, index) => (
+              <SourceRow
+                index={index}
+                item={{
+                  countryCode: entry.countryCode,
+                  name: entry.country,
+                  source: entry.source,
+                  sourceUrl: entry.sourceUrl,
+                }}
+                key={entry.countryCode}
+              />
             ))}
           </ul>
         </section>
@@ -149,5 +254,73 @@ export function About() {
         </section>
       </FadeContent>
     </div>
+  );
+}
+
+/**
+ * 单一来源卡片：适用于整个指数共用一个来源的场景
+ */
+function SourceCard({ date, name, note, url }: {
+  date?: string;
+  name: string;
+  note: string;
+  url: string;
+}) {
+  return (
+    <div className="rounded-xl bg-muted/50 p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-base font-medium">{name}</p>
+        <a
+          className="inline-flex shrink-0 items-center gap-1 text-xs text-primary hover:underline decoration-primary/50 underline-offset-2 hover:text-primary/80"
+          href={url}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          访问来源
+          <ExternalLink className="h-3 w-3" />
+        </a>
+      </div>
+      {date && (
+        <p className="mt-1 text-xs text-muted-foreground">
+          数据时间：
+          {date}
+        </p>
+      )}
+      <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{note}</p>
+    </div>
+  );
+}
+
+/**
+ * 逐国来源行：序号 + 国旗 + 国家 + 来源机构 + 外链
+ */
+function SourceRow({ index, item }: { index: number; item: SourceItem }) {
+  return (
+    <li>
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex items-start gap-3">
+          <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+            {index + 1}
+          </span>
+          <div>
+            <p className="flex items-center gap-2 text-base font-medium">
+              <CountryFlag className="h-5 w-5" countryCode={item.countryCode} />
+              {item.name}
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">{item.source}</p>
+          </div>
+        </div>
+        <a
+          className="inline-flex shrink-0 items-center gap-1 text-xs text-primary hover:underline decoration-primary/50 underline-offset-2 hover:text-primary/80"
+          href={item.sourceUrl}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          访问来源
+          <ExternalLink className="h-3 w-3" />
+        </a>
+      </div>
+      <Separator className="mt-4" />
+    </li>
   );
 }
