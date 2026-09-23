@@ -1,54 +1,17 @@
-import type { ColumnDef, SortingState } from "@tanstack/react-table";
-import {
-  coreFeatures,
-  createExpandedRowModel,
-  createSortedRowModel,
-  flexRender,
-  stockFeatures,
-  useTable,
-} from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
-import * as React from "react";
+import { ExternalLink } from "lucide-react";
 
+import type { DataTableColumn } from "@/components/data-table";
 import type { BigMacEntry } from "@/data/bigmac";
 
-import { BigMacBarChart } from "@/components/bigmac-bar-chart";
 import { CountryFlag } from "@/components/country-flag";
-import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
-import { BlurText } from "@/components/react-bits/BlurText/BlurText";
-import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ExploreView } from "@/components/explore-view";
+import { BigMacTooltip } from "@/components/index-tooltips";
+import { RankBarChart } from "@/components/rank-bar-chart";
+import { RegionBadge } from "@/components/region-badge";
 import { bigmac } from "@/data/bigmac";
 import { cn } from "@/lib/utilities";
 
-function regionBg(region: string): string {
-  if (region === "北美") {
-    return "var(--color-region-north-america)";
-  }
-  if (region === "亚洲") {
-    return "var(--color-region-asia)";
-  }
-  if (region === "欧洲") {
-    return "var(--color-region-europe)";
-  }
-  return "var(--color-region-oceania)";
-}
-
-function sortIcon(direction: "asc" | "desc" | false, canSort: boolean) {
-  if (direction === "asc") {
-    return <ChevronUp className="ml-1 h-3 w-3" />;
-  }
-  if (direction === "desc") {
-    return <ChevronDown className="ml-1 h-3 w-3" />;
-  }
-  if (canSort) {
-    return <ArrowUpDown className="ml-1 h-3 w-3" />;
-  }
-  return null;
-}
-
-const columns: ColumnDef<typeof stockFeatures, BigMacEntry>[] = [
+const columns: DataTableColumn<BigMacEntry>[] = [
   {
     accessorFn: row => row.country,
     cell: ({ row }) => (
@@ -62,14 +25,7 @@ const columns: ColumnDef<typeof stockFeatures, BigMacEntry>[] = [
   },
   {
     accessorFn: row => row.region,
-    cell: ({ row }) => (
-      <span
-        className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium text-white"
-        style={{ background: regionBg(row.original.region) }}
-      >
-        {row.original.region}
-      </span>
-    ),
+    cell: ({ row }) => <RegionBadge region={row.original.region} />,
     header: "区域",
     id: "region",
   },
@@ -93,181 +49,94 @@ const columns: ColumnDef<typeof stockFeatures, BigMacEntry>[] = [
     ),
     header: "美元价格",
     id: "usdPrice",
-    sortingFn: "basic",
+    sortFn: "basic",
   },
   {
     accessorFn: row => row.valuationPct,
     cell: ({ row }) => {
-      const v = row.original.valuationPct;
-      const color = v > 0 ? "text-green-600" : (v < 0 ? "text-red-600" : "text-muted-foreground");
+      const value = row.original.valuationPct;
+      const tone = value > 0 ? "text-green-600" : (value < 0 ? "text-red-600" : "text-muted-foreground");
       return (
-        <span className={cn("font-semibold tabular-nums", color)}>
-          {v > 0 ? "+" : ""}
-          {v}
+        <span className={cn("font-semibold tabular-nums", tone)}>
+          {value > 0 ? "+" : ""}
+          {value}
           %
         </span>
       );
     },
     header: "估值偏差",
     id: "valuationPct",
-    sortingFn: "basic",
+    sortFn: "basic",
   },
 ];
 
 export function BigMacExplore() {
-  const [sorting, setSorting] = React.useState<SortingState>([
-    { desc: true, id: "valuationPct" },
-  ]);
-  const [expanded, setExpanded] = React.useState<Record<string, boolean>>({});
-
-  const table = useTable({
-    columns,
-    data: bigmac,
-    features: { ...coreFeatures, ...stockFeatures },
-    getExpandedRowModel: createExpandedRowModel(),
-    getRowCanExpand: () => true,
-    getSortedRowModel: createSortedRowModel(),
-    onExpandedChange: setExpanded,
-    onSortingChange: setSorting,
-    state: { expanded, sorting },
-  });
-
   return (
-    <div>
-      {/* Header */}
-      <div className="pb-6">
-        <BlurText
-          animateBy="words"
-          className="font-display text-[clamp(2rem,4vw,3rem)] font-normal leading-[1.1] tracking-[-0.02em]"
-          delay={150}
-          text="巨无霸指数 · 数据探索"
+    <ExploreView
+      chart={(
+        <RankBarChart
+          data={bigmac}
+          formatTick={value => `${value}%`}
+          formatValue={value => `${value > 0 ? "+" : ""}${value}%`}
+          showZeroLine
+          tooltip={BigMacTooltip}
+          valueKey="valuationPct"
         />
-        <AnimatedContent delay={0.1} distance={20} duration={0.5}>
-          <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">
-            排序并深入查看
-            {" "}
-            {bigmac.length}
-            {" 个国家/地区的巨无霸指数数据"}
-          </p>
-        </AnimatedContent>
-      </div>
-
-      {/* Views */}
-      <AnimatedContent delay={0.1} distance={40} duration={0.6} threshold={0.05}>
-        <Tabs defaultValue="table">
-          <TabsList className="mt-4">
-            <TabsTrigger value="table">表格视图</TabsTrigger>
-            <TabsTrigger value="chart">图表视图</TabsTrigger>
-          </TabsList>
-
-          <TabsContent className="mt-4" value="table">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  {table.getHeaderGroups().map(headerGroup => (
-                    <TableRow key={headerGroup.id}>
-                      {headerGroup.headers.map(header => (
-                        <TableHead colSpan={header.colSpan} key={header.id}>
-                          {header.isPlaceholder
-                            ? null
-                            : (
-                                <Button
-                                  className="-ml-3 h-auto p-0 text-muted-foreground hover:text-foreground"
-                                  disabled={!header.column.getCanSort()}
-                                  onClick={header.column.getToggleSortingHandler()}
-                                  variant="ghost"
-                                >
-                                  {flexRender(header.column.columnDef.header, header.getContext())}
-                                  {sortIcon(header.column.getIsSorted(), header.column.getCanSort())}
-                                </Button>
-                              )}
-                        </TableHead>
-                      ))}
-                      <TableHead className="w-8" />
-                    </TableRow>
-                  ))}
-                </TableHeader>
-                <TableBody>
-                  {table.getRowModel().rows.map(row => (
-                    <React.Fragment key={row.id}>
-                      <TableRow
-                        className="cursor-pointer transition-colors hover:bg-muted/50"
-                        onClick={() => row.toggleExpanded()}
-                      >
-                        {row.getVisibleCells().map(cell => (
-                          <TableCell key={cell.id}>
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </TableCell>
-                        ))}
-                        <TableCell>
-                          {row.getIsExpanded()
-                            ? <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                            : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
-                        </TableCell>
-                      </TableRow>
-                      {row.getIsExpanded() && (
-                        <TableRow>
-                          <TableCell className="bg-muted/30 p-4" colSpan={columns.length + 1}>
-                            <div className="grid gap-3 sm:grid-cols-2">
-                              <div>
-                                <p className="text-xs font-medium text-muted-foreground">当地货币</p>
-                                <p className="text-sm">{row.original.localCurrency}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs font-medium text-muted-foreground">当地价格</p>
-                                <p className="text-sm">{row.original.localPriceFormatted}</p>
-                              </div>
-                              <div>
-                                <p className="text-xs font-medium text-muted-foreground">美元等值</p>
-                                <p className="text-sm">
-                                  $
-                                  {row.original.usdPrice.toFixed(2)}
-                                  {" USD"}
-                                </p>
-                              </div>
-                              <div>
-                                <p className="text-xs font-medium text-muted-foreground">估值偏差</p>
-                                <p className="text-sm">
-                                  {row.original.valuationPct > 0 ? "高估 " : (row.original.valuationPct < 0 ? "低估 " : "持平 ")}
-                                  {row.original.valuationPct > 0 ? "+" : ""}
-                                  {row.original.valuationPct}
-                                  %
-                                </p>
-                              </div>
-                              <div className="sm:col-span-2">
-                                <p className="text-xs font-medium text-muted-foreground">数据来源</p>
-                                <a
-                                  className="inline-flex items-center gap-1 break-all text-sm text-primary underline underline-offset-2"
-                                  href="https://github.com/TheEconomist/big-mac-data"
-                                  onClick={event => event.stopPropagation()}
-                                  rel="noopener noreferrer"
-                                  target="_blank"
-                                >
-                                  The Economist Big Mac Data (GitHub)
-                                  <ExternalLink className="h-3 w-3 shrink-0" />
-                                </a>
-                              </div>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </TabsContent>
-
-          <TabsContent className="mt-4" value="chart">
-            <div>
-              <p className="mb-3 text-sm text-muted-foreground">
-                全部国家 · 巨无霸估值偏差
-              </p>
-              <BigMacBarChart data={bigmac} layout="horizontal" />
-            </div>
-          </TabsContent>
-        </Tabs>
-      </AnimatedContent>
-    </div>
+      )}
+      chartCaption="全部国家 · 巨无霸估值偏差"
+      columns={columns}
+      data={bigmac}
+      defaultSort={[{ desc: true, id: "valuationPct" }]}
+      description={(
+        <>
+          排序并深入查看
+          {bigmac.length}
+          {" "}
+          个国家/地区的巨无霸指数数据
+        </>
+      )}
+      renderExpanded={row => (
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground">当地货币</p>
+            <p className="text-sm">{row.localCurrency}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-muted-foreground">当地价格</p>
+            <p className="text-sm">{row.localPriceFormatted}</p>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-muted-foreground">美元等值</p>
+            <p className="text-sm">
+              $
+              {row.usdPrice.toFixed(2)}
+              {" USD"}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs font-medium text-muted-foreground">估值偏差</p>
+            <p className="text-sm">
+              {row.valuationPct > 0 ? "高估 " : (row.valuationPct < 0 ? "低估 " : "持平 ")}
+              {row.valuationPct > 0 ? "+" : ""}
+              {row.valuationPct}
+              %
+            </p>
+          </div>
+          <div className="sm:col-span-2">
+            <p className="text-xs font-medium text-muted-foreground">数据来源</p>
+            <a
+              className="inline-flex items-center gap-1 break-all text-sm text-primary underline underline-offset-2"
+              href="https://github.com/TheEconomist/big-mac-data"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              The Economist Big Mac Data (GitHub)
+              <ExternalLink className="h-3 w-3 shrink-0" />
+            </a>
+          </div>
+        </div>
+      )}
+      title="巨无霸指数 · 数据探索"
+    />
   );
 }

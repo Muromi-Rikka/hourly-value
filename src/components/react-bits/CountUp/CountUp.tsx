@@ -1,6 +1,8 @@
 import { useInView, useMotionValue, useSpring } from "motion/react";
 import { useCallback, useEffect, useRef } from "react";
 
+import { shouldReduceMotion } from "@/lib/reduced-motion";
+
 interface CountUpProperties {
   className?: string;
   delay?: number;
@@ -70,13 +72,25 @@ export function CountUp({
   );
 
   useEffect(() => {
-    if (reference.current) {
-      reference.current.textContent = formatValue(direction === "down" ? to : from);
+    if (!reference.current) {
+      return;
     }
+    // 减少动态效果：初始即显示终值，不等待进入视口
+    reference.current.textContent = shouldReduceMotion()
+      ? formatValue(direction === "down" ? from : to)
+      : formatValue(direction === "down" ? to : from);
   }, [from, to, direction, formatValue]);
 
   useEffect(() => {
     if (!(isInView && startWhen)) {
+      return;
+    }
+
+    if (shouldReduceMotion()) {
+      // 减少动态效果：直接显示终值，不跑数字滚动
+      if (reference.current) {
+        reference.current.textContent = formatValue(direction === "down" ? from : to);
+      }
       return;
     }
 

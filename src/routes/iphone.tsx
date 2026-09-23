@@ -1,10 +1,9 @@
-import { createRoute } from "@tanstack/react-router";
+import { createRoute, lazyRouteComponent } from "@tanstack/react-router";
 
-import { IPhone } from "@/pages/iphone";
 import { rootRoute } from "@/routes/__root";
 
 export const iphoneRoute = createRoute({
-  component: IPhone,
+  component: lazyRouteComponent(() => import("@/pages/iphone"), "IPhone"),
   getParentRoute: () => rootRoute,
   path: "/iphone",
 });

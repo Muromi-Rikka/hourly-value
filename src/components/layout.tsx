@@ -6,22 +6,40 @@ import { Button } from "@/components/ui/button";
 import { wages } from "@/data/wages";
 import { cn } from "@/lib/utilities";
 
-const navItems = [
-  { href: "/", label: "首页" },
-  { href: "/explore", label: "数据探索" },
-  { href: "/iphone", label: "iPhone指数" },
-  { href: "/bigmac", label: "巨无霸指数" },
-  { href: "/commodity", label: "物资指数" },
-  { href: "/modely", label: "Model Y指数" },
-  { href: "/about", label: "关于" },
+/**
+ * 单一指数入口（首页/落地页）；short 供 md–lg 窄宽度导航使用
+*/
+const indexItems = [
+  { href: "/explore", label: "最低工资", short: "最低工资" },
+  { href: "/iphone", label: "iPhone 指数", short: "iPhone" },
+  { href: "/bigmac", label: "巨无霸指数", short: "巨无霸" },
+  { href: "/commodity", label: "物资指数", short: "物资" },
+  { href: "/modely", label: "Model Y 指数", short: "Model Y" },
 ];
+
+/**
+ * 每个路由的文档标题，切页时同步更新
+*/
+const pageTitles: Record<string, string> = {
+  "/": "全球最低工资对比",
+  "/about": "关于本项目",
+  "/bigmac": "巨无霸指数",
+  "/bigmac-explore": "巨无霸指数 · 数据探索",
+  "/commodity": "物资指数",
+  "/commodity-explore": "物资指数 · 数据探索",
+  "/explore": "最低工资 · 数据探索",
+  "/iphone": "iPhone 指数",
+  "/iphone-explore": "iPhone 指数 · 数据探索",
+  "/modely": "Model Y 指数",
+  "/modely-explore": "Model Y 指数 · 数据探索",
+};
+
+const copyrightYear = new Date().getFullYear();
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const location = useLocation();
-
-  const wideRoutes = ["/explore", "/iphone-explore", "/bigmac-explore", "/commodity-explore", "/modely-explore"];
-  const mainMaxWidth = wideRoutes.includes(location.pathname) ? "max-w-6xl" : "max-w-5xl";
+  useDocumentTitle(location.pathname);
 
   return (
     <div className="min-h-dvh bg-background font-sans text-foreground antialiased">
@@ -33,30 +51,54 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link className="flex items-center gap-2 font-semibold" to="/">
             <span className="rounded-full bg-primary/10 p-1.5">
-              <Globe className="h-5 w-5 animate-[spin_12s_linear_infinite] text-primary" />
+              <Globe className="h-5 w-5 text-primary" />
             </span>
             <span className="font-display text-base">全球最低工资对比</span>
           </Link>
 
           <nav className="hidden items-center gap-1 md:flex">
-            {navItems.map(item => (
-              <Link
-                className={cn(
-                  "relative rounded-md px-3 py-2 text-sm transition-colors hover:text-primary",
-                  location.pathname === item.href && "font-medium text-primary",
-                )}
+            <Link
+              className={cn(
+                "relative rounded-md px-3 py-2 text-sm transition-colors hover:text-primary",
+                location.pathname === "/" && "font-medium text-primary",
+              )}
+              to="/"
+            >
+              首页
+              {location.pathname === "/" && (
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-primary" />
+              )}
+            </Link>
+
+            <span aria-hidden="true" className="mx-1 h-4 w-px bg-border" />
+            {indexItems.map(item => (
+              <IndexLink
+                href={item.href}
                 key={item.href}
-                to={item.href}
-              >
-                {item.label}
-                {location.pathname === item.href && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-primary" />
-                )}
-              </Link>
+                label={item.label}
+                pathname={location.pathname}
+                short={item.short}
+              />
             ))}
+            <span aria-hidden="true" className="mx-1 h-4 w-px bg-border" />
+
+            <Link
+              className={cn(
+                "relative rounded-md px-3 py-2 text-sm transition-colors hover:text-primary",
+                location.pathname === "/about" && "font-medium text-primary",
+              )}
+              to="/about"
+            >
+              关于
+              {location.pathname === "/about" && (
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-primary" />
+              )}
+            </Link>
           </nav>
 
           <Button
+            aria-expanded={mobileOpen}
+            aria-label={mobileOpen ? "关闭菜单" : "打开菜单"}
             className="md:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
             size="icon"
@@ -68,11 +110,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
         {mobileOpen && (
           <nav className="border-t md:hidden">
-            {navItems.map(item => (
+            <Link
+              className={cn(
+                "block px-4 py-4 text-sm transition-colors hover:text-primary",
+                location.pathname === "/" && "border-l-2 border-primary bg-primary/5 font-medium text-primary pl-3.5",
+              )}
+              onClick={() => setMobileOpen(false)}
+              to="/"
+            >
+              首页
+            </Link>
+
+            <p className="border-t px-4 pt-4 pb-1 text-xs text-muted-foreground">指数</p>
+            {indexItems.map(item => (
               <Link
                 className={cn(
-                  "block px-4 py-4 text-sm transition-colors hover:text-primary",
-                  location.pathname === item.href && "border-l-2 border-primary bg-primary/5 font-medium text-primary pl-3.5",
+                  "block px-4 py-3 pl-6 text-sm transition-colors hover:text-primary",
+                  location.pathname === item.href && "border-l-2 border-primary bg-primary/5 font-medium text-primary pl-[1.375rem]",
                 )}
                 key={item.href}
                 onClick={() => setMobileOpen(false)}
@@ -81,16 +135,27 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 {item.label}
               </Link>
             ))}
+
+            <Link
+              className={cn(
+                "block border-t px-4 py-4 text-sm transition-colors hover:text-primary",
+                location.pathname === "/about" && "border-l-2 border-primary bg-primary/5 font-medium text-primary pl-3.5",
+              )}
+              onClick={() => setMobileOpen(false)}
+              to="/about"
+            >
+              关于
+            </Link>
           </nav>
         )}
       </header>
 
-      <main className={cn("mx-auto px-4 py-8 sm:px-6", mainMaxWidth)} id="main">
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6" id="main">
         {children}
       </main>
 
       <footer className="border-t bg-muted/50 text-sm text-muted-foreground">
-        <div className="gradient-accent" />
+        <div className="rule-top" />
         <div className="mx-auto max-w-6xl px-4 py-10">
           <div className="grid gap-8 sm:grid-cols-3">
             {/* Left — Logo & description */}
@@ -112,7 +177,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
             {/* Center — Data sources */}
             <div>
-              <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-foreground">数据来源</h3>
+              <h3 className="mb-3 text-xs font-medium text-foreground">数据来源</h3>
               <ul className="space-y-1.5 text-xs">
                 {wages.slice(0, 4).map(entry => (
                   <li className="flex items-center gap-1.5" key={entry.countryCode}>
@@ -125,9 +190,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
             {/* Right — Quick links */}
             <div>
-              <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-foreground">快速导航</h3>
+              <h3 className="mb-3 text-xs font-medium text-foreground">快速导航</h3>
               <ul className="space-y-1.5 text-xs">
-                {navItems.slice(0, 5).map(item => (
+                {[...indexItems, { href: "/about", label: "关于" }].map(item => (
                   <li key={item.href}>
                     <Link className="transition-colors hover:text-primary" to={item.href}>
                       {item.label}
@@ -140,19 +205,54 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
           {/* Bottom bar */}
           <div className="mt-8 flex flex-col items-center gap-3 border-t border-border/50 pt-5 sm:flex-row sm:justify-between">
-            <span className="text-xs">© 2025 Muromi-Rikka · 数据来源：各国政府官方机构</span>
+            <span className="text-xs">
+              ©
+              {" "}
+              {copyrightYear}
+              {" "}
+              Muromi-Rikka · 数据来源：各国政府官方机构
+            </span>
             <Button
+              aria-label="回到顶部"
               className="h-7 w-7 rounded-full"
               onClick={() => scrollTo({ behavior: "smooth", top: 0 })}
               size="icon"
               variant="outline"
             >
               <ArrowUp className="h-3.5 w-3.5" />
-              <span className="sr-only">回到顶部</span>
             </Button>
           </div>
         </div>
       </footer>
     </div>
   );
+}
+
+function IndexLink({ href, label, pathname, short }: { href: string; label: string; pathname: string; short: string }) {
+  const active = pathname === href || pathname.startsWith(`${href}-`);
+
+  return (
+    <Link
+      className={cn(
+        "relative rounded-md px-3 py-2 text-sm transition-colors hover:text-primary",
+        active && "font-medium text-primary",
+      )}
+      to={href}
+    >
+      <span className="hidden lg:inline">{label}</span>
+      <span className="lg:hidden">{short}</span>
+      {active && (
+        <span className="absolute bottom-0 left-1/2 h-0.5 w-4 -translate-x-1/2 rounded-full bg-primary" />
+      )}
+    </Link>
+  );
+}
+
+function useDocumentTitle(pathname: string) {
+  React.useEffect(() => {
+    const page = pageTitles[pathname];
+    document.title = page === undefined
+      ? "全球最低工资对比"
+      : (page === "/" ? page : `${page} · 全球购买力`);
+  }, [pathname]);
 }

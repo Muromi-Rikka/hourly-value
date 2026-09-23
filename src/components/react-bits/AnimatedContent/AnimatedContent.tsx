@@ -2,6 +2,8 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import React, { useEffect, useRef } from "react";
 
+import { shouldReduceMotion } from "@/lib/reduced-motion";
+
 gsap.registerPlugin(ScrollTrigger);
 
 interface AnimatedContentProperties extends React.HTMLAttributes<HTMLDivElement> {
@@ -52,6 +54,12 @@ const AnimatedContent: React.FC<AnimatedContentProperties> = ({
     if (!element)
       return;
 
+    // 减少动态效果：跳过位移/淡入，仅把 wrapper 的 invisible 覆盖为可见
+    if (shouldReduceMotion()) {
+      gsap.set(element, { visibility: "visible" });
+      return;
+    }
+
     let scrollerTarget: Element | null | string = container || document.querySelector("#snap-main-container") || null;
 
     if (typeof scrollerTarget === "string") {
@@ -100,7 +108,7 @@ const AnimatedContent: React.FC<AnimatedContentProperties> = ({
     const st = ScrollTrigger.create({
       once: true,
       onEnter: () => tl.play(),
-      scroller: scrollerTarget || globalThis,
+      scroller: scrollerTarget,
       start: `top ${startPct}%`,
       trigger: element,
     });

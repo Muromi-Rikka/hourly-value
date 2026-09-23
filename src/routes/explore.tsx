@@ -1,9 +1,8 @@
-import { createRoute } from "@tanstack/react-router";
-import { Explore } from "@/pages/explore";
+import { createRoute, lazyRouteComponent } from "@tanstack/react-router";
 import { rootRoute } from "@/routes/__root";
 
 const exploreRoute = createRoute({
-  component: Explore,
+  component: lazyRouteComponent(() => import("@/pages/explore"), "Explore"),
   getParentRoute: () => rootRoute,
   path: "/explore",
 });

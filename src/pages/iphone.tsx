@@ -4,28 +4,26 @@ import * as React from "react";
 
 import type { IPhoneIndexEntry } from "@/data/iphone-index";
 import { CountryFlag } from "@/components/country-flag";
-import { IPhoneBarChart } from "@/components/iphone-bar-chart";
+import { createIPhoneTooltip } from "@/components/index-tooltips";
+import { RankBarChart } from "@/components/rank-bar-chart";
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
 import { CountUp } from "@/components/react-bits/CountUp/CountUp";
 import { FadeContent } from "@/components/react-bits/FadeContent/FadeContent";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { iphoneDuoIndex, sortedByHoursDuo } from "@/data/iphone-duo-index";
-import { iphoneIndex, sortedByHours } from "@/data/iphone-index";
+import { sortedByHoursDuo } from "@/data/iphone-duo-index";
+import { sortedByHours } from "@/data/iphone-index";
+import { regionAverages } from "@/lib/region";
 
 type ModelKey = "duo" | "pro18";
 
-const MODEL_CONFIG: Record<ModelKey, { data: IPhoneIndexEntry[]; label: string; sorted: IPhoneIndexEntry[]; sub: string }> = {
+const MODEL_CONFIG: Record<ModelKey, { sorted: IPhoneIndexEntry[]; sub: string }> = {
   duo: {
-    data: iphoneDuoIndex,
-    label: "iPhone Duo",
     sorted: sortedByHoursDuo,
     sub: "iPhone Duo",
   },
   pro18: {
-    data: iphoneIndex,
-    label: "iPhone 18 Pro",
     sorted: sortedByHours,
     sub: "iPhone 18 Pro (256GB)",
   },
@@ -34,7 +32,7 @@ const MODEL_CONFIG: Record<ModelKey, { data: IPhoneIndexEntry[]; label: string; 
 export function IPhone() {
   const [model, setModel] = React.useState<ModelKey>("pro18");
   const config = MODEL_CONFIG[model];
-  const { data, sorted, sub } = config;
+  const { sorted, sub } = config;
 
   // Only entries with actual hours data
   const withHours = sorted.filter(entry => entry.hoursToBuy !== null);
@@ -42,14 +40,14 @@ export function IPhone() {
   const mostExpensive = withHours[withHours.length - 1];
   const count = withHours.length;
   const ratio = Number((mostExpensive.hoursToBuy! / cheapest.hoursToBuy!).toFixed(1));
-  const regionData = regionAverages(data);
+  const regionData = regionAverages(withHours, entry => entry.hoursToBuy!);
   const maxRegionAvg = Math.max(...regionData.map(r => r.avg));
 
   return (
     <div>
       {/* Hero — editorial statement */}
       <section className="pb-12 pt-6 sm:pb-16 sm:pt-8">
-        <div className="gradient-accent mb-6" />
+        <div className="rule-top mb-6" />
         <SplitText
           className="max-w-3xl font-display text-[clamp(2.8rem,6vw,5rem)] font-normal leading-[1.05] tracking-[-0.03em]"
           delay={80}
@@ -86,7 +84,15 @@ export function IPhone() {
       <AnimatedContent direction="vertical" distance={40} duration={0.8}>
         <section className="-mx-4 border-y sm:-mx-6">
           <div className="px-4 py-5 sm:px-6">
-            <IPhoneBarChart data={sorted} key={model} layout="horizontal" />
+            <RankBarChart
+              data={withHours}
+              formatTick={value => `${value}h`}
+              formatValue={value => `${value}h`}
+              key={model}
+              layout="horizontal"
+              tooltip={createIPhoneTooltip(withHours)}
+              valueKey="hoursToBuy"
+            />
           </div>
         </section>
       </AnimatedContent>
@@ -96,7 +102,7 @@ export function IPhone() {
         <section>
           {/* Headline row */}
           <div className="mt-10 mb-6 sm:mt-12">
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">数据洞察</p>
+            <p className="text-xs font-medium tracking-wider text-muted-foreground">数据洞察</p>
           </div>
 
           {/* Two-column editorial layout */}
@@ -145,7 +151,7 @@ export function IPhone() {
                       <span className="w-10 shrink-0 text-right text-xs text-muted-foreground">{r.region}</span>
                       <div className="relative h-5 flex-1 overflow-hidden rounded-sm bg-muted">
                         <div
-                          className="absolute inset-y-0 left-0 rounded-sm bg-gradient-to-r from-primary to-accent-warm transition-all duration-700"
+                          className="absolute inset-y-0 left-0 rounded-sm bg-primary transition-all duration-700"
                           style={{
                             width: `${(r.avg / maxRegionAvg) * 100}%`,
                           }}
@@ -198,23 +204,4 @@ export function IPhone() {
       </AnimatedContent>
     </div>
   );
-}
-
-function regionAverages(data: IPhoneIndexEntry[]): Array<{ avg: number; count: number; region: string }> {
-  const entries = data.filter(entry => entry.hoursToBuy !== null);
-  const map = new Map<string, number[]>();
-  for (const w of entries) {
-    const array = map.get(w.region);
-    if (array) {
-      array.push(w.hoursToBuy!);
-    }
-    else {
-      map.set(w.region, [w.hoursToBuy!]);
-    }
-  }
-  return map
-    .entries()
-    .map(([region, vals]) => ({ avg: Math.round(vals.reduce((a, b) => a + b, 0) / vals.length), count: vals.length, region }))
-    .toArray()
-    .toSorted((a, b) => a.avg - b.avg);
 }

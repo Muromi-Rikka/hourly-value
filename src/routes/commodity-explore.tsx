@@ -1,10 +1,9 @@
-import { createRoute } from "@tanstack/react-router";
+import { createRoute, lazyRouteComponent } from "@tanstack/react-router";
 
-import { CommodityExplore } from "@/pages/commodity-explore";
 import { rootRoute } from "@/routes/__root";
 
 export const commodityExploreRoute = createRoute({
-  component: CommodityExplore,
+  component: lazyRouteComponent(() => import("@/pages/commodity-explore"), "CommodityExplore"),
   getParentRoute: () => rootRoute,
   path: "/commodity-explore",
 });

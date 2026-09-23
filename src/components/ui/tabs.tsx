@@ -13,7 +13,10 @@ interface TabsContentProperties extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 interface TabsProperties extends React.HTMLAttributes<HTMLDivElement> {
-  defaultValue: string;
+  /**
+  * 非受控模式的初始值；与 `value` 同时省略时无选中项
+  */
+  defaultValue?: string;
   onValueChange?: (value: string) => void;
   value?: string;
 }
@@ -23,7 +26,7 @@ interface TabsTriggerProperties extends React.ButtonHTMLAttributes<HTMLButtonEle
 }
 
 function Tabs({ children, className, defaultValue, onValueChange, value: controlledValue, ...properties }: TabsProperties) {
-  const [internalValue, setInternalValue] = React.useState(defaultValue);
+  const [internalValue, setInternalValue] = React.useState(defaultValue ?? "");
   const value = controlledValue ?? internalValue;
   const handleValueChange = React.useCallback(
     (v: string) => {

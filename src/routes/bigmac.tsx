@@ -1,10 +1,9 @@
-import { createRoute } from "@tanstack/react-router";
+import { createRoute, lazyRouteComponent } from "@tanstack/react-router";
 
-import { BigMac } from "@/pages/bigmac";
 import { rootRoute } from "@/routes/__root";
 
 export const bigmacRoute = createRoute({
-  component: BigMac,
+  component: lazyRouteComponent(() => import("@/pages/bigmac"), "BigMac"),
   getParentRoute: () => rootRoute,
   path: "/bigmac",
 });

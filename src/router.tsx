@@ -14,7 +14,7 @@ import { modelyExploreRoute } from "@/routes/modely-explore";
 
 const routeTree = rootRoute.addChildren([indexRoute, exploreRoute, aboutRoute, iphoneRoute, iphoneExploreRoute, bigmacRoute, bigmacExploreRoute, commodityRoute, commodityExploreRoute, modelyRoute, modelyExploreRoute]);
 
-const router = createRouter({ routeTree });
+const router = createRouter({ routeTree, scrollRestoration: true });
 
 declare module "@tanstack/react-router" {
   interface Register {

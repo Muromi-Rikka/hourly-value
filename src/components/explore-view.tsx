@@ -1,0 +1,88 @@
+import type { RowData, SortingState } from "@tanstack/react-table";
+import type * as React from "react";
+
+import type { DataTableColumn } from "@/components/data-table";
+
+import { DataTable } from "@/components/data-table";
+import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
+import { BlurText } from "@/components/react-bits/BlurText/BlurText";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+interface ExploreViewProperties<T extends RowData> {
+  /**
+  * 图表视图本体
+  */
+  chart: React.ReactNode;
+  /**
+  * 图表视图的口径说明
+  */
+  chartCaption: React.ReactNode;
+  columns: DataTableColumn<T>[];
+  data: T[];
+  defaultSort: SortingState;
+  /**
+  * 副标题，写清数据口径与条数
+  */
+  description: React.ReactNode;
+  renderExpanded: (row: T) => React.ReactNode;
+  /**
+  * 页面标题（同时作为浏览器标签标题的一部分）
+  */
+  title: string;
+}
+
+/**
+ * 指数数据探索页的统一骨架：标题 → 口径说明 → 表格/图表切换。
+ * 五个 explore 页共用，只传数据与列定义。
+ */
+export function ExploreView<T extends RowData>({
+  chart,
+  chartCaption,
+  columns,
+  data,
+  defaultSort,
+  description,
+  renderExpanded,
+  title,
+}: ExploreViewProperties<T>) {
+  return (
+    <div>
+      <div className="pb-6">
+        <BlurText
+          animateBy="words"
+          className="font-display text-[clamp(2rem,4vw,3rem)] font-normal leading-[1.1] tracking-[-0.02em]"
+          delay={150}
+          text={title}
+        />
+        <AnimatedContent delay={0.1} distance={20} duration={0.5}>
+          <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">{description}</p>
+        </AnimatedContent>
+      </div>
+
+      <AnimatedContent delay={0.1} distance={40} duration={0.6} threshold={0.05}>
+        <Tabs defaultValue="table">
+          <TabsList className="mt-4">
+            <TabsTrigger value="table">表格视图</TabsTrigger>
+            <TabsTrigger value="chart">图表视图</TabsTrigger>
+          </TabsList>
+
+          <TabsContent className="mt-4" value="table">
+            <DataTable
+              columns={columns}
+              data={data}
+              defaultSort={defaultSort}
+              renderExpanded={renderExpanded}
+            />
+          </TabsContent>
+
+          <TabsContent className="mt-4" value="chart">
+            <div>
+              <p className="mb-3 text-sm text-muted-foreground">{chartCaption}</p>
+              {chart}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </AnimatedContent>
+    </div>
+  );
+}

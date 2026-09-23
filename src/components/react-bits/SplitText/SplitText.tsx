@@ -4,6 +4,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText as GSAPSplitText } from "gsap/SplitText";
 import React, { useEffect, useRef, useState } from "react";
 
+import { shouldReduceMotion } from "@/lib/reduced-motion";
+
 gsap.registerPlugin(ScrollTrigger, GSAPSplitText, useGSAP);
 
 export interface SplitTextProps {
@@ -62,6 +64,10 @@ const SplitText: React.FC<SplitTextProps> = ({
     () => {
       if (!reference.current || !text || !fontsLoaded)
         return;
+      // 减少动态效果：保持纯文本，不拆字也不入场
+      if (shouldReduceMotion()) {
+        return;
+      }
       // Prevent re-animation if already completed
       if (animationCompletedReference.current)
         return;

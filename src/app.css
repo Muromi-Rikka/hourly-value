@@ -3,45 +3,52 @@
 @import "tailwindcss";
 @plugin "@iconify/tailwind4";
 
+/*
+  设计令牌 —— 「数据公报」方向
+  纸 (cool ash paper) / 墨 (ink) / 账簿青 (ledger teal) / 印章朱 (stamp) / 栏线 (rule)
+  配色以 WCAG AA 对比度校验：正文 ≥ 4.5:1，大字号与图形 ≥ 3:1。
+*/
 @theme {
-  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
-  --font-sans: "Outfit", system-ui, sans-serif;
+  /* 中文与拉丁同栈：Instrument Serif 仅服务数字（--font-numeral） */
+  --font-sans: "Outfit", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  --font-display: "Outfit", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  --font-numeral: "Instrument Serif", ui-serif, Georgia, serif;
 
-  /* ── Palette ── */
-  --color-background: oklch(0.985 0.004 60);
-  --color-foreground: oklch(0.145 0.014 286);
-  --color-card: oklch(0.99 0.002 60);
-  --color-card-foreground: oklch(0.145 0.014 286);
-  --color-popover: oklch(0.99 0.002 60);
-  --color-popover-foreground: oklch(0.145 0.014 286);
-  --color-primary: oklch(0.55 0.16 25);
-  --color-primary-foreground: oklch(0.99 0 0);
-  --color-secondary: oklch(0.965 0.003 286);
-  --color-secondary-foreground: oklch(0.205 0.014 286);
-  --color-muted: oklch(0.965 0.003 286);
-  --color-muted-foreground: oklch(0.556 0.015 286);
-  --color-accent: oklch(0.965 0.003 286);
-  --color-accent-foreground: oklch(0.205 0.014 286);
-  --color-destructive: oklch(0.577 0.245 27.3);
-  --color-destructive-foreground: oklch(0.577 0.245 27.3);
-  --color-border: oklch(0.922 0.007 286);
-  --color-input: oklch(0.922 0.007 286);
-  --color-ring: oklch(0.55 0.16 25);
+  /* ── Palette (light) ── */
+  --color-background: oklch(0.951 0.007 107);
+  --color-foreground: oklch(0.209 0.006 157);
+  --color-card: oklch(0.969 0.005 106);
+  --color-card-foreground: oklch(0.209 0.006 157);
+  --color-popover: oklch(0.969 0.005 106);
+  --color-popover-foreground: oklch(0.209 0.006 157);
+  --color-primary: oklch(0.474 0.083 178);
+  --color-primary-foreground: oklch(0.969 0.005 106);
+  --color-secondary: oklch(0.923 0.008 107);
+  --color-secondary-foreground: oklch(0.209 0.006 157);
+  --color-muted: oklch(0.923 0.008 107);
+  --color-muted-foreground: oklch(0.522 0.011 140);
+  --color-accent: oklch(0.923 0.008 107);
+  --color-accent-foreground: oklch(0.209 0.006 157);
+  --color-destructive: oklch(0.493 0.158 32);
+  --color-destructive-foreground: oklch(0.969 0.005 106);
+  --color-border: oklch(0.874 0.011 107);
+  --color-input: oklch(0.874 0.011 107);
+  --color-ring: oklch(0.474 0.083 178);
 
   /* ── Surface layers ── */
-  --color-surface: oklch(0.98 0.003 60);
-  --color-surface-raised: oklch(0.96 0.006 55);
-  --color-surface-overlay: oklch(0.94 0.008 50);
+  --color-surface: oklch(0.937 0.007 107);
+  --color-surface-raised: oklch(0.951 0.007 107);
+  --color-surface-overlay: oklch(0.874 0.011 107);
 
-  /* ── Accent colors ── */
-  --color-accent-warm: oklch(0.72 0.14 55);
-  --color-accent-gold: oklch(0.78 0.12 85);
+  /* ── Semantic accents ── */
+  --color-stamp: oklch(0.493 0.158 32);
+  --color-accent-warm: oklch(0.62 0.11 165);
 
   /* ── Region colors ── */
-  --color-region-asia: oklch(0.65 0.15 55);
-  --color-region-europe: oklch(0.60 0.14 265);
-  --color-region-oceania: oklch(0.62 0.16 155);
-  --color-region-north-america: oklch(0.60 0.15 30);
+  --color-region-asia: oklch(0.511 0.126 42);
+  --color-region-europe: oklch(0.489 0.133 259);
+  --color-region-oceania: oklch(0.473 0.107 145);
+  --color-region-north-america: oklch(0.496 0.124 313);
 
   --radius-lg: 0.75rem;
   --radius-md: 0.5rem;
@@ -53,55 +60,55 @@
 /* ── Dark mode ── */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-background: oklch(0.13 0.014 286);
-    --color-foreground: oklch(0.985 0.002 286);
-    --color-card: oklch(0.18 0.014 286);
-    --color-card-foreground: oklch(0.985 0.002 286);
-    --color-popover: oklch(0.13 0.014 286);
-    --color-popover-foreground: oklch(0.985 0.002 286);
-    --color-primary: oklch(0.65 0.18 25);
-    --color-primary-foreground: oklch(0.145 0.014 286);
-    --color-secondary: oklch(0.269 0.014 286);
-    --color-secondary-foreground: oklch(0.985 0.002 286);
-    --color-muted: oklch(0.269 0.014 286);
-    --color-muted-foreground: oklch(0.708 0.015 286);
-    --color-accent: oklch(0.269 0.014 286);
-    --color-accent-foreground: oklch(0.985 0.002 286);
-    --color-destructive: oklch(0.396 0.141 25.7);
-    --color-destructive-foreground: oklch(0.637 0.237 25.3);
-    --color-border: oklch(0.269 0.014 286);
-    --color-input: oklch(0.269 0.014 286);
-    --color-ring: oklch(0.439 0.014 286);
+    --color-background: oklch(0.201 0.006 157);
+    --color-foreground: oklch(0.947 0.007 116);
+    --color-card: oklch(0.239 0.007 164);
+    --color-card-foreground: oklch(0.947 0.007 116);
+    --color-popover: oklch(0.239 0.007 164);
+    --color-popover-foreground: oklch(0.947 0.007 116);
+    --color-primary: oklch(0.665 0.101 177);
+    --color-primary-foreground: oklch(0.201 0.006 157);
+    --color-secondary: oklch(0.275 0.008 170);
+    --color-secondary-foreground: oklch(0.947 0.007 116);
+    --color-muted: oklch(0.275 0.008 170);
+    --color-muted-foreground: oklch(0.705 0.012 150);
+    --color-accent: oklch(0.275 0.008 170);
+    --color-accent-foreground: oklch(0.947 0.007 116);
+    --color-destructive: oklch(0.671 0.144 33);
+    --color-destructive-foreground: oklch(0.201 0.006 157);
+    --color-border: oklch(0.327 0.009 160);
+    --color-input: oklch(0.327 0.009 160);
+    --color-ring: oklch(0.665 0.101 177);
 
     /* Surface layers — dark */
-    --color-surface: oklch(0.16 0.014 286);
-    --color-surface-raised: oklch(0.20 0.014 286);
-    --color-surface-overlay: oklch(0.24 0.014 286);
+    --color-surface: oklch(0.222 0.007 160);
+    --color-surface-raised: oklch(0.256 0.007 164);
+    --color-surface-overlay: oklch(0.327 0.009 160);
 
-    /* Accent colors — dark */
-    --color-accent-warm: oklch(0.78 0.14 55);
-    --color-accent-gold: oklch(0.82 0.12 85);
+    /* Semantic accents — dark */
+    --color-stamp: oklch(0.671 0.144 33);
+    --color-accent-warm: oklch(0.72 0.11 165);
 
-    /* Region colors — boosted lightness for dark bg */
-    --color-region-asia: oklch(0.75 0.15 55);
-    --color-region-europe: oklch(0.70 0.14 265);
-    --color-region-oceania: oklch(0.72 0.16 155);
-    --color-region-north-america: oklch(0.70 0.15 30);
+    /* Region colors — 提亮以适配深色底 */
+    --color-region-asia: oklch(0.666 0.122 48);
+    --color-region-europe: oklch(0.713 0.098 261);
+    --color-region-oceania: oklch(0.739 0.11 149);
+    --color-region-north-america: oklch(0.71 0.09 309);
   }
 }
 
 /* ── Browser surface ── */
 ::selection {
-  background: oklch(0.55 0.16 25 / 0.25);
+  background: oklch(0.474 0.083 178 / 0.25);
 }
 
 html {
-  scrollbar-color: oklch(0.7 0.01 286) oklch(0.95 0.003 286);
+  scrollbar-color: oklch(0.7 0.01 150) oklch(0.93 0.007 107);
 }
 
 @media (prefers-color-scheme: dark) {
   html {
-    scrollbar-color: oklch(0.4 0.01 286) oklch(0.2 0.014 286);
+    scrollbar-color: oklch(0.45 0.01 157) oklch(0.22 0.006 157);
   }
 }
 
@@ -118,22 +125,14 @@ html {
 
 /* ── Editorial utilities ── */
 
-/* Decorative gradient accent line */
-.gradient-accent {
-  background: linear-gradient(90deg, var(--color-primary), var(--color-accent-warm), var(--color-accent-gold));
-  height: 2px;
-}
-
-/* Data emphasis number styling */
+/* 数字专用：Instrument Serif + 等宽数字 */
 .stat-number {
-  font-family: var(--font-display);
+  font-family: var(--font-numeral);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
 
-/* Soft inset shadow card */
-.card-inset {
-  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.05), 0 1px 3px oklch(0 0 0 / 0.04);
+/* 栏线：分隔结构而非装饰 */
+.rule-top {
+  border-top: 1px solid var(--color-border);
 }
-
-

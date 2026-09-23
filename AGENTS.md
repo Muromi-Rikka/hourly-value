@@ -2,64 +2,70 @@
 
 ## Project Overview
 
-Global minimum-wage purchasing-power visualization website. Displays 13 countries' minimum wages converted to CNY-equivalent hourly rates. Built from `@trapar-waves/react-tailwind` template.
+Global minimum-wage purchasing-power visualization website. Five indices (minimum wage, iPhone, Big Mac, commodity basket, Model Y) across 11 routes, comparing 13 countries/regions — all values anchored in CNY. Built from `@trapar-waves/react-tailwind` template.
 
 - **Package**: `@trapar-waves/react-tailwind` v2.0.0
 - **License**: MIT (Trapar waves, 2025)
 
 ## Architecture & Data Flow
 
-Single-page React app with client-side routing and static data.
+React SPA with client-side routing, per-route code splitting, and static data.
 
 ```
 src/index.tsx  →  src/app.tsx  →  <RouterProvider router={router} />
                                         │
-                                  src/router.tsx (TanStack Router)
+                              src/router.tsx (11 routes; index eager, 其余 lazy)
                                         │
                               src/routes/__root.tsx  →  <Layout>
                                         │
-                         ┌──────────────┼──────────────┐
-                    index.tsx      explore.tsx      about.tsx
-                         │              │              │
-                    pages/home     pages/explore   pages/about
-                         │              │              │
-                   ┌─────┴─────┐   ┌────┴────┐    (static)
-              WageBarChart  Cards  Table  WageBarChart
-                   │                    │
-              data/wages.ts  ◄──────────┘
-              (13 WageEntry records, sortedByWage, regions)
+   ┌──────────────┬──────────────┬──────┴───────┬──────────────────┐
+index.tsx     about.tsx     explore.tsx   指数落地页 ×4     探索页 ×4
+   │              │              │        (iphone/bigmac/   (…-explore)
+pages/home    pages/about   pages/explore   commodity/modely)
+   │              │              │              │
+WageRuler     五大指数+来源   ExploreView   RankBarChart + TooltipShell
+(CSS 刻度尺)                  + DataTable        │
+                                        │
+                          src/data/*.ts — 5 套数据集，页面直接 import，无 API
 ```
 
-**Router**: TanStack Router (`@tanstack/react-router`) — NOT react-router-dom. Routes defined as `createRoute()` objects in `src/routes/*.tsx`, assembled into a tree in `src/router.tsx`.
+**Router**: TanStack Router (`@tanstack/react-router`) — NOT react-router-dom. Routes defined as `createRoute()` objects in `src/routes/*.tsx`, assembled into a tree in `src/router.tsx`. All non-index routes are lazy: `component: lazyRouteComponent(() => import("@/pages/x"), "X")`. `scrollRestoration: true`.
 
-**Data**: `src/data/wages.ts` is the single source of truth. All pages import directly from it. No API calls, no server state.
+**Data**: `src/data/*.ts` — five datasets (`wages`, `iphone-index`/`iphone-duo-index`, `bigmac`/`bigmac-ppp`, `commodity-index`, `modely-index`). Each exports an entry interface plus pre-sorted arrays. Pages import directly. No API calls, no server state.
 
 ## Key Directories
 
 ```
 src/
-├── components/         # Shared UI
-│   ├── ui/             # shadcn/ui primitives (button, card, table, tabs, select, badge, separator)
-│   ├── layout.tsx      # App shell: header + nav + footer
-│   ├── wage-bar-chart.tsx  # Recharts wrapper (horizontal/vertical BarChart)
-│   └── wage-tooltip.tsx    # Custom Recharts tooltip
-├── data/
-│   └── wages.ts        # WageEntry interface + 13 records + sortedByWage + regions
+├── components/             # Shared UI
+│   ├── ui/                 # shadcn/ui primitives (button, card, table, tabs, select, badge, separator)
+│   ├── layout.tsx          # App shell: header + grouped 指数 dropdown nav + footer
+│   ├── rank-bar-chart.tsx  # 5 指数共用排行条形图 (Recharts, 区域着色, 底部图例)
+│   ├── tooltip-shell.tsx   # 指数 tooltip 统一外壳 (国旗+排名+区域)
+│   ├── index-tooltips.tsx  # 5 指数 tooltip 唯一实现（落地页/探索页共用）
+│   ├── explore-view.tsx    # 探索页骨架 (图表 + DataTable + 展开行)
+│   ├── data-table.tsx      # TanStack Table 封装 (DataTableColumn<T>)
+│   ├── region-badge.tsx    # 区域徽章/圆点 (RegionBadge / RegionDot)
+│   ├── region-legend.tsx   # 图表底部区域图例
+│   └── react-bits/         # 动效组件 (GSAP/motion；均有 reduced-motion 守卫)
+├── data/                   # 5 套静态数据集
+│   ├── wages.ts            # WageEntry + 13 records + sortedByWage
+│   ├── iphone-index.ts / iphone-duo-index.ts
+│   ├── bigmac.ts / bigmac-ppp.ts
+│   ├── commodity-index.ts
+│   └── modely-index.ts
 ├── lib/
-│   └── utilities.ts    # cn() re-export from "cn" package
-├── pages/              # Route page components
-│   ├── home.tsx        # Hero chart + insight cards + CTA
-│   ├── explore.tsx     # Filterable/sortable table + chart view (TanStack Table)
-│   └── about.tsx       # Data sources + methodology
-├── routes/             # TanStack Router route definitions
-│   ├── __root.tsx      # Root route (Layout wrapper)
-│   ├── index.tsx       # /
-│   ├── explore.tsx     # /explore
-│   └── about.tsx       # /about
-├── app.tsx             # Entry: <RouterProvider>
-├── app.css             # Tailwind v4 theme (CSS @theme, oklch colors, shadcn vars)
-├── index.tsx           # React 19 createRoot mount
-└── environment.d.ts    # Rsbuild type reference
+│   ├── utilities.ts        # cn() re-export from "cn" package
+│   ├── region.ts           # regionKey / regionColor / regionLegend / regionAverages
+│   └── reduced-motion.ts   # shouldReduceMotion() — JS 动效守卫
+├── pages/                  # Route pages: home, about, 5 落地页 + 5 探索页
+├── routes/                 # TanStack Router definitions (11 条; 非 index 懒加载)
+│   ├── __root.tsx          # Root route (Layout wrapper)
+│   └── *.tsx               # 每条路由 lazyRouteComponent 指向 pages/
+├── app.tsx                 # Entry: <RouterProvider>
+├── app.css                 # Tailwind v4 theme (CSS @theme, oklch colors, shadcn vars)
+├── index.tsx               # React 19 createRoot mount
+└── environment.d.ts        # Rsbuild type reference
 ```
 
 ## Development Commands
@@ -110,6 +116,11 @@ Uses `@tanstack/react-table` v9 with:
 - Responsive: Tailwind breakpoints (`sm:640px`, `md:768px`, `lg:1024px`, `xl:1280px`).
 - Icons: Lucide React (`lucide-react`) for UI icons, `@iconify/tailwind4` for broader icon sets.
 
+### Motion & Performance
+- **Reduced motion**: CSS motion is globally neutered by the `prefers-reduced-motion` block in `app.css`. Every JS-driven animation (GSAP/motion in `react-bits/`) must early-return via `shouldReduceMotion()` from `@/lib/reduced-motion`.
+- **Route lazy-loading**: all non-index routes use `lazyRouteComponent(() => import("@/pages/x"), "X")`. Keep new routes lazy; keep `/` (home) eager.
+- **No `three` / `@react-three/fiber`**: removed with the Silk background — don't reintroduce heavy runtimes for decoration.
+
 ### TypeScript
 - Target: ES2020, Module: ESNext, Resolution: Bundler.
 - Strict mode with `noUnusedLocals` and `noUnusedParameters`.
@@ -122,11 +133,15 @@ All user-facing text is in **Chinese (Simplified)**. Country names, labels, plac
 
 | File | Purpose |
 |---|---|
-| `src/data/wages.ts` | Single data source: `WageEntry` interface, 13 records, `sortedByWage`, `regions` |
-| `src/router.tsx` | TanStack Router setup, route tree assembly, type augmentation |
-| `src/app.css` | Tailwind v4 theme, shadcn CSS variables, fonts (Instrument Serif + Outfit) |
+| `src/data/*.ts` | 5 套数据集: wages / iphone(-duo) / bigmac(-ppp) / commodity / modely |
+| `src/router.tsx` | TanStack Router setup, 11-route tree, type augmentation, scrollRestoration |
+| `src/app.css` | Tailwind v4 theme, shadcn CSS variables, fonts (Instrument Serif + Outfit), reduced-motion block |
+| `src/lib/region.ts` | 区域色映射 + `regionAverages()` 分组均值（图表/徽章/tooltip 共用） |
+| `src/lib/reduced-motion.ts` | `shouldReduceMotion()` — GSAP/motion 动画的 reduced-motion 守卫 |
+| `src/components/rank-bar-chart.tsx` | 5 指数共用排行图；`tooltip` 属性传入各指数 tooltip |
+| `src/components/index-tooltips.tsx` | 指数 tooltip 唯一实现（iPhone 用 `createIPhoneTooltip(榜单)` 工厂） |
 | `src/lib/utilities.ts` | `cn()` utility (re-exports from `cn` package, NOT tailwind-merge+clsx) |
-| `src/components/layout.tsx` | App shell with responsive nav, skip-to-content a11y link |
+| `src/components/layout.tsx` | App shell with responsive grouped nav, skip-to-content a11y link |
 | `rsbuild.config.ts` | Build config: `@` alias, PostCSS (inline), Rsdoctor (conditional), TurboConsole (dev) |
 | `eslint.config.js` | Flat config: `@renton/eslint-config-react` + `@shadcn/lint` registered (no rules) |
 | `lint-staged.config.js` | Pre-commit: `eslint --cache --max-warnings=0 --no-warn-ignored` |
@@ -173,7 +188,7 @@ The ESLint config transitively pulls `@vitest/eslint-plugin` (from `@renton/esli
 2. **Named exports**: Use `export function` / `export const`, not default exports (except `app.tsx`).
 3. **Import paths**: Use `@/` alias. Never use relative paths like `../../`.
 4. **shadcn components**: Edit existing files in `src/components/ui/`. Do not use shadcn CLI.
-5. **Data changes**: Edit `src/data/wages.ts`. The `WageEntry` interface is the contract.
+5. **Data changes**: Edit the relevant `src/data/*.ts`. Each file exports its own entry interface plus pre-sorted arrays.
 6. **Router**: Use TanStack Router APIs (`createRoute`, `Link`, `useLocation`). Do not install react-router-dom.
 7. **Table API**: Use `useTable` (v9), not `useReactTable` (v8).
 8. **Styles**: Use Tailwind classes + shadcn CSS variables. No inline styles.

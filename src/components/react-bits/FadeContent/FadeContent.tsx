@@ -3,6 +3,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as React from "react";
 import { useEffect, useRef } from "react";
 
+import { shouldReduceMotion } from "@/lib/reduced-motion";
+
 gsap.registerPlugin(ScrollTrigger);
 
 interface FadeContentProperties extends React.HTMLAttributes<HTMLDivElement> {
@@ -44,6 +46,11 @@ const FadeContent: React.FC<FadeContentProperties> = ({
     const element = reference.current;
     if (!element)
       return;
+
+    // 减少动态效果：不隐藏、不模糊，内容直接可见
+    if (shouldReduceMotion()) {
+      return;
+    }
 
     let scrollerTarget: Element | null | string = container || document.querySelector("#snap-main-container") || null;
 
@@ -89,7 +96,7 @@ const FadeContent: React.FC<FadeContentProperties> = ({
     const st = ScrollTrigger.create({
       once: true,
       onEnter: () => tl.play(),
-      scroller: scrollerTarget || globalThis,
+      scroller: scrollerTarget,
       start: `top ${startPct}%`,
       trigger: element,
     });

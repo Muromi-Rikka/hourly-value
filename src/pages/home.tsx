@@ -10,9 +10,9 @@ import {
 
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
 import { CountUp } from "@/components/react-bits/CountUp/CountUp";
-import { Silk } from "@/components/react-bits/Silk/Silk";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
 import { SpotlightCard } from "@/components/react-bits/SpotlightCard/SpotlightCard";
+import { RegionLegend } from "@/components/region-legend";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { sortedByValuation } from "@/data/bigmac";
@@ -20,6 +20,7 @@ import { sortedByHours as sortedByCommodityHours } from "@/data/commodity-index"
 import { sortedByHours as sortedByIphoneHours } from "@/data/iphone-index";
 import { sortedByDays } from "@/data/modely-index";
 import { sortedByWage, wages } from "@/data/wages";
+import { regionColor } from "@/lib/region";
 
 const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   Beef,
@@ -28,6 +29,9 @@ const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   ShoppingBasket,
   Smartphone,
 };
+
+// 比值保留 1 位小数，避免浮点长尾被 CountUp 展开成一串小数
+const round1 = (value: number) => Number(value.toFixed(1));
 
 interface IndexStat {
   description: string;
@@ -47,10 +51,7 @@ export function Home() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden pb-10 pt-6 sm:pb-14 sm:pt-8">
-        <div className="gradient-accent mb-6" />
-        <div className="absolute inset-0 -z-10 opacity-15">
-          <Silk color="#C54E2B" lightMode noiseIntensity={0.8} scale={1.2} speed={3} />
-        </div>
+        <div className="rule-top mb-6" />
         <SplitText
           className="max-w-3xl font-display text-[clamp(2.5rem,5.5vw,4.5rem)] font-normal leading-[1.05] tracking-[-0.03em]"
           delay={80}
@@ -66,6 +67,11 @@ export function Home() {
           </p>
           <div className="mt-4 border-t border-border/50 w-16" />
         </AnimatedContent>
+
+        {/* 刻度尺 — global wage spread as a ruler */}
+        <AnimatedContent delay={0.25} distance={20} duration={0.6}>
+          <WageRuler />
+        </AnimatedContent>
       </section>
 
       {/* Index cards */}
@@ -75,7 +81,7 @@ export function Home() {
             {stats.map((stat) => {
               const Icon = ICONS[stat.icon];
               return (
-                <SpotlightCard key={stat.id} spotlightColor="rgba(197, 78, 43, 0.12)">
+                <SpotlightCard key={stat.id} spotlightColor="rgba(14, 107, 92, 0.12)">
                   <Card className="flex flex-col border-0 bg-transparent shadow-none">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-lg font-display">
@@ -120,9 +126,9 @@ export function Home() {
       {/* Highlights */}
       <AnimatedContent delay={0.15} distance={40} duration={0.6} threshold={0.1}>
         <section className="mt-10 sm:mt-12">
-          <p className="mb-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">数据亮点</p>
+          <p className="mb-4 text-xs font-medium tracking-wider text-muted-foreground">数据亮点</p>
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-2xl border bg-gradient-to-br from-surface to-surface-raised p-5">
+            <div className="rounded-2xl border bg-card p-5">
               <p className="stat-number text-4xl leading-none tracking-tight">
                 <CountUp duration={1.5} to={highlights.countryCount} />
                 <span className="ml-1 text-sm text-muted-foreground">国家/地区</span>
@@ -134,7 +140,7 @@ export function Home() {
             </div>
             {highlights.topCountry[1] >= 3
               ? (
-                  <div className="rounded-2xl border bg-gradient-to-br from-surface to-surface-raised p-5">
+                  <div className="rounded-2xl border bg-card p-5">
                     <p className="stat-number text-4xl leading-none tracking-tight">
                       {highlights.topCountry[0]}
                     </p>
@@ -146,12 +152,12 @@ export function Home() {
                   </div>
                 )
               : (
-                  <div className="rounded-2xl border bg-gradient-to-br from-surface to-surface-raised p-5">
+                  <div className="rounded-2xl border bg-card p-5">
                     <p className="stat-number text-4xl leading-none tracking-tight">5 大指数</p>
                     <p className="mt-2 text-sm text-muted-foreground">从工资到消费品，多维对比</p>
                   </div>
                 )}
-            <div className="rounded-2xl border bg-gradient-to-br from-surface to-surface-raised p-5">
+            <div className="rounded-2xl border bg-card p-5">
               <p className="stat-number text-4xl leading-none tracking-tight">
                 <CountUp duration={2} to={highlights.maxGap.ratio} />
                 <span className="text-[0.4em] text-muted-foreground">×</span>
@@ -190,30 +196,34 @@ function getHighlights() {
       freq.set(item.country, (freq.get(item.country) ?? 0) + 1);
     }
   }
-  const topCountry = freq.keys().reduce(
+  const topCountry = freq.keys().reduce<[string, number]>(
     (best, key) => {
-      const count = freq.get(key)!;
+      const count = freq.get(key) ?? 0;
       return count > best[1] ? [key, count] : best;
     },
-    ["", 0] as [string, number],
+    ["", 0],
   );
+
+  const iphoneHours = sortedByIphoneHours.map(entry => entry.hoursToBuy).filter((hours): hours is number => hours !== null);
+  const commodityHours = sortedByCommodityHours.map(entry => entry.hoursToBuy).filter((hours): hours is number => hours !== null);
+  const modelyDays = sortedByDays.map(entry => entry.daysToBuy).filter((days): days is number => days !== null);
 
   const ratios: Array<{ index: string; ratio: number }> = [
     {
       index: "最低工资",
-      ratio: sortedByWage[0].cnyEquivalent / sortedByWage[sortedByWage.length - 1].cnyEquivalent,
+      ratio: round1(sortedByWage[0].cnyEquivalent / sortedByWage[sortedByWage.length - 1].cnyEquivalent),
     },
     {
       index: "iPhone",
-      ratio: sortedByIphoneHours[sortedByIphoneHours.length - 1].hoursToBuy / sortedByIphoneHours[0].hoursToBuy,
+      ratio: round1(iphoneHours[iphoneHours.length - 1] / iphoneHours[0]),
     },
     {
       index: "物资",
-      ratio: sortedByCommodityHours[sortedByCommodityHours.length - 1].hoursToBuy / sortedByCommodityHours[0].hoursToBuy,
+      ratio: round1(commodityHours[commodityHours.length - 1] / commodityHours[0]),
     },
     {
       index: "Model Y",
-      ratio: sortedByDays[sortedByDays.length - 1].daysToBuy! / sortedByDays[0].daysToBuy!,
+      ratio: round1(modelyDays[modelyDays.length - 1] / modelyDays[0]),
     },
   ];
   const maxGap = ratios.toSorted((a, b) => b.ratio - a.ratio)[0];
@@ -299,4 +309,81 @@ function getIndexStats(): IndexStat[] {
       title: "Model Y 指数",
     },
   ];
+}
+
+/**
+ * 首页「刻度尺」：13 国最低时薪按比例落在同一把尺上，
+ * 刻度线在下、国家点在上，点色即区域色。
+ */
+function WageRuler() {
+  const values = wages.map(entry => entry.cnyEquivalent);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min;
+  const positionOf = (value: number) => (span === 0 ? 50 : ((value - min) / span) * 100);
+  const lowest = sortedByWage[sortedByWage.length - 1];
+  const highest = sortedByWage[0];
+  const ticks = Array.from({ length: 21 }, (_, index) => index);
+
+  return (
+    <div className="mt-6">
+      <div className="flex items-baseline justify-between gap-2 text-xs text-muted-foreground">
+        <span>
+          最低
+          {" "}
+          {lowest.country}
+        </span>
+        <span className="hidden sm:inline">人民币/小时</span>
+        <span>
+          {highest.country}
+          {" "}
+          最高
+        </span>
+      </div>
+
+      <div
+        aria-label={`全球最低时薪刻度尺：${lowest.country} ¥${min} 至 ${highest.country} ¥${max} 每小时，共 ${wages.length} 个国家/地区`}
+        className="relative mt-2 h-9"
+        role="img"
+      >
+        {/* 栏线基座 */}
+        <div className="absolute inset-x-0 bottom-7 h-px bg-border" />
+        {/* 刻度：每 5% 一格，每 25% 为主刻度 */}
+        {ticks.map(tick => (
+          <span
+            className={tick % 5 === 0
+              ? "absolute bottom-3 h-4 w-px bg-border"
+              : "absolute bottom-5 h-2 w-px bg-border"}
+            key={tick}
+            style={{ left: `${tick * 5}%` }}
+          />
+        ))}
+        {/* 主刻度的人民币标值 */}
+        {[0, 25, 50, 75, 100].map((percent) => {
+          const edge = percent === 0 ? "" : (percent === 100 ? "-translate-x-full" : "-translate-x-1/2");
+          return (
+            <span
+              className={`absolute bottom-0 text-[10px] tabular-nums text-muted-foreground ${edge}`}
+              key={percent}
+              style={{ left: `${percent}%` }}
+            >
+              ¥
+              {Math.round(min + span * percent / 100)}
+            </span>
+          );
+        })}
+        {/* 国家点：落在各自的时薪位置上 */}
+        {wages.map(entry => (
+          <span
+            className="absolute bottom-7 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-background"
+            key={entry.countryCode}
+            style={{ background: regionColor(entry.region), left: `${positionOf(entry.cnyEquivalent)}%` }}
+            title={`${entry.country} · ¥${entry.cnyEquivalent}/小时`}
+          />
+        ))}
+      </div>
+
+      <RegionLegend />
+    </div>
+  );
 }

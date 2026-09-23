@@ -2,6 +2,8 @@ import type { Easing, Transition } from "motion/react";
 import { motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { shouldReduceMotion } from "@/lib/reduced-motion";
+
 interface BlurTextProperties {
   animateBy?: "letters" | "words";
   animationFrom?: Record<string, number | string>;
@@ -44,6 +46,7 @@ const BlurText: React.FC<BlurTextProperties> = ({
   const elements = animateBy === "words" ? text.split(" ") : text.split("");
   const [inView, setInView] = useState(false);
   const reference = useRef<HTMLParagraphElement>(null);
+  const reducedMotion = useMemo(() => shouldReduceMotion(), []);
 
   useEffect(() => {
     if (!reference.current)
@@ -102,8 +105,8 @@ const BlurText: React.FC<BlurTextProperties> = ({
 
         return (
           <motion.span
-            animate={inView ? animateKeyframes : fromSnapshot}
-            initial={fromSnapshot}
+            animate={reducedMotion ? undefined : (inView ? animateKeyframes : fromSnapshot)}
+            initial={reducedMotion ? undefined : fromSnapshot}
             key={index}
             onAnimationComplete={index === elements.length - 1 ? onAnimationComplete : undefined}
             style={{

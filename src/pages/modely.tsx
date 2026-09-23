@@ -1,15 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import * as React from "react";
 
 import { CountryFlag } from "@/components/country-flag";
-import { ModelYBarChart } from "@/components/modely-bar-chart";
+import { ModelYTooltip } from "@/components/index-tooltips";
+import { RankBarChart } from "@/components/rank-bar-chart";
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
 import { CountUp } from "@/components/react-bits/CountUp/CountUp";
 import { FadeContent } from "@/components/react-bits/FadeContent/FadeContent";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
 import { Button } from "@/components/ui/button";
 import { modelyIndex, sortedByDays } from "@/data/modely-index";
+import { regionAverages } from "@/lib/region";
 
 export function ModelY() {
   // Only entries with actual days data
@@ -18,14 +19,18 @@ export function ModelY() {
   const mostExpensive = withDays[withDays.length - 1];
   const count = withDays.length;
   const ratio = Number((mostExpensive.daysToBuy! / cheapest.daysToBuy!).toFixed(1));
-  const regionData = regionAverages();
+  const regionData = regionAverages(
+    modelyIndex.filter(entry => entry.daysToBuy !== null),
+    entry => entry.daysToBuy!,
+    { decimals: 1 },
+  );
   const maxRegionAvg = Math.max(...regionData.map(r => r.avg));
 
   return (
     <div>
       {/* Hero — editorial statement */}
       <section className="pb-12 pt-6 sm:pb-16 sm:pt-8">
-        <div className="gradient-accent mb-6" />
+        <div className="rule-top mb-6" />
         <SplitText
           className="max-w-3xl font-display text-[clamp(2.8rem,6vw,5rem)] font-normal leading-[1.05] tracking-[-0.03em]"
           delay={80}
@@ -50,7 +55,14 @@ export function ModelY() {
       <AnimatedContent direction="vertical" distance={40} duration={0.8}>
         <section className="-mx-4 border-y sm:-mx-6">
           <div className="px-4 py-5 sm:px-6">
-            <ModelYBarChart data={sortedByDays} layout="horizontal" />
+            <RankBarChart
+              data={withDays}
+              formatTick={value => `${value}天`}
+              formatValue={value => `${value}天`}
+              layout="horizontal"
+              tooltip={ModelYTooltip}
+              valueKey="daysToBuy"
+            />
           </div>
         </section>
       </AnimatedContent>
@@ -60,7 +72,7 @@ export function ModelY() {
         <section>
           {/* Headline row */}
           <div className="mt-10 mb-6 sm:mt-12">
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">数据洞察</p>
+            <p className="text-xs font-medium tracking-wider text-muted-foreground">数据洞察</p>
           </div>
 
           {/* Two-column editorial layout */}
@@ -109,7 +121,7 @@ export function ModelY() {
                       <span className="w-10 shrink-0 text-right text-xs text-muted-foreground">{r.region}</span>
                       <div className="relative h-5 flex-1 overflow-hidden rounded-sm bg-muted">
                         <div
-                          className="absolute inset-y-0 left-0 rounded-sm bg-gradient-to-r from-primary to-accent-warm transition-all duration-700"
+                          className="absolute inset-y-0 left-0 rounded-sm bg-primary transition-all duration-700"
                           style={{
                             width: `${(r.avg / maxRegionAvg) * 100}%`,
                           }}
@@ -162,23 +174,4 @@ export function ModelY() {
       </AnimatedContent>
     </div>
   );
-}
-
-function regionAverages(): Array<{ avg: number; count: number; region: string }> {
-  const entries = modelyIndex.filter(entry => entry.daysToBuy !== null);
-  const map = new Map<string, number[]>();
-  for (const w of entries) {
-    const array = map.get(w.region);
-    if (array) {
-      array.push(w.daysToBuy!);
-    }
-    else {
-      map.set(w.region, [w.daysToBuy!]);
-    }
-  }
-  return map
-    .entries()
-    .map(([region, vals]) => ({ avg: Math.round(vals.reduce((a, b) => a + b, 0) / vals.length * 10) / 10, count: vals.length, region }))
-    .toArray()
-    .toSorted((a, b) => a.avg - b.avg);
 }
