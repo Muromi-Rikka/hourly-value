@@ -153,7 +153,7 @@ All user-facing text is in **Chinese (Simplified)**. Country names, labels, plac
 | `rsbuild.config.ts` | Build config: `@` alias, PostCSS (inline), Rsdoctor (conditional), TurboConsole (dev) |
 | `eslint.config.js` | Flat config: `@renton/eslint-config-react` + `@shadcn/lint` registered (no rules) |
 | `lint-staged.config.js` | Pre-commit: `eslint --cache --max-warnings=0 --no-warn-ignored` |
-| `docs/薪资.md` | Source data (gitignored): 13-country minimum wage table with sources |
+| `docs/薪资.md` | NOT in repo (whole `docs/` dir is gitignored) — local scratch only; canonical data lives in `src/data/wages.ts` |
 
 ## Runtime/Tooling Preferences
 

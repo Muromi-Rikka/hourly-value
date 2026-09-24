@@ -99,8 +99,16 @@ function buildCnyPerUnit(rates, sourceLabel) {
  */
 async function fetchErApi() {
   const data = await fetchJson("https://open.er-api.com/v6/latest/EUR");
+  // time_last_update_utc 形如 "Thu, 24 Sep 2026 00:02:32 +0000"，
+  // 直接 slice(0, 10) 会截成 "Thu, 24 Se"，因此优先用 unix 时间戳解析。
+  const parsed = typeof data.time_last_update_unix === "number"
+    ? new Date(data.time_last_update_unix * 1000)
+    : new Date(data.time_last_update_utc ?? NaN);
+  const date = Number.isNaN(parsed.getTime())
+    ? FALLBACK_DATE
+    : parsed.toISOString().slice(0, 10);
   return {
-    date: String(data.time_last_update_utc ?? "").slice(0, 10),
+    date,
     provider: "open.er-api.com（ExchangeRate-API 备用源）",
     rates: data.rates,
   };
