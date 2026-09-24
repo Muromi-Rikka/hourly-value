@@ -2,7 +2,7 @@ import { cnyPerUnit } from "@/data/exchange-rates";
 
 export const MODELY_SOURCE = {
   name: "Tesla 各国官网",
-  note: "Model Y 后驱版标价取自 13 个国家/地区的特斯拉官网，各地区含税口径不同",
+  note: "Model Y 后驱版标价取自 14 个国家/地区的特斯拉官网，各地区含税口径不同",
   url: "https://www.tesla.com/model-y",
 };
 
@@ -148,6 +148,16 @@ const rawModelys: Omit<ModelYEntry, "cnyEquivalent">[] = [
     source: "特斯拉韩国官网",
     sourceUrl: "https://www.tesla.com/ko_kr/model-y",
     taxNote: "含增值税，不含地方电动车补贴",
+  },
+  {
+    country: "印度",
+    countryCode: "IN",
+    localCurrency: "印度卢比",
+    localPrice: 5_089_000,
+    region: "亚洲",
+    source: "特斯拉印度官网",
+    sourceUrl: "https://www.tesla.com/en_IN/model-y",
+    taxNote: "含5% GST（另收 TCS 1% 与管理服务费）",
   },
 ];
 

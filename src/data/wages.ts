@@ -171,6 +171,18 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     source: "人社部《全国各省、自治区、直辖市最低工资标准情况》",
     sourceUrl: "https://www.mohrss.gov.cn/SYrlzyhshbzb/laodongguanxi_/fwyd/202601/t20260112_565296.html",
   },
+  {
+    country: "印度",
+    countryCode: "IN",
+    effectiveDate: "2026-04-01",
+    localCurrency: "印度卢比",
+    localUnit: "印度卢比/小时",
+    localWage: 86.63,
+    note: "无全国统一时薪，取中央法定标准非技术工日薪（B 类地区中位）₹693，按 8 小时/日折算",
+    region: "亚洲",
+    source: "印度劳工与就业部；Chief Labour Commissioner (Central)",
+    sourceUrl: "https://clc.gov.in/clc/min-wages",
+  },
 ];
 
 /**

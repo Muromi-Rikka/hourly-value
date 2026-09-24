@@ -312,7 +312,7 @@ function getIndexStats(): IndexStat[] {
 }
 
 /**
- * 首页「刻度尺」：13 国最低时薪按比例落在同一把尺上，
+ * 首页「刻度尺」：各国最低时薪按比例落在同一把尺上，
  * 刻度线在下、国家点在上，点色即区域色。
  */
 function WageRuler() {

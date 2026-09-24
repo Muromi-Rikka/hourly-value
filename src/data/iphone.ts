@@ -2,7 +2,7 @@ import { cnyPerUnit } from "@/data/exchange-rates";
 
 export const IPHONE_SOURCE = {
   name: "Apple Store 各国官方商城",
-  note: "iPhone 18 Pro 与 iPhone Duo 价格均取自 13 个国家/地区的 Apple 官方商城标价，各地区含税口径不同",
+  note: "iPhone 18 Pro 与 iPhone Duo 价格均取自 14 个国家/地区的 Apple 官方商城标价，各地区含税口径不同",
   url: "https://www.apple.com/shop/buy-iphone",
 };
 
@@ -78,6 +78,16 @@ const rawIphones: Omit<IPhoneEntry, "cnyEquivalent">[] = [
     source: "Apple Store 韩国官方商城",
     sourceUrl: "https://www.apple.com/kr/shop/buy-iphone",
     taxNote: "含10%增值税",
+  },
+  {
+    country: "印度",
+    countryCode: "IN",
+    localCurrency: "印度卢比",
+    localPrice: 164900,
+    region: "亚洲",
+    source: "Apple Store 印度官方商城",
+    sourceUrl: "https://www.apple.com/in/shop/buy-iphone",
+    taxNote: "含税（MRP 最高零售价，含全部税费）",
   },
   {
     country: "新西兰",

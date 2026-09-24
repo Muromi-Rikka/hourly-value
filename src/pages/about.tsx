@@ -15,7 +15,7 @@ import { wages } from "@/data/wages";
 
 const ABOUT_INDEXES = [
   {
-    desc: "以各国货币对人民币的即期汇率折算法定时薪，横向对比 13 个国家/地区的最低时薪水平。",
+    desc: `以各国货币对人民币的即期汇率折算法定时薪，横向对比 ${wages.length} 个国家/地区的最低时薪水平。`,
     link: "/explore",
     title: "最低工资",
   },

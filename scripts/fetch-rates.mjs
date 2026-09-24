@@ -28,6 +28,7 @@ const CURRENCY_NAMES = {
   CNY: "人民币",
   EUR: "欧元",
   GBP: "英镑",
+  INR: "印度卢比",
   JPY: "日元",
   KRW: "韩元",
   NZD: "新西兰元",
@@ -48,6 +49,7 @@ const SYMBOLS = Object.keys(CURRENCY_NAMES)
 const FALLBACK_CNY_PER_UNIT = {
   人民币: 1,
   加元: 5.35,
+  印度卢比: 0.076,
   新西兰元: 4.35,
   日元: 0.048,
   欧元: 7.85,

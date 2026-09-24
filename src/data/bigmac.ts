@@ -162,6 +162,17 @@ export const bigmac: BigMacEntry[] = [
     usdPrice: 3.35,
     valuationPct: Math.round(((3.35 / usPrice) - 1) * 1000) / 10,
   },
+  {
+    country: "印度",
+    countryCode: "IN",
+    dataDate: "2026年最新统计",
+    localCurrency: "印度卢比",
+    localPrice: 236.25,
+    localPriceFormatted: "₹236.25",
+    region: "亚洲",
+    usdPrice: 2.45,
+    valuationPct: Math.round(((2.45 / usPrice) - 1) * 1000) / 10,
+  },
 ];
 
 /**

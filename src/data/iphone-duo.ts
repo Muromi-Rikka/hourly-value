@@ -56,6 +56,16 @@ const rawIphonesDuo: Omit<IPhoneEntry, "cnyEquivalent">[] = [
     taxNote: "含10%增值税",
   },
   {
+    country: "印度",
+    countryCode: "IN",
+    localCurrency: "印度卢比",
+    localPrice: 299900,
+    region: "亚洲",
+    source: "Apple Store 印度官方商城",
+    sourceUrl: "https://www.apple.com/in/shop/buy-iphone",
+    taxNote: "含税（MRP 最高零售价，含全部税费）",
+  },
+  {
     country: "澳大利亚",
     countryCode: "AU",
     localCurrency: "澳元",

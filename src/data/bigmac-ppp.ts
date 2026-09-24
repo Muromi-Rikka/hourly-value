@@ -15,6 +15,7 @@ export interface BigMacPurchasingPower {
 const currencySymbol: Record<string, string> = {
   人民币: "¥",
   加元: "C$",
+  印度卢比: "₹",
   新西兰元: "NZ$",
   日元: "¥",
   欧元: "€",
