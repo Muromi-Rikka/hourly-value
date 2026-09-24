@@ -19,10 +19,14 @@ const currencySymbol: Record<string, string> = {
   新西兰元: "NZ$",
   日元: "¥",
   欧元: "€",
+  波兰兹罗提: "zł",
+  泰铢: "฿",
   澳元: "A$",
   美元: "$",
   英镑: "£",
   韩元: "₩",
+  马来西亚林吉特: "RM",
+  墨西哥比索: "Mex$",
 };
 
 const wageByCode = new Map(wages.map(w => [w.countryCode, w]));

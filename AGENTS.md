@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Global minimum-wage purchasing-power visualization website. Five indices (minimum wage, iPhone, Big Mac, commodity basket, Model Y) across 11 routes, comparing 14 countries/regions — all values anchored in CNY. Built from `@trapar-waves/react-tailwind` template.
+Global minimum-wage purchasing-power visualization website. Five indices (minimum wage, iPhone, Big Mac, commodity basket, Model Y) across 11 routes, comparing 22 countries/regions — all values anchored in CNY. Built from `@trapar-waves/react-tailwind` template.
 
 - **Package**: `@trapar-waves/react-tailwind` v2.0.0
 - **License**: MIT (Trapar waves, 2025)
@@ -51,7 +51,7 @@ src/
 │   ├── region-legend.tsx   # 图表底部区域图例
 │   └── react-bits/         # 动效组件 (GSAP/motion；均有 reduced-motion 守卫)
 ├── data/                   # 5 套静态数据集
-│   ├── wages.ts            # WageEntry + 13 records + sortedByWage（cnyEquivalent 由汇率表计算）
+│   ├── wages.ts            # WageEntry + 22 records + sortedByWage（cnyEquivalent 由汇率表计算）
 │   ├── exchange-rates.ts   # AUTO-GENERATED 汇率表 (ratesUpdatedAt / cnyPerUnit)
 │   ├── iphone-index.ts / iphone-duo-index.ts
 │   ├── bigmac.ts / bigmac-ppp.ts
