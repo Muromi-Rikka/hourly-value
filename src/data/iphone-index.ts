@@ -73,5 +73,3 @@ export const sortedByHours = iphoneIndex.toSorted((a, b) => {
   }
   return a.hoursToBuy - b.hoursToBuy;
 });
-
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;

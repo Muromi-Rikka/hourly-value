@@ -350,5 +350,3 @@ export const wages: WageEntry[] = rawWages.map(entry => ({
 }));
 
 export const sortedByWage = wages.toSorted((a, b) => b.cnyEquivalent - a.cnyEquivalent);
-
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;

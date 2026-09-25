@@ -36,7 +36,7 @@ const currencySymbol: Record<string, string> = {
 
 const wageByCode = new Map(wages.map(w => [w.countryCode, w]));
 
-export const bigmacPpp: BigMacPurchasingPower[] = bigmac
+const bigmacPpp: BigMacPurchasingPower[] = bigmac
   .map((entry) => {
     const wage = wageByCode.get(entry.countryCode);
     if (!wage) {
@@ -61,5 +61,3 @@ export const bigmacPpp: BigMacPurchasingPower[] = bigmac
  * Sorted by bigMacPerHour descending (most Big Macs per hour first).
  */
 export const sortedByBigMacPerHour = bigmacPpp.toSorted((a, b) => b.bigMacPerHour - a.bigMacPerHour);
-
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;

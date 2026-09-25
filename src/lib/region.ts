@@ -17,7 +17,7 @@ export function regionColor(region: string): string {
   return `var(--color-region-${regionKey(region)})`;
 }
 
-export function regionKey(region: string): string {
+function regionKey(region: string): string {
   return REGION_KEYS[region] ?? "oceania";
 }
 
@@ -33,7 +33,7 @@ export const regionLegend = [
   { color: "var(--color-region-middle-east)", label: "中东" },
 ] as const;
 
-export interface RegionStat {
+interface RegionStat {
   avg: number;
   count: number;
   region: string;

@@ -264,5 +264,3 @@ export const iphonesDuo: IPhoneEntry[] = rawIphonesDuo.map(entry => ({
   ...entry,
   cnyEquivalent: Math.round(entry.localPrice * cnyPerUnit[entry.localCurrency]),
 }));
-
-export const sortedByPriceDuo = iphonesDuo.toSorted((a, b) => b.cnyEquivalent - a.cnyEquivalent);

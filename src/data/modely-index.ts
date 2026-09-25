@@ -81,5 +81,3 @@ export const sortedByDays = modelyIndex.toSorted((a, b) => {
   }
   return a.daysToBuy - b.daysToBuy;
 });
-
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;

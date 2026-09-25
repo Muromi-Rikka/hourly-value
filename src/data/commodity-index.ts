@@ -87,5 +87,3 @@ export const commodityIndex: CommodityIndexEntry[] = commodities
 export const sortedByHours = commodityIndex.toSorted(
   (a, b) => a.hoursToBuy - b.hoursToBuy,
 );
-
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;

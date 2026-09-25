@@ -401,5 +401,3 @@ export const commodities: CommodityItem[] = [
     sugar1kg: 1.97,
   },
 ];
-
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;

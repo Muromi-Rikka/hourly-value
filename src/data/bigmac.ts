@@ -327,5 +327,3 @@ export const sortedByUsdPrice = bigmac.toSorted((a, b) => b.usdPrice - a.usdPric
  * Sorted by valuation % descending (most overvalued first).
  */
 export const sortedByValuation = bigmac.toSorted((a, b) => b.valuationPct - a.valuationPct);
-
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;

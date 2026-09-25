@@ -40,7 +40,7 @@ WageRuler     五大指数+来源   ExploreView   RankBarChart + TooltipShell
 ```
 src/
 ├── components/             # Shared UI
-│   ├── ui/                 # shadcn/ui primitives (button, card, table, tabs, select, badge, separator)
+│   ├── ui/                 # shadcn/ui primitives (button, card, table, tabs, separator)
 │   ├── layout.tsx          # App shell: header + grouped 指数 dropdown nav + footer
 │   ├── rank-bar-chart.tsx  # 5 指数共用排行条形图 (Recharts, 区域着色, 底部图例)
 │   ├── tooltip-shell.tsx   # 指数 tooltip 统一外壳 (国旗+排名+区域)

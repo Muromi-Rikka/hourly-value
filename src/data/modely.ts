@@ -298,7 +298,3 @@ export const modelys: ModelYEntry[] = rawModelys.map(entry => ({
   ...entry,
   cnyEquivalent: Math.round(entry.localPrice * cnyPerUnit[entry.localCurrency]),
 }));
-
-export const sortedByPrice = modelys.toSorted((a, b) => b.cnyEquivalent - a.cnyEquivalent);
-
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;
