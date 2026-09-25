@@ -8,6 +8,7 @@ import {
   Smartphone,
 } from "lucide-react";
 
+import { CountryFlag } from "@/components/country-flag";
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
 import { CountUp } from "@/components/react-bits/CountUp/CountUp";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
@@ -39,7 +40,7 @@ interface IndexStat {
   id: string;
   link: string;
   linkLabel: string;
-  metrics: Array<{ detail?: string; label: string; value: string }>;
+  metrics: Array<{ countryCode?: string; detail?: string; label: string; value: string }>;
   title: string;
 }
 
@@ -100,7 +101,15 @@ export function Home() {
                             <div className="flex items-baseline gap-2">
                               <span className="stat-number text-lg">{metric.value}</span>
                               {metric.detail
-                                ? <span className="text-xs text-muted-foreground">{metric.detail}</span>
+                                ? (
+                                    // 国名固定宽度（最长 4 字 + 国旗），使各卡片的国旗与数值右缘对齐到同一垂直线
+                                    <span className="flex w-[4.5rem] shrink-0 items-center gap-1 text-xs text-muted-foreground">
+                                      {metric.countryCode
+                                        ? <CountryFlag className="h-4 w-4 shrink-0" countryCode={metric.countryCode} />
+                                        : null}
+                                      <span className="truncate">{metric.detail}</span>
+                                    </span>
+                                  )
                                 : null}
                             </div>
                           </div>
@@ -138,15 +147,16 @@ export function Home() {
                 {" 个区域 · 5 大指数"}
               </p>
             </div>
-            {highlights.topCountry[1] >= 3
+            {highlights.topCountry.count >= 3
               ? (
                   <div className="rounded-2xl border bg-card p-5">
-                    <p className="stat-number text-4xl leading-none tracking-tight">
-                      {highlights.topCountry[0]}
+                    <p className="stat-number flex items-center gap-2 text-4xl leading-none tracking-tight">
+                      <CountryFlag className="h-8 w-8" countryCode={highlights.topCountry.countryCode} />
+                      {highlights.topCountry.country}
                     </p>
                     <p className="mt-2 text-sm text-muted-foreground">
                       在
-                      <CountUp duration={1} to={highlights.topCountry[1]} />
+                      <CountUp duration={1} to={highlights.topCountry.count} />
                       {" 个指数中排名前三"}
                     </p>
                   </div>
@@ -190,19 +200,17 @@ function getHighlights() {
   const countryCount = new Set(wages.map(w => w.countryCode)).size;
   const regionCount = new Set(wages.map(w => w.region)).size;
 
-  const freq = new Map<string, number>();
+  const counts = new Map<string, number>();
+  let topCountry = { count: 0, country: "", countryCode: "" };
   for (const array of [sortedByWage.slice(0, 3), sortedByIphoneHours.slice(0, 3), sortedByValuation.slice(0, 3), sortedByCommodityHours.slice(0, 3), sortedByDays.slice(0, 3)]) {
     for (const item of array) {
-      freq.set(item.country, (freq.get(item.country) ?? 0) + 1);
+      const count = (counts.get(item.countryCode) ?? 0) + 1;
+      counts.set(item.countryCode, count);
+      if (count > topCountry.count) {
+        topCountry = { count, country: item.country, countryCode: item.countryCode };
+      }
     }
   }
-  const topCountry = freq.keys().reduce<[string, number]>(
-    (best, key) => {
-      const count = freq.get(key) ?? 0;
-      return count > best[1] ? [key, count] : best;
-    },
-    ["", 0],
-  );
 
   const iphoneHours = sortedByIphoneHours.map(entry => entry.hoursToBuy).filter((hours): hours is number => hours !== null);
   const commodityHours = sortedByCommodityHours.map(entry => entry.hoursToBuy).filter((hours): hours is number => hours !== null);
@@ -255,8 +263,8 @@ function getIndexStats(): IndexStat[] {
       link: "/explore",
       linkLabel: "查看工资数据",
       metrics: [
-        { detail: wageHigh.country, label: "最高", value: `¥${wageHigh.cnyEquivalent}/h` },
-        { detail: wageLow.country, label: "最低", value: `¥${wageLow.cnyEquivalent}/h` },
+        { countryCode: wageHigh.countryCode, detail: wageHigh.country, label: "最高", value: `¥${wageHigh.cnyEquivalent}/h` },
+        { countryCode: wageLow.countryCode, detail: wageLow.country, label: "最低", value: `¥${wageLow.cnyEquivalent}/h` },
       ],
       title: "最低工资",
     },
@@ -267,8 +275,8 @@ function getIndexStats(): IndexStat[] {
       link: "/iphone",
       linkLabel: "查看 iPhone 指数",
       metrics: [
-        { detail: iphoneCheapest.country, label: "最少", value: `${iphoneCheapest.hoursToBuy}h` },
-        { detail: iphoneMost.country, label: "最多", value: `${iphoneMost.hoursToBuy}h` },
+        { countryCode: iphoneCheapest.countryCode, detail: iphoneCheapest.country, label: "最少", value: `${iphoneCheapest.hoursToBuy}h` },
+        { countryCode: iphoneMost.countryCode, detail: iphoneMost.country, label: "最多", value: `${iphoneMost.hoursToBuy}h` },
       ],
       title: "iPhone 指数",
     },
@@ -279,8 +287,8 @@ function getIndexStats(): IndexStat[] {
       link: "/bigmac",
       linkLabel: "查看巨无霸指数",
       metrics: [
-        { detail: over.country, label: "最高估", value: `${over.valuationPct}%` },
-        { detail: under.country, label: "最低估", value: `${under.valuationPct}%` },
+        { countryCode: over.countryCode, detail: over.country, label: "最高估", value: `${over.valuationPct}%` },
+        { countryCode: under.countryCode, detail: under.country, label: "最低估", value: `${under.valuationPct}%` },
       ],
       title: "巨无霸指数",
     },
@@ -291,8 +299,8 @@ function getIndexStats(): IndexStat[] {
       link: "/commodity",
       linkLabel: "查看物资指数",
       metrics: [
-        { detail: commodityCheapest.country, label: "最少", value: `${commodityCheapest.hoursToBuy}h` },
-        { detail: commodityMost.country, label: "最多", value: `${commodityMost.hoursToBuy}h` },
+        { countryCode: commodityCheapest.countryCode, detail: commodityCheapest.country, label: "最少", value: `${commodityCheapest.hoursToBuy}h` },
+        { countryCode: commodityMost.countryCode, detail: commodityMost.country, label: "最多", value: `${commodityMost.hoursToBuy}h` },
       ],
       title: "物资指数",
     },
@@ -303,8 +311,8 @@ function getIndexStats(): IndexStat[] {
       link: "/modely",
       linkLabel: "查看 Model Y 指数",
       metrics: [
-        { detail: modelyCheapest.country, label: "最少", value: `${modelyCheapest.daysToBuy}天` },
-        { detail: modelyMost.country, label: "最多", value: `${modelyMost.daysToBuy}天` },
+        { countryCode: modelyCheapest.countryCode, detail: modelyCheapest.country, label: "最少", value: `${modelyCheapest.daysToBuy}天` },
+        { countryCode: modelyMost.countryCode, detail: modelyMost.country, label: "最多", value: `${modelyMost.daysToBuy}天` },
       ],
       title: "Model Y 指数",
     },
@@ -328,13 +336,15 @@ function WageRuler() {
   return (
     <div className="mt-6">
       <div className="flex items-baseline justify-between gap-2 text-xs text-muted-foreground">
-        <span>
+        <span className="flex items-center gap-1.5">
+          <CountryFlag className="h-4 w-4" countryCode={lowest.countryCode} />
           最低
           {" "}
           {lowest.country}
         </span>
         <span className="hidden sm:inline">人民币/小时</span>
-        <span>
+        <span className="flex items-center gap-1.5">
+          <CountryFlag className="h-4 w-4" countryCode={highest.countryCode} />
           {highest.country}
           {" "}
           最高
