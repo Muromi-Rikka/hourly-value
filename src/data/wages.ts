@@ -9,7 +9,7 @@ export interface WageEntry {
   localUnit: string;
   localWage: number;
   note: string;
-  region: "亚洲" | "北美" | "大洋洲" | "欧洲";
+  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
   source: string;
   sourceUrl: string;
 }
@@ -279,6 +279,66 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     source: "希腊劳工与社会庇护部（共同部长级决定 8934/2026）",
     sourceUrl: "https://ypergasias.gov.gr/se-ischy-apo-simera-o-neos-katotatos-misthos-ofelei-15-ekatommyrio-polites/",
   },
+  {
+    country: "菲律宾",
+    countryCode: "PH",
+    effectiveDate: "2026-07-25",
+    localCurrency: "菲律宾比索",
+    localUnit: "菲律宾比索/小时",
+    localWage: 94.38,
+    note: "无全国统一时薪，按地区工资委员会分区设定；取首都区（NCR）非农业部门日薪 755 比索（工资令 No. NCR-27，第 NCR-28 号重申），按 8 小时/日折算",
+    region: "亚洲",
+    source: "菲律宾劳工就业部 DOLE；地区三方工资与生产力委员会（RTWPB-NCR）",
+    sourceUrl: "https://nwpc.dole.gov.ph/ncr",
+  },
+  {
+    country: "捷克",
+    countryCode: "CZ",
+    effectiveDate: "2026-01-01",
+    localCurrency: "捷克克朗",
+    localUnit: "捷克克朗/小时",
+    localWage: 134.4,
+    note: "全国统一，直接采用法定时薪 134.40 克朗（月最低工资 22400 克朗，40 小时/周）",
+    region: "欧洲",
+    source: "捷克劳工与社会事务部（MPSV）公告第 356/2025 Sb. 号",
+    sourceUrl: "https://www.mpsv.cz/web/cz/minimalni-mzda",
+  },
+  {
+    country: "匈牙利",
+    countryCode: "HU",
+    effectiveDate: "2026-01-01",
+    localCurrency: "匈牙利福林",
+    localUnit: "匈牙利福林/小时",
+    localWage: 2017.5,
+    note: "全国统一（非熟练岗最低工资），取月最低工资 322800 福林，按 160 小时/月折算；需学历的保障工资为 373200 福林/月",
+    region: "欧洲",
+    source: "匈牙利政府令第 426/2025 (XII. 23.) 号；RSM Hungary",
+    sourceUrl: "https://www.rsm.hu/blogs/payroll/minimum-wage-and-guaranteed-minimum-wage-2026-this-is-how-much-the-lowest-wage-will",
+  },
+  {
+    country: "智利",
+    countryCode: "CL",
+    effectiveDate: "2026-01-01",
+    localCurrency: "智利比索",
+    localUnit: "智利比索/小时",
+    localWage: 2961.54,
+    note: "全国统一，取月最低收入 539000 比索（18–65 岁），按 2026 年 4 月起法定周工时 42 小时折算月工时 182 小时",
+    region: "南美",
+    source: "智利劳动与社会福利部（DT）；第 21.751 号法",
+    sourceUrl: "https://www.dt.gob.cl/",
+  },
+  {
+    country: "以色列",
+    countryCode: "IL",
+    effectiveDate: "2026-04-01",
+    localCurrency: "新谢克尔",
+    localUnit: "新谢克尔/小时",
+    localWage: 34.64,
+    note: "全国统一，取月最低工资 6443.85 新谢克尔，按法定月工时 186 小时折算",
+    region: "中东",
+    source: "以色列国家保险协会《最低工资》；《最低工资法》5747-1987",
+    sourceUrl: "https://www.btl.gov.il/English%20Homepage/Mediniyut/GeneralInformation/Pages/MinimumWage.aspx",
+  },
 ];
 
 /**
@@ -291,4 +351,4 @@ export const wages: WageEntry[] = rawWages.map(entry => ({
 
 export const sortedByWage = wages.toSorted((a, b) => b.cnyEquivalent - a.cnyEquivalent);
 
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美"] as const;
+export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;

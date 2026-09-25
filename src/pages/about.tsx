@@ -13,6 +13,11 @@ import { IPHONE_SOURCE, iphones } from "@/data/iphone";
 import { MODELY_SOURCE, modelys } from "@/data/modely";
 import { wages } from "@/data/wages";
 
+// 汇率来源链接跟随实际生效的 provider（主源 Frankfurter / 备用源 open.er-api.com）
+const RATES_PROVIDER_HREF = ratesProvider.includes("Frankfurter")
+  ? "https://frankfurter.app"
+  : "https://open.er-api.com";
+
 const ABOUT_INDEXES = [
   {
     desc: `以各国货币对人民币的即期汇率折算法定时薪，横向对比 ${wages.length} 个国家/地区的最低时薪水平。`,
@@ -106,17 +111,18 @@ export function About() {
               {" "}
               <a
                 className="text-primary underline decoration-primary/50 underline-offset-2 hover:text-primary/80"
-                href="https://frankfurter.app"
+                href={RATES_PROVIDER_HREF}
                 rel="noopener noreferrer"
                 target="_blank"
               >
                 {ratesProvider}
               </a>
-              ，备用源 open.er-api.com。
+              。
             </p>
             <p>
-              欧洲央行每个工作日 16:00 CET 更新参考汇率，周末与节假日沿用上一工作日数据；
-              若拉取失败则沿用上次成功获取的汇率，构建不会中断。
+              主源为 Frankfurter（欧洲央行每个工作日 16:00 CET 更新参考汇率，周末与节假日沿用上一工作日数据）；
+              ECB 参考汇率不含智利比索（CLP），缺失币种或主源失败时回退备用源 open.er-api.com；
+              两源皆失败则沿用上次成功获取的汇率，构建不会中断。
             </p>
             <p>
               巨无霸指数例外：其美元价与估值偏差沿用来源数据集发布时的快照值，不随实时汇率变动。

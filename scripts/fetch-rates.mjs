@@ -25,15 +25,20 @@ const TIMEOUT_MS = 5000;
 const CURRENCY_NAMES = {
   AUD: "澳元",
   CAD: "加元",
+  CLP: "智利比索",
   CNY: "人民币",
+  CZK: "捷克克朗",
   EUR: "欧元",
   GBP: "英镑",
+  HUF: "匈牙利福林",
+  ILS: "新谢克尔",
   INR: "印度卢比",
   JPY: "日元",
   KRW: "韩元",
   MXN: "墨西哥比索",
   MYR: "马来西亚林吉特",
   NZD: "新西兰元",
+  PHP: "菲律宾比索",
   PLN: "波兰兹罗提",
   THB: "泰铢",
   USD: "美元",
@@ -53,15 +58,20 @@ const SYMBOLS = Object.keys(CURRENCY_NAMES)
 const FALLBACK_CNY_PER_UNIT = {
   人民币: 1,
   加元: 5.35,
+  匈牙利福林: 0.021,
   印度卢比: 0.076,
+  捷克克朗: 0.313,
   新西兰元: 4.35,
+  新谢克尔: 2.212,
   日元: 0.048,
+  智利比索: 0.007,
   欧元: 7.85,
   波兰兹罗提: 1.749,
   泰铢: 0.201,
   澳元: 4.75,
   美元: 7.25,
   英镑: 9.25,
+  菲律宾比索: 0.107,
   韩元: 0.0053,
   马来西亚林吉特: 1.644,
   墨西哥比索: 0.385,
@@ -172,7 +182,7 @@ async function main() {
         renderFile({ cnyPerUnit, date, provider }),
         "utf8",
       );
-      console.log(`[rates] 已更新汇率（${provider}，ECB 日期 ${date}）→ ${path.relative(process.cwd(), OUTPUT_PATH)}`);
+      console.log(`[rates] 已更新汇率（${provider}，数据日期 ${date}）→ ${path.relative(process.cwd(), OUTPUT_PATH)}`);
       return;
     }
     catch (error) {

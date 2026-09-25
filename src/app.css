@@ -49,6 +49,8 @@
   --color-region-europe: oklch(0.489 0.133 259);
   --color-region-oceania: oklch(0.473 0.107 145);
   --color-region-north-america: oklch(0.496 0.124 313);
+  --color-region-south-america: oklch(0.478 0.155 22);
+  --color-region-middle-east: oklch(0.475 0.095 205);
 
   --radius-lg: 0.75rem;
   --radius-md: 0.5rem;
@@ -94,6 +96,8 @@
     --color-region-europe: oklch(0.713 0.098 261);
     --color-region-oceania: oklch(0.739 0.11 149);
     --color-region-north-america: oklch(0.71 0.09 309);
+    --color-region-south-america: oklch(0.67 0.14 25);
+    --color-region-middle-east: oklch(0.72 0.09 210);
   }
 }
 

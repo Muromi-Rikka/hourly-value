@@ -2,7 +2,7 @@ import { cnyPerUnit } from "@/data/exchange-rates";
 
 export const MODELY_SOURCE = {
   name: "Tesla 各国官网",
-  note: "Model Y 后驱版标价取自 22 个国家/地区的特斯拉官网，各地区含税口径不同",
+  note: "Model Y 后驱版标价取自 27 个国家/地区的特斯拉官网，各地区含税口径不同",
   url: "https://www.tesla.com/model-y",
 };
 
@@ -12,7 +12,7 @@ export interface ModelYEntry {
   countryCode: string;
   localCurrency: string;
   localPrice: number;
-  region: "亚洲" | "北美" | "大洋洲" | "欧洲";
+  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
   source: string;
   sourceUrl: string;
   taxNote: string;
@@ -239,6 +239,56 @@ const rawModelys: Omit<ModelYEntry, "cnyEquivalent">[] = [
     sourceUrl: "https://www.tesla.com/el_gr/model-y",
     taxNote: "含24% ΦΠΑ/VAT",
   },
+  {
+    country: "菲律宾",
+    countryCode: "PH",
+    localCurrency: "菲律宾比索",
+    localPrice: 2_369_000,
+    region: "亚洲",
+    source: "特斯拉菲律宾官网",
+    sourceUrl: "https://www.tesla.com/en_PH/modely/design",
+    taxNote: "含12%增值税（菲律宾标价含 VAT）",
+  },
+  {
+    country: "捷克",
+    countryCode: "CZ",
+    localCurrency: "捷克克朗",
+    localPrice: 979_990,
+    region: "欧洲",
+    source: "特斯拉捷克官网",
+    sourceUrl: "https://www.tesla.com/cs_CZ/modely/design",
+    taxNote: "含21% DPH（增值税）",
+  },
+  {
+    country: "匈牙利",
+    countryCode: "HU",
+    localCurrency: "匈牙利福林",
+    localPrice: 16_989_900,
+    region: "欧洲",
+    source: "特斯拉匈牙利官网",
+    sourceUrl: "https://www.tesla.com/hu_hu/modely/design",
+    taxNote: "含27% ÁFA（增值税）",
+  },
+  {
+    country: "智利",
+    countryCode: "CL",
+    localCurrency: "智利比索",
+    localPrice: 36_900_000,
+    region: "南美",
+    source: "特斯拉智利官网",
+    sourceUrl: "https://www.tesla.com/es_CL/modely/design",
+    taxNote: "含19% IVA（增值税）",
+  },
+  {
+    country: "以色列",
+    countryCode: "IL",
+    localCurrency: "新谢克尔",
+    localPrice: 245_946,
+    region: "中东",
+    source: "特斯拉以色列官网",
+    sourceUrl: "https://www.tesla.com/he_IL/modely/design",
+    taxNote: "官网总价＝车价 173990 + 税费 69170 + 登记费 2786 新谢克尔（含增值税与购置税）",
+  },
 ];
 
 /**
@@ -251,4 +301,4 @@ export const modelys: ModelYEntry[] = rawModelys.map(entry => ({
 
 export const sortedByPrice = modelys.toSorted((a, b) => b.cnyEquivalent - a.cnyEquivalent);
 
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美"] as const;
+export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;

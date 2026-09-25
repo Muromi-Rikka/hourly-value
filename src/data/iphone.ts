@@ -2,7 +2,7 @@ import { cnyPerUnit } from "@/data/exchange-rates";
 
 export const IPHONE_SOURCE = {
   name: "Apple Store 各国官方商城",
-  note: "iPhone 18 Pro 与 iPhone Duo 价格均取自 21 个国家/地区的 Apple 官方商城标价，各地区含税口径不同（希腊无官方在线商城，未纳入）",
+  note: "iPhone 18 Pro 与 iPhone Duo 价格均取自 25 个国家/地区的 Apple 官方商城标价，各地区含税口径不同（希腊、以色列无官方在线商城，未纳入）",
   url: "https://www.apple.com/shop/buy-iphone",
 };
 
@@ -12,7 +12,7 @@ export interface IPhoneEntry {
   countryCode: string;
   localCurrency: string;
   localPrice: number;
-  region: "亚洲" | "北美" | "大洋洲" | "欧洲";
+  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
   source: string;
   sourceUrl: string;
   taxNote: string;
@@ -229,6 +229,46 @@ const rawIphones: Omit<IPhoneEntry, "cnyEquivalent">[] = [
     sourceUrl: "https://www.apple.com/ie/shop/buy-iphone",
     taxNote: "含23% VAT",
   },
+  {
+    country: "菲律宾",
+    countryCode: "PH",
+    localCurrency: "菲律宾比索",
+    localPrice: 94_990,
+    region: "亚洲",
+    source: "Apple Store 菲律宾官方商城",
+    sourceUrl: "https://www.apple.com/ph/shop/buy-iphone",
+    taxNote: "含12%增值税（菲律宾标价含 VAT）",
+  },
+  {
+    country: "捷克",
+    countryCode: "CZ",
+    localCurrency: "捷克克朗",
+    localPrice: 34_990,
+    region: "欧洲",
+    source: "Apple Store 捷克官方商城",
+    sourceUrl: "https://www.apple.com/cz/shop/buy-iphone",
+    taxNote: "含21% DPH（增值税）",
+  },
+  {
+    country: "匈牙利",
+    countryCode: "HU",
+    localCurrency: "匈牙利福林",
+    localPrice: 499_990,
+    region: "欧洲",
+    source: "Apple Store 匈牙利官方商城",
+    sourceUrl: "https://www.apple.com/hu/shop/buy-iphone",
+    taxNote: "含27% ÁFA（增值税）",
+  },
+  {
+    country: "智利",
+    countryCode: "CL",
+    localCurrency: "智利比索",
+    localPrice: 1_549_990,
+    region: "南美",
+    source: "Apple Store 智利官方商城",
+    sourceUrl: "https://www.apple.com/cl/shop/buy-iphone",
+    taxNote: "含19% IVA（增值税）",
+  },
 ];
 
 /**
@@ -241,4 +281,4 @@ export const iphones: IPhoneEntry[] = rawIphones.map(entry => ({
 
 export const sortedByPrice = iphones.toSorted((a, b) => b.cnyEquivalent - a.cnyEquivalent);
 
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美"] as const;
+export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;

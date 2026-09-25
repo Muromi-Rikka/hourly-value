@@ -11,7 +11,7 @@ export interface BigMacEntry {
   localCurrency: string;
   localPrice: number;
   localPriceFormatted: string;
-  region: "亚洲" | "北美" | "大洋洲" | "欧洲";
+  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
   usdPrice: number;
   valuationPct: number;
 }
@@ -19,6 +19,17 @@ export interface BigMacEntry {
 const usPrice = 6.22;
 
 export const bigmac: BigMacEntry[] = [
+  {
+    country: "以色列",
+    countryCode: "IL",
+    dataDate: "2026-07-01",
+    localCurrency: "新谢克尔",
+    localPrice: 23,
+    localPriceFormatted: "₪23",
+    region: "中东",
+    usdPrice: 7.67,
+    valuationPct: Math.round(((7.67 / usPrice) - 1) * 1000) / 10,
+  },
   {
     country: "英国",
     countryCode: "GB",
@@ -185,6 +196,39 @@ export const bigmac: BigMacEntry[] = [
     valuationPct: Math.round(((5.81 / usPrice) - 1) * 1000) / 10,
   },
   {
+    country: "捷克",
+    countryCode: "CZ",
+    dataDate: "2026-07-01",
+    localCurrency: "捷克克朗",
+    localPrice: 115,
+    localPriceFormatted: "Kč115",
+    region: "欧洲",
+    usdPrice: 5.43,
+    valuationPct: Math.round(((5.43 / usPrice) - 1) * 1000) / 10,
+  },
+  {
+    country: "智利",
+    countryCode: "CL",
+    dataDate: "2026-07-01",
+    localCurrency: "智利比索",
+    localPrice: 4990,
+    localPriceFormatted: "CLP$4,990",
+    region: "南美",
+    usdPrice: 5.41,
+    valuationPct: Math.round(((5.41 / usPrice) - 1) * 1000) / 10,
+  },
+  {
+    country: "匈牙利",
+    countryCode: "HU",
+    dataDate: "2026-07-01",
+    localCurrency: "匈牙利福林",
+    localPrice: 1660,
+    localPriceFormatted: "Ft1,660",
+    region: "欧洲",
+    usdPrice: 5.3,
+    valuationPct: Math.round(((5.3 / usPrice) - 1) * 1000) / 10,
+  },
+  {
     country: "新西兰",
     countryCode: "NZ",
     dataDate: "2026-07-01",
@@ -251,6 +295,17 @@ export const bigmac: BigMacEntry[] = [
     valuationPct: Math.round(((3.08 / usPrice) - 1) * 1000) / 10,
   },
   {
+    country: "菲律宾",
+    countryCode: "PH",
+    dataDate: "2026-07-01",
+    localCurrency: "菲律宾比索",
+    localPrice: 169,
+    localPriceFormatted: "₱169",
+    region: "亚洲",
+    usdPrice: 2.74,
+    valuationPct: Math.round(((2.74 / usPrice) - 1) * 1000) / 10,
+  },
+  {
     country: "印度",
     countryCode: "IN",
     dataDate: "2026-07-01",
@@ -273,4 +328,4 @@ export const sortedByUsdPrice = bigmac.toSorted((a, b) => b.usdPrice - a.usdPric
  */
 export const sortedByValuation = bigmac.toSorted((a, b) => b.valuationPct - a.valuationPct);
 
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美"] as const;
+export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;

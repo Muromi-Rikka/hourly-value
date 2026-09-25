@@ -31,7 +31,7 @@ export interface ModelYIndexEntry {
   modelyPrice: number;
   modelySource: string;
   modelySourceUrl: string;
-  region: "亚洲" | "北美" | "大洋洲" | "欧洲";
+  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
   taxNote: string;
   wageSource: string;
   wageSourceUrl: string;
@@ -82,4 +82,4 @@ export const sortedByDays = modelyIndex.toSorted((a, b) => {
   return a.daysToBuy - b.daysToBuy;
 });
 
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美"] as const;
+export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;

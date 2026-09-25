@@ -9,21 +9,26 @@ export interface BigMacPurchasingPower {
   localPriceFormatted: string;
   localWage: number;
   localWageFormatted: string;
-  region: "亚洲" | "北美" | "大洋洲" | "欧洲";
+  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
 }
 
 const currencySymbol: Record<string, string> = {
   人民币: "¥",
   加元: "C$",
+  匈牙利福林: "Ft",
   印度卢比: "₹",
+  捷克克朗: "Kč",
   新西兰元: "NZ$",
+  新谢克尔: "₪",
   日元: "¥",
+  智利比索: "CLP$",
   欧元: "€",
   波兰兹罗提: "zł",
   泰铢: "฿",
   澳元: "A$",
   美元: "$",
   英镑: "£",
+  菲律宾比索: "₱",
   韩元: "₩",
   马来西亚林吉特: "RM",
   墨西哥比索: "Mex$",
@@ -57,4 +62,4 @@ export const bigmacPpp: BigMacPurchasingPower[] = bigmac
  */
 export const sortedByBigMacPerHour = bigmacPpp.toSorted((a, b) => b.bigMacPerHour - a.bigMacPerHour);
 
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美"] as const;
+export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;

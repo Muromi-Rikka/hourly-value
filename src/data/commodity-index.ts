@@ -30,7 +30,7 @@ export interface CommodityIndexEntry {
    * Hours of minimum-wage work to buy the basket
    */
   hoursToBuy: number;
-  region: "亚洲" | "北美" | "大洋洲" | "欧洲";
+  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
   wageSource: string;
   wageSourceUrl: string;
 }
@@ -88,4 +88,4 @@ export const sortedByHours = commodityIndex.toSorted(
   (a, b) => a.hoursToBuy - b.hoursToBuy,
 );
 
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美"] as const;
+export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;

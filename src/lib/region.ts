@@ -2,8 +2,10 @@
  * 区域 → 主题色变量的唯一映射。图表、徽章、tooltip 共用。
  */
 const REGION_KEYS: Record<string, string> = {
+  中东: "middle-east",
   亚洲: "asia",
   北美: "north-america",
+  南美: "south-america",
   大洋洲: "oceania",
   欧洲: "europe",
 };
@@ -27,6 +29,8 @@ export const regionLegend = [
   { color: "var(--color-region-europe)", label: "欧洲" },
   { color: "var(--color-region-oceania)", label: "大洋洲" },
   { color: "var(--color-region-north-america)", label: "北美" },
+  { color: "var(--color-region-south-america)", label: "南美" },
+  { color: "var(--color-region-middle-east)", label: "中东" },
 ] as const;
 
 export interface RegionStat {

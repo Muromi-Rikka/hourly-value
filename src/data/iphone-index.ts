@@ -27,7 +27,7 @@ export interface IPhoneIndexEntry {
    * iPhone 18 Pro local price
    */
   localPrice: number;
-  region: "亚洲" | "北美" | "大洋洲" | "欧洲";
+  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
   taxNote: string;
   wageSource: string;
   wageSourceUrl: string;
@@ -74,4 +74,4 @@ export const sortedByHours = iphoneIndex.toSorted((a, b) => {
   return a.hoursToBuy - b.hoursToBuy;
 });
 
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美"] as const;
+export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;

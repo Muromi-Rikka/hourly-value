@@ -2,14 +2,14 @@
  * 各国常见生活物资零售价格（USD）
  * 数据来源：GlobalProductPrices.com
  *
- * 注意：全部 20 国统一为国家页顶栏现价（2026 年 8 月本币价，
+ * 注意：全部 25 国统一为国家页顶栏现价（2026 年 8 月本币价，
  * 按站点当日汇率折算美元）；卢森堡（LU）整站无数据、印度（IN）缺牛肉价，均未纳入。
  */
 
 export const COMMODITY_SOURCE = {
   date: "2026年8月",
   name: "GlobalProductPrices.com",
-  note: "20 国统一取自国家页顶栏现价（2026 年 8 月本币价，按站点当日汇率折美元）；卢森堡（LU）整站无数据、印度（IN）缺牛肉价，均未纳入",
+  note: "25 国统一取自国家页顶栏现价（2026 年 8 月本币价，按站点当日汇率折美元）；卢森堡（LU）整站无数据、印度（IN）缺牛肉价，均未纳入",
   url: "https://www.globalproductprices.com/indicators_list.php",
 };
 
@@ -34,7 +34,7 @@ export interface CommodityItem {
    * 食用油 1L（常用烹饪油）
    */
   oil1l: number;
-  region: "亚洲" | "北美" | "大洋洲" | "欧洲";
+  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
   /**
    * 大米 1kg
    */
@@ -330,6 +330,76 @@ export const commodities: CommodityItem[] = [
     salt1kg: 1.14,
     sugar1kg: 0.8,
   },
+  {
+    beef1kg: 10.65,
+    chicken1kg: 3.42,
+    country: "菲律宾",
+    countryCode: "PH",
+    eggs12: 2.18,
+    flour1kg: 1.7,
+    milk1l: 1.77,
+    oil1l: 3.72,
+    region: "亚洲",
+    rice1kg: 1.45,
+    salt1kg: 0.6,
+    sugar1kg: 1.37,
+  },
+  {
+    beef1kg: 17.13,
+    chicken1kg: 4.19,
+    country: "捷克",
+    countryCode: "CZ",
+    eggs12: 5.03,
+    flour1kg: 1.58,
+    milk1l: 1.63,
+    oil1l: 2.56,
+    region: "欧洲",
+    rice1kg: 1.86,
+    salt1kg: 1.72,
+    sugar1kg: 1.16,
+  },
+  {
+    beef1kg: 13.43,
+    chicken1kg: 2.84,
+    country: "匈牙利",
+    countryCode: "HU",
+    eggs12: 3.18,
+    flour1kg: 0.9,
+    milk1l: 1.08,
+    oil1l: 2.82,
+    region: "欧洲",
+    rice1kg: 2.88,
+    salt1kg: 1.71,
+    sugar1kg: 1.02,
+  },
+  {
+    beef1kg: 13.86,
+    chicken1kg: 3.82,
+    country: "智利",
+    countryCode: "CL",
+    eggs12: 3.93,
+    flour1kg: 1.34,
+    milk1l: 1.34,
+    oil1l: 3.92,
+    region: "南美",
+    rice1kg: 2.33,
+    salt1kg: 0.5,
+    sugar1kg: 1.5,
+  },
+  {
+    beef1kg: 31.14,
+    chicken1kg: 8.17,
+    country: "以色列",
+    countryCode: "IL",
+    eggs12: 4.31,
+    flour1kg: 3.45,
+    milk1l: 3.25,
+    oil1l: 7.84,
+    region: "中东",
+    rice1kg: 3.61,
+    salt1kg: 0.69,
+    sugar1kg: 1.97,
+  },
 ];
 
-export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美"] as const;
+export const regions = ["全部", "亚洲", "欧洲", "大洋洲", "北美", "南美", "中东"] as const;
