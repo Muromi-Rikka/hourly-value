@@ -29,7 +29,7 @@ export function SourceBlock({
         <ExternalLink className="h-3.5 w-3.5 shrink-0" />
       </a>
       {note && (
-        <p className="mt-2 max-w-prose text-xs leading-relaxed text-muted-foreground">{note}</p>
+        <p className="mt-2 max-w-prose text-xs leading-relaxed text-pretty text-muted-foreground">{note}</p>
       )}
       <p className="mt-2 text-xs text-muted-foreground">
         逐国明细见本页「探索」视图或「关于」页的数据来源清单。

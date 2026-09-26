@@ -62,6 +62,10 @@ interface DataTableProperties<T extends RowData> {
    * 行 id 取值，用于展开状态保持
    */
   getRowId?: (row: T) => string;
+  /**
+   * 空状态时展示的「清除筛选」回调；不传则不渲染按钮
+   */
+  onClearFilters?: () => void;
   onColumnFiltersChange?: (updater: React.SetStateAction<ColumnFiltersState>) => void;
   /**
    * 展开行的详情内容
@@ -83,6 +87,7 @@ export function DataTable<T extends RowData>({
   data,
   defaultSort,
   getRowId,
+  onClearFilters,
   onColumnFiltersChange,
   renderExpanded,
   toolbar,
@@ -145,7 +150,19 @@ export function DataTable<T extends RowData>({
               ? (
                   <TableRow>
                     <TableCell className="h-24 text-center text-sm text-muted-foreground" colSpan={columns.length + 1}>
-                      没有符合当前筛选条件的国家
+                      <span>没有符合当前筛选条件的国家</span>
+                      {onClearFilters
+                        ? (
+                            <Button
+                              className="ml-3"
+                              onClick={onClearFilters}
+                              size="sm"
+                              variant="outline"
+                            >
+                              清除筛选
+                            </Button>
+                          )
+                        : null}
                     </TableCell>
                   </TableRow>
                 )

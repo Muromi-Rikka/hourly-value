@@ -29,6 +29,10 @@ interface ExploreViewProperties<T extends RowData> {
    * 副标题，写清数据口径与条数
    */
   description: React.ReactNode;
+  /**
+   * 表格空状态时的「清除筛选」回调；不传则不渲染按钮
+   */
+  onClearFilters?: () => void;
   onColumnFiltersChange?: (updater: React.SetStateAction<ColumnFiltersState>) => void;
   renderExpanded: (row: T) => React.ReactNode;
   /**
@@ -54,6 +58,7 @@ export function ExploreView<T extends RowData>({
   data,
   defaultSort,
   description,
+  onClearFilters,
   onColumnFiltersChange,
   renderExpanded,
   title,
@@ -64,12 +69,12 @@ export function ExploreView<T extends RowData>({
       <div className="pb-6">
         <BlurText
           animateBy="words"
-          className="font-display text-[clamp(2rem,4vw,3rem)] font-normal leading-[1.1] tracking-[-0.02em]"
+          className="text-balance font-display text-[clamp(2rem,4vw,3rem)] font-normal leading-[1.1] tracking-[-0.02em]"
           delay={150}
           text={title}
         />
         <AnimatedContent delay={0.1} distance={20} duration={0.5}>
-          <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">{description}</p>
+          <p className="mt-2 max-w-lg text-sm leading-relaxed text-pretty text-muted-foreground">{description}</p>
         </AnimatedContent>
       </div>
 
@@ -86,6 +91,7 @@ export function ExploreView<T extends RowData>({
               columns={columns}
               data={data}
               defaultSort={defaultSort}
+              onClearFilters={onClearFilters}
               onColumnFiltersChange={onColumnFiltersChange}
               renderExpanded={renderExpanded}
               toolbar={toolbar}

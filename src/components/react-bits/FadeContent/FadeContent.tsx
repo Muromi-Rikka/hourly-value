@@ -63,13 +63,15 @@ const FadeContent: React.FC<FadeContentProperties> = ({
 
     gsap.set(element, {
       autoAlpha: initialOpacity,
-      filter: blur ? "blur(10px)" : "blur(0px)",
+      ...(blur && { filter: "blur(10px)" }),
       willChange: "opacity, filter, transform",
     });
 
     const tl = gsap.timeline({
       delay: getSeconds(delay),
       onComplete: () => {
+        // 动画已结束：释放合成层提示，避免常驻 will-change
+        gsap.set(element, { willChange: "auto" });
         if (onComplete)
           onComplete();
         if (disappearAfter > 0) {
@@ -78,7 +80,7 @@ const FadeContent: React.FC<FadeContentProperties> = ({
             delay: getSeconds(disappearAfter),
             duration: getSeconds(disappearDuration),
             ease: disappearEase,
-            filter: blur ? "blur(10px)" : "blur(0px)",
+            ...(blur && { filter: "blur(10px)" }),
             onComplete: () => onDisappearanceComplete?.(),
           });
         }
@@ -90,7 +92,7 @@ const FadeContent: React.FC<FadeContentProperties> = ({
       autoAlpha: 1,
       duration: getSeconds(duration),
       ease,
-      filter: "blur(0px)",
+      ...(blur && { filter: "blur(0px)" }),
     });
 
     const st = ScrollTrigger.create({

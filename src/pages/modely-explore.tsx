@@ -158,7 +158,7 @@ export function ModelYExplore() {
                     <ExternalLink className="h-3 w-3 shrink-0" />
                   </a>
                 )
-              : <p className="text-sm text-muted-foreground">暂无数据</p>}
+              : <p className="text-sm text-muted-foreground">该国未收录此项，不参与该指标排行</p>}
           </div>
           <div className="sm:col-span-2">
             <p className="text-xs font-medium text-muted-foreground">税费说明</p>

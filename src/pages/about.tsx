@@ -71,12 +71,12 @@ export function About() {
         <div className="rule-top mb-6" />
         <BlurText
           animateBy="words"
-          className="font-display text-[clamp(2rem,4vw,3rem)] font-normal leading-[1.1] tracking-[-0.02em]"
+          className="text-balance font-display text-[clamp(2rem,4vw,3rem)] font-normal leading-[1.1] tracking-[-0.02em]"
           delay={150}
           text="关于本项目"
         />
         <AnimatedContent delay={0.1} distance={20} duration={0.5}>
-          <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-2 max-w-lg text-sm leading-relaxed text-pretty text-muted-foreground">
             数据来源、折算方法与使用说明
           </p>
         </AnimatedContent>
@@ -84,7 +84,7 @@ export function About() {
 
       {/* Methodology */}
       <AnimatedContent distance={30} duration={0.6}>
-        <section className="max-w-prose space-y-3 pb-10 text-sm leading-relaxed text-muted-foreground">
+        <section className="max-w-prose space-y-3 pb-10 text-sm leading-relaxed text-pretty text-muted-foreground">
           <p>
             所有数据均以各国家/地区政府官方公布的法定最低时薪为基准。
             对于按月设定最低工资的国家（如西班牙、比利时、智利），按法定工时数折算为时薪。
@@ -129,7 +129,7 @@ export function About() {
       <AnimatedContent delay={0.05} distance={25} duration={0.6}>
         <section className="border-t pt-8 pb-10">
           <h2 className="mb-5 font-display text-xl font-normal tracking-tight">汇率来源与更新</h2>
-          <div className="max-w-prose space-y-2 rounded-xl bg-muted/50 p-5 text-xs leading-relaxed text-muted-foreground">
+          <div className="max-w-prose space-y-2 rounded-xl bg-muted/50 p-5 text-xs leading-relaxed text-pretty text-muted-foreground">
             <p>
               人民币折算所用汇率于每次构建与开发启动时自动拉取，当前生效汇率更新于
               {" "}
@@ -204,7 +204,7 @@ export function About() {
       <AnimatedContent delay={0.1} distance={20} duration={0.5}>
         <section className="border-t pt-8">
           <h2 className="mb-5 font-display text-xl font-normal tracking-tight">iPhone 指数数据来源</h2>
-          <p className="mb-5 max-w-prose text-xs leading-relaxed text-muted-foreground">
+          <p className="mb-5 max-w-prose text-xs leading-relaxed text-pretty text-muted-foreground">
             {IPHONE_SOURCE_NOTE}
           </p>
           <ul className="space-y-4">
@@ -253,7 +253,7 @@ export function About() {
       <AnimatedContent delay={0.1} distance={20} duration={0.5}>
         <section className="border-t pt-8">
           <h2 className="mb-5 font-display text-xl font-normal tracking-tight">Model Y 指数数据来源</h2>
-          <p className="mb-5 max-w-prose text-xs leading-relaxed text-muted-foreground">
+          <p className="mb-5 max-w-prose text-xs leading-relaxed text-pretty text-muted-foreground">
             {MODELY_SOURCE_NOTE}
           </p>
           <ul className="space-y-4">

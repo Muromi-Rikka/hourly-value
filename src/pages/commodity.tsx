@@ -11,11 +11,12 @@ import { CountUp } from "@/components/react-bits/CountUp/CountUp";
 import { FadeContent } from "@/components/react-bits/FadeContent/FadeContent";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
 import { SourceBlock } from "@/components/source-block";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { COMMODITY_SOURCE } from "@/data/commodity";
 import { sortedByHours } from "@/data/commodity-index";
 import { hourNumber } from "@/lib/format";
 import { regionAverages } from "@/lib/region";
+import { cn } from "@/lib/utilities";
 
 export function Commodity() {
   // 无工资数据的国家不参与任何「最贵/最便宜」结论
@@ -33,7 +34,7 @@ export function Commodity() {
       <section className="pb-12 pt-6 sm:pb-16 sm:pt-8">
         <div className="rule-top mb-6" />
         <SplitText
-          className="max-w-3xl font-display text-[clamp(2.8rem,6vw,5rem)] font-normal leading-[1.05] tracking-[-0.03em]"
+          className="max-w-3xl text-balance font-display text-[clamp(2.8rem,6vw,5rem)] font-normal leading-[1.05] tracking-[-0.03em]"
           delay={80}
           duration={1}
           ease="power3.out"
@@ -42,7 +43,7 @@ export function Commodity() {
           text="物资篮子指数"
         />
         <AnimatedContent delay={0.1} distance={30} duration={0.6}>
-          <p className="mt-4 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
+          <p className="mt-4 max-w-lg text-base leading-relaxed text-pretty text-muted-foreground sm:text-lg">
             以各国最低时薪计算购买固定生活物资篮子（5kg面粉、5kg大米、1kg食糖、1kg食盐、2L牛奶、24个鸡蛋、5L食用油、1kg牛肉、1kg鸡肉）所需的工作小时数，
             {" "}
             {count}
@@ -109,8 +110,8 @@ export function Commodity() {
               </div>
               <div className="relative mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
                 <div
-                  className="absolute inset-y-0 left-0 rounded-full bg-primary"
-                  style={{ width: `${(cheapest.hoursToBuy / mostExpensive.hoursToBuy) * 100}%` }}
+                  className="absolute inset-y-0 left-0 w-full origin-left rounded-full bg-primary"
+                  style={{ transform: `scaleX(${cheapest.hoursToBuy / mostExpensive.hoursToBuy})` }}
                 />
               </div>
             </div>
@@ -119,16 +120,16 @@ export function Commodity() {
             <div className="sm:col-span-7">
               <p className="mb-1 text-sm text-muted-foreground">区域所需工时中位数</p>
               <p className="mb-3 text-xs text-muted-foreground">中位数不受极值国家影响，括号内为该区域收录国家数</p>
-              <FadeContent blur duration={800} threshold={0.2}>
+              <FadeContent duration={800} threshold={0.2}>
                 <div className="space-y-2.5">
                   {regionData.map(r => (
                     <div className="flex items-center gap-3" key={r.region}>
                       <span className="w-10 shrink-0 text-right text-xs text-muted-foreground">{r.region}</span>
                       <div className="relative h-5 flex-1 overflow-hidden rounded-sm bg-muted">
                         <div
-                          className="absolute inset-y-0 left-0 rounded-sm bg-primary transition-all duration-700"
+                          className="absolute inset-y-0 left-0 w-full origin-left rounded-sm bg-primary transition-transform duration-300 ease-out"
                           style={{
-                            width: `${(r.median / maxRegionMedian) * 100}%`,
+                            transform: `scaleX(${r.median / maxRegionMedian})`,
                           }}
                         />
                         <span className="absolute inset-y-0 right-2 flex items-center text-xs font-semibold tabular-nums">
@@ -185,11 +186,9 @@ export function Commodity() {
       {/* CTA */}
       <AnimatedContent delay={0.1} distance={30} duration={0.6}>
         <section className="mt-12 pb-4 sm:mt-16">
-          <Link className="group" to="/commodity-explore">
-            <Button className="rounded-full shadow-lg shadow-primary/20" size="lg">
-              开始探索数据
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </Button>
+          <Link className={cn(buttonVariants({ size: "lg" }), "group rounded-full")} to="/commodity-explore">
+            开始探索数据
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </section>
       </AnimatedContent>

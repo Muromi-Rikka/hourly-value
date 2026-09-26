@@ -9,10 +9,11 @@ import { CountUp } from "@/components/react-bits/CountUp/CountUp";
 import { FadeContent } from "@/components/react-bits/FadeContent/FadeContent";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
 import { SourceBlock } from "@/components/source-block";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { bigmac, BIGMAC_SOURCE, sortedByUsdPrice, sortedByValuation } from "@/data/bigmac";
 import { sortedByBigMacPerHour } from "@/data/bigmac-ppp";
 import { regionAverages } from "@/lib/region";
+import { cn } from "@/lib/utilities";
 
 export function BigMac() {
   const cheapest = sortedByUsdPrice[sortedByUsdPrice.length - 1];
@@ -30,7 +31,7 @@ export function BigMac() {
       <section className="pb-12 pt-6 sm:pb-16 sm:pt-8">
         <div className="rule-top mb-6" />
         <SplitText
-          className="max-w-3xl font-display text-[clamp(2.8rem,6vw,5rem)] font-normal leading-[1.05] tracking-[-0.03em]"
+          className="max-w-3xl text-balance font-display text-[clamp(2.8rem,6vw,5rem)] font-normal leading-[1.05] tracking-[-0.03em]"
           delay={80}
           duration={1}
           ease="power3.out"
@@ -39,7 +40,7 @@ export function BigMac() {
           text="巨无霸指数"
         />
         <AnimatedContent delay={0.1} distance={30} duration={0.6}>
-          <p className="mt-4 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
+          <p className="mt-4 max-w-lg text-base leading-relaxed text-pretty text-muted-foreground sm:text-lg">
             基于《经济学人》的巨无霸指数方法论，以各国麦当劳巨无霸汉堡的零售价格对比美元汇率，
             {" "}
             {count}
@@ -71,10 +72,10 @@ export function BigMac() {
         <section className="mt-12 sm:mt-16">
           <div className="mb-6">
             <p className="text-xs font-medium tracking-wider text-muted-foreground">购买力对比</p>
-            <h2 className="mt-2 font-display text-[clamp(1.8rem,3.5vw,2.8rem)] font-normal leading-[1.1] tracking-[-0.02em]">
+            <h2 className="mt-2 text-balance font-display text-[clamp(1.8rem,3.5vw,2.8rem)] font-normal leading-[1.1] tracking-[-0.02em]">
               工作一小时能买几个巨无霸？
             </h2>
-            <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-2 max-w-lg text-sm leading-relaxed text-pretty text-muted-foreground">
               以各国法定最低时薪除以当地巨无霸售价，直观体现最低工资的实际购买力。
             </p>
           </div>
@@ -138,8 +139,8 @@ export function BigMac() {
               </div>
               <div className="relative mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
                 <div
-                  className="absolute inset-y-0 left-0 rounded-full bg-primary"
-                  style={{ width: `${spread > 0 ? Math.min(100, Math.abs(mostUndervalued.valuationPct) / spread * 100) : 100}%` }}
+                  className="absolute inset-y-0 left-0 w-full origin-left rounded-full bg-primary"
+                  style={{ transform: `scaleX(${spread > 0 ? Math.min(1, Math.abs(mostUndervalued.valuationPct) / spread) : 1})` }}
                 />
               </div>
             </div>
@@ -147,16 +148,16 @@ export function BigMac() {
             {/* Right — region breakdown */}
             <div className="sm:col-span-7">
               <p className="mb-3 text-sm text-muted-foreground">区域平均估值偏差</p>
-              <FadeContent blur duration={800} threshold={0.2}>
+              <FadeContent duration={800} threshold={0.2}>
                 <div className="space-y-2.5">
                   {regionData.map(r => (
                     <div className="flex items-center gap-3" key={r.region}>
                       <span className="w-10 shrink-0 text-right text-xs text-muted-foreground">{r.region}</span>
                       <div className="relative h-5 flex-1 overflow-hidden rounded-sm bg-muted">
                         <div
-                          className="absolute inset-y-0 left-0 rounded-sm bg-primary transition-all duration-700"
+                          className="absolute inset-y-0 left-0 w-full origin-left rounded-sm bg-primary transition-transform duration-300 ease-out"
                           style={{
-                            width: `${(Math.abs(r.avg) / maxRegionAvg) * 100}%`,
+                            transform: `scaleX(${Math.abs(r.avg) / maxRegionAvg})`,
                           }}
                         />
                         <span className="absolute inset-y-0 right-2 flex items-center text-xs font-semibold tabular-nums">
@@ -266,11 +267,9 @@ export function BigMac() {
       {/* CTA */}
       <AnimatedContent delay={0.1} distance={30} duration={0.6}>
         <section className="mt-12 pb-4 sm:mt-16">
-          <Link className="group" to="/bigmac-explore">
-            <Button className="rounded-full shadow-lg shadow-primary/20" size="lg">
-              开始探索数据
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </Button>
+          <Link className={cn(buttonVariants({ size: "lg" }), "group rounded-full")} to="/bigmac-explore">
+            开始探索数据
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </section>
       </AnimatedContent>

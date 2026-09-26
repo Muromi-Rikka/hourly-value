@@ -13,6 +13,7 @@ import {
 } from "recharts";
 
 import { RegionLegend } from "@/components/region-legend";
+import { shouldReduceMotion } from "@/lib/reduced-motion";
 import { regionColor } from "@/lib/region";
 
 /**
@@ -100,6 +101,7 @@ export function RankBarChart<T extends { country: string; countryCode: string; r
               animationBegin={200}
               animationDuration={800}
               dataKey="__value"
+              isAnimationActive={!shouldReduceMotion()}
               maxBarSize={28}
               radius={[0, 4, 4, 0]}
             >
@@ -146,6 +148,7 @@ export function RankBarChart<T extends { country: string; countryCode: string; r
             animationBegin={200}
             animationDuration={800}
             dataKey="__value"
+            isAnimationActive={!shouldReduceMotion()}
             maxBarSize={48}
             radius={[4, 4, 0, 0]}
           >

@@ -20,9 +20,8 @@ import { FeaturedMethodNotes } from "@/components/method-notes";
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
 import { CountUp } from "@/components/react-bits/CountUp/CountUp";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
-import { SpotlightCard } from "@/components/react-bits/SpotlightCard/SpotlightCard";
 import { RegionLegend } from "@/components/region-legend";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { hourlyPower, hourlyPowerOf } from "@/data/hourly-power";
 import { SCOPE_CHIPS } from "@/data/methodology";
@@ -70,7 +69,7 @@ export function Home() {
       <section className="relative overflow-hidden pb-10 pt-6 sm:pb-14 sm:pt-8">
         <div className="rule-top mb-6" />
         <SplitText
-          className="max-w-4xl font-display text-[clamp(2.3rem,5.2vw,4.2rem)] font-normal leading-[1.06] tracking-[-0.03em]"
+          className="max-w-4xl text-balance font-display text-[clamp(2.3rem,5.2vw,4.2rem)] font-normal leading-[1.06] tracking-[-0.03em]"
           delay={80}
           duration={1}
           ease="power3.out"
@@ -79,7 +78,7 @@ export function Home() {
           text="同样工作 1 小时，各国能买到什么？"
         />
         <AnimatedContent delay={0.15} distance={30} duration={0.6}>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-pretty text-muted-foreground sm:text-lg">
             以各国法定最低时薪为共同起点，把工资、巨无霸、基础物资、iPhone 和 Model Y
             拉到同一把尺子上。已收录
             {" "}
@@ -94,14 +93,12 @@ export function Home() {
             ))}
           </div>
           <div className="mt-6 flex flex-wrap gap-2">
-            <Link className="group" to="/hourly">
-              <Button className="rounded-full shadow-lg shadow-primary/20" size="lg">
-                选择两个国家比较
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </Button>
+            <Link className={cn(buttonVariants({ size: "lg" }), "group rounded-full")} to="/hourly">
+              选择两个国家比较
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-            <Link to="/about">
-              <Button size="lg" variant="outline">先看口径说明</Button>
+            <Link className={buttonVariants({ size: "lg", variant: "outline" })} to="/about">
+              先看口径说明
             </Link>
           </div>
         </AnimatedContent>
@@ -141,7 +138,7 @@ export function Home() {
           <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-xs font-medium tracking-wider text-muted-foreground">一小时对一小时</p>
-              <h2 className="mt-2 font-display text-[clamp(1.6rem,3vw,2.4rem)] font-normal leading-tight tracking-[-0.02em]">
+              <h2 className="mt-2 text-balance font-display text-[clamp(1.6rem,3vw,2.4rem)] font-normal leading-tight tracking-[-0.02em]">
                 同样一小时，谁更宽裕
               </h2>
             </div>
@@ -169,10 +166,10 @@ export function Home() {
         <section className="mt-12 sm:mt-16">
           <div className="mb-5">
             <p className="text-xs font-medium tracking-wider text-muted-foreground">五项指标</p>
-            <h2 className="mt-2 font-display text-[clamp(1.6rem,3vw,2.4rem)] font-normal leading-tight tracking-[-0.02em]">
+            <h2 className="mt-2 text-balance font-display text-[clamp(1.6rem,3vw,2.4rem)] font-normal leading-tight tracking-[-0.02em]">
               从一顿饭到一辆车
             </h2>
-            <p className="mt-2 max-w-lg text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-2 max-w-lg text-sm leading-relaxed text-pretty text-muted-foreground">
               日常饮食、随身物品、大件耐用品的压力完全不同，分开看才不会互相抵消。
             </p>
           </div>
@@ -180,47 +177,43 @@ export function Home() {
             {stats.map((stat) => {
               const Icon = ICONS[stat.icon];
               return (
-                <SpotlightCard key={stat.id} spotlightColor="rgba(14, 107, 92, 0.12)">
-                  <Card className="flex flex-col border-0 bg-transparent shadow-none">
-                    <CardHeader>
-                      <p className="text-[11px] tracking-wider text-muted-foreground">{stat.group}</p>
-                      <CardTitle className="flex items-center gap-2 text-lg font-display">
-                        <span className="rounded-full bg-primary/10 p-2">
-                          <Icon className="h-5 w-5 text-primary" />
-                        </span>
-                        {stat.title}
-                      </CardTitle>
-                      <CardDescription>{stat.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex-1">
-                      <div className="space-y-3">
-                        {stat.metrics.map(metric => (
-                          <div className="flex items-baseline justify-between" key={metric.label}>
-                            <span className="text-sm text-muted-foreground">{metric.label}</span>
-                            <div className="flex items-baseline gap-2">
-                              <span className="stat-number text-lg">{metric.value}</span>
-                              <span className="flex w-[4.5rem] shrink-0 items-center gap-1 text-xs text-muted-foreground">
-                                <CountryFlag className="h-4 w-4 shrink-0" countryCode={metric.countryCode} />
-                                <span className="truncate">{metric.country}</span>
-                              </span>
-                            </div>
+                <Card className="flex flex-col" key={stat.id}>
+                  <CardHeader>
+                    <p className="text-[11px] tracking-wider text-muted-foreground">{stat.group}</p>
+                    <CardTitle className="flex items-center gap-2 text-lg font-display">
+                      <span className="rounded-full bg-primary/10 p-2">
+                        <Icon className="h-5 w-5 text-primary" />
+                      </span>
+                      {stat.title}
+                    </CardTitle>
+                    <CardDescription>{stat.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-1">
+                    <div className="space-y-3">
+                      {stat.metrics.map(metric => (
+                        <div className="flex items-baseline justify-between" key={metric.label}>
+                          <span className="text-sm text-muted-foreground">{metric.label}</span>
+                          <div className="flex items-baseline gap-2">
+                            <span className="stat-number text-lg">{metric.value}</span>
+                            <span className="flex w-[4.5rem] shrink-0 items-center gap-1 text-xs text-muted-foreground">
+                              <CountryFlag className="h-4 w-4 shrink-0" countryCode={metric.countryCode} />
+                              <span className="truncate">{metric.country}</span>
+                            </span>
                           </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                    <CardFooter className="mt-auto border-t border-border/30 pt-4">
-                      <div className="flex w-full items-center justify-between">
-                        <CoverageBadge coverage={stat.coverage} />
-                        <Link className="group" to={stat.link}>
-                          <Button size="sm" variant="ghost">
-                            {stat.linkLabel}
-                            <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                          </Button>
-                        </Link>
-                      </div>
-                    </CardFooter>
-                  </Card>
-                </SpotlightCard>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                  <CardFooter className="mt-auto border-t border-border/30 pt-4">
+                    <div className="flex w-full items-center justify-between">
+                      <CoverageBadge coverage={stat.coverage} />
+                      <Link className={cn(buttonVariants({ size: "sm", variant: "ghost" }), "group")} to={stat.link}>
+                        {stat.linkLabel}
+                        <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </Link>
+                    </div>
+                  </CardFooter>
+                </Card>
               );
             })}
           </div>
@@ -283,11 +276,9 @@ export function Home() {
       <AnimatedContent delay={0.1} distance={30} duration={0.6}>
         <section className="mt-12 pb-4 sm:mt-16">
           <div className="flex flex-wrap items-center gap-3">
-            <Link className="group" to="/hourly">
-              <Button className="rounded-full shadow-lg shadow-primary/20" size="lg">
-                进入一小时购买力
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </Button>
+            <Link className={cn(buttonVariants({ size: "lg" }), "group rounded-full")} to="/hourly">
+              进入一小时购买力
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <Link className="group inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary" to="/explore">
               只看最低工资数据

@@ -36,7 +36,7 @@ export function MethodNotes({ featuredOnly = false, title = "三分钟读懂口�
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-medium tracking-wider text-muted-foreground">数据口径</p>
-          <h2 className="mt-2 font-display text-[clamp(1.6rem,3vw,2.2rem)] font-normal leading-tight tracking-[-0.02em]">
+          <h2 className="mt-2 text-balance font-display text-[clamp(1.6rem,3vw,2.2rem)] font-normal leading-tight tracking-[-0.02em]">
             {title}
           </h2>
         </div>

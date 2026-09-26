@@ -15,7 +15,7 @@ import { MethodNotes } from "@/components/method-notes";
 import { RankBarChart } from "@/components/rank-bar-chart";
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   commonCodes,
   commonHourlyPower,
@@ -157,6 +157,11 @@ export function Hourly() {
   const setSearchScope = (next: "all" | "common") => {
     setSearch({ scope: next === "common" ? "common" : undefined });
   };
+  const clearFilters = () => {
+    setQuery("");
+    setColumnFilters([]);
+    setSearch({ scope: undefined });
+  };
 
   const shareHref = `/hourly?a=${a.countryCode}&b=${b.countryCode}&metric=${metric.key}&scope=${scope}`;
 
@@ -186,7 +191,7 @@ export function Hourly() {
       <section className="relative overflow-hidden pb-10 pt-6 sm:pb-14 sm:pt-8">
         <div className="rule-top mb-6" />
         <SplitText
-          className="max-w-3xl font-display text-[clamp(2.5rem,5.5vw,4.5rem)] font-normal leading-[1.05] tracking-[-0.03em]"
+          className="max-w-3xl text-balance font-display text-[clamp(2.5rem,5.5vw,4.5rem)] font-normal leading-[1.05] tracking-[-0.03em]"
           delay={80}
           duration={1}
           ease="power3.out"
@@ -195,7 +200,7 @@ export function Hourly() {
           text="一小时能买什么"
         />
         <AnimatedContent delay={0.15} distance={30} duration={0.6}>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-pretty text-muted-foreground sm:text-lg">
             同样工作
             {" "}
             1
@@ -253,6 +258,7 @@ export function Hourly() {
                 {" 个国家/地区在同一张表里对照。展开任意一行可看该国的工时折算口径与来源。"}
               </>
             )}
+            onClearFilters={clearFilters}
             onColumnFiltersChange={setColumnFilters}
             renderExpanded={row => <DetailPanel entry={row} />}
             title="各国一小时购买力矩阵"
@@ -276,7 +282,7 @@ export function Hourly() {
       <AnimatedContent delay={0.1} distance={40} duration={0.6} threshold={0.1}>
         <section className="mt-12 sm:mt-16">
           <p className="text-xs font-medium tracking-wider text-muted-foreground">区域中位数</p>
-          <h2 className="mt-2 font-display text-[clamp(1.5rem,2.6vw,2rem)] font-normal leading-tight">
+          <h2 className="mt-2 text-balance font-display text-[clamp(1.5rem,2.6vw,2rem)] font-normal leading-tight">
             各区域的
             {metric.label}
           </h2>
@@ -342,11 +348,9 @@ export function Hourly() {
               { href: "/iphone", label: "iPhone 指数" },
               { href: "/modely", label: "Model Y 指数" },
             ].map(item => (
-              <Link key={item.href} to={item.href}>
-                <Button size="sm" variant="outline">
-                  {item.label}
-                  <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                </Button>
+              <Link className={buttonVariants({ size: "sm", variant: "outline" })} key={item.href} to={item.href}>
+                {item.label}
+                <ArrowRight className="ml-1 h-3.5 w-3.5" />
               </Link>
             ))}
           </div>
@@ -444,6 +448,7 @@ function MetricSwitcher({ activeKey, onChange }: { activeKey: HourlyMetric["key"
     <div className="flex flex-wrap gap-1.5">
       {HOURLY_METRICS.map(metric => (
         <Button
+          aria-pressed={metric.key === activeKey}
           className={cn(metric.key === activeKey && "border-primary text-primary")}
           key={metric.key}
           onClick={() => onChange(metric.key)}
