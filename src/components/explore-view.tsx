@@ -1,4 +1,4 @@
-import type { RowData, SortingState } from "@tanstack/react-table";
+import type { ColumnFiltersState, RowData, SortingState } from "@tanstack/react-table";
 import type * as React from "react";
 
 import type { DataTableColumn } from "@/components/data-table";
@@ -10,40 +10,54 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ExploreViewProperties<T extends RowData> {
   /**
-  * 图表视图本体
-  */
+   * 图表视图本体
+   */
   chart: React.ReactNode;
   /**
-  * 图表视图的口径说明
-  */
+   * 图表视图的口径说明
+   */
   chartCaption: React.ReactNode;
+  /**
+   * 排序主指标切换器（跨指数页用：一次只看一个指标）
+   */
+  chartControls?: React.ReactNode;
+  columnFilters?: ColumnFiltersState;
   columns: DataTableColumn<T>[];
   data: T[];
   defaultSort: SortingState;
   /**
-  * 副标题，写清数据口径与条数
-  */
+   * 副标题，写清数据口径与条数
+   */
   description: React.ReactNode;
+  onColumnFiltersChange?: (updater: React.SetStateAction<ColumnFiltersState>) => void;
   renderExpanded: (row: T) => React.ReactNode;
   /**
-  * 页面标题（同时作为浏览器标签标题的一部分）
-  */
+   * 页面标题（同时作为浏览器标签标题的一部分）
+   */
   title: string;
+  /**
+   * 表格工具条（搜索、区域筛选、覆盖率筛选）
+   */
+  toolbar?: React.ReactNode;
 }
 
 /**
  * 指数数据探索页的统一骨架：标题 → 口径说明 → 表格/图表切换。
- * 五个 explore 页共用，只传数据与列定义。
+ * 五个 explore 页与跨指数页共用，只传数据与列定义。
  */
 export function ExploreView<T extends RowData>({
   chart,
   chartCaption,
+  chartControls,
+  columnFilters,
   columns,
   data,
   defaultSort,
   description,
+  onColumnFiltersChange,
   renderExpanded,
   title,
+  toolbar,
 }: ExploreViewProperties<T>) {
   return (
     <div>
@@ -68,15 +82,19 @@ export function ExploreView<T extends RowData>({
 
           <TabsContent className="mt-4" value="table">
             <DataTable
+              columnFilters={columnFilters}
               columns={columns}
               data={data}
               defaultSort={defaultSort}
+              onColumnFiltersChange={onColumnFiltersChange}
               renderExpanded={renderExpanded}
+              toolbar={toolbar}
             />
           </TabsContent>
 
           <TabsContent className="mt-4" value="chart">
             <div>
+              {chartControls ? <div className="mb-3">{chartControls}</div> : null}
               <p className="mb-3 text-sm text-muted-foreground">{chartCaption}</p>
               {chart}
             </div>

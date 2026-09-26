@@ -1,4 +1,6 @@
 import type { IPhoneEntry } from "@/data/iphone";
+import type { Region } from "@/lib/region";
+
 import { iphones } from "@/data/iphone";
 import { wages } from "@/data/wages";
 
@@ -6,12 +8,12 @@ import { wages } from "@/data/wages";
  * Merge iPhone prices with minimum wage to compute hours of work needed.
  */
 export interface IPhoneIndexEntry {
-  /**
-   * Minimum hourly wage in CNY
-   */
   country: string;
   countryCode: string;
-  hourlyWage: number;
+  /**
+   * Minimum hourly wage in CNY; null if no wage data
+   */
+  hourlyWage: null | number;
   /**
    * Hours of minimum-wage work to buy one iPhone; null if no wage data
    */
@@ -27,7 +29,7 @@ export interface IPhoneIndexEntry {
    * iPhone 18 Pro local price
    */
   localPrice: number;
-  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
+  region: Region;
   taxNote: string;
   wageSource: string;
   wageSourceUrl: string;
@@ -37,10 +39,10 @@ const wageByCode = new Map(wages.map(w => [w.countryCode, w]));
 
 export const iphoneIndex: IPhoneIndexEntry[] = iphones.map((phone: IPhoneEntry) => {
   const wage = wageByCode.get(phone.countryCode);
-  const hourlyWage = wage?.cnyEquivalent ?? 0;
-  const hoursToBuy = wage
-    ? Math.round((phone.cnyEquivalent / hourlyWage) * 10) / 10
-    : null;
+  const hourlyWage = wage?.cnyEquivalent ?? null;
+  const hoursToBuy = hourlyWage === null || hourlyWage <= 0
+    ? null
+    : Math.round((phone.cnyEquivalent / hourlyWage) * 10) / 10;
   return {
     country: phone.country,
     countryCode: phone.countryCode,

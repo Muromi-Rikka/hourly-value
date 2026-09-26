@@ -1,17 +1,39 @@
+import type { Region } from "@/lib/region";
 import { cnyPerUnit } from "@/data/exchange-rates";
+
+/**
+ * 当地最低工资的公布单位，决定时薪是如何得到的
+ */
+export type HoursBasis = "day" | "hour" | "month" | "week";
 
 export interface WageEntry {
   cnyEquivalent: number;
   country: string;
   countryCode: string;
   effectiveDate: string;
+  /**
+   * 公布单位：按月/按日设定的国家，时薪由月或日工资换算而来
+   */
+  hoursBasis: HoursBasis;
+  /**
+   * 是否为代理值：无全国统一标准时取地区中位数、集体协议口径或首都区档位
+   */
+  isProxy: boolean;
   localCurrency: string;
   localUnit: string;
   localWage: number;
   note: string;
-  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
+  region: Region;
   source: string;
   sourceUrl: string;
+  /**
+   * 换算时薪所用的工时数（`note` 中明确写出的数字）；按小时公布时为 null
+   */
+  statutoryHours: null | number;
+  /**
+   * 法定周工时上限；仅在来源明确时填写，不从月工时外推
+   */
+  statutoryWeeklyHours: null | number;
 }
 
 const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
@@ -19,6 +41,8 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     country: "澳大利亚",
     countryCode: "AU",
     effectiveDate: "2026-07-01",
+    hoursBasis: "hour",
+    isProxy: false,
     localCurrency: "澳元",
     localUnit: "澳元/小时",
     localWage: 24.1,
@@ -26,11 +50,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "大洋洲",
     source: "Fair Work Commission",
     sourceUrl: "https://www.fwc.gov.au",
+    statutoryHours: null,
+    statutoryWeeklyHours: 38,
   },
   {
     country: "卢森堡",
     countryCode: "LU",
     effectiveDate: "2026-01-01",
+    hoursBasis: "hour",
+    isProxy: false,
     localCurrency: "欧元",
     localUnit: "欧元/小时",
     localWage: 14.86,
@@ -38,11 +66,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "欧洲",
     source: "Eurostat 最低工资统计",
     sourceUrl: "https://ec.europa.eu/eurostat/web/labour-market/earnings/minimum-wages",
+    statutoryHours: null,
+    statutoryWeeklyHours: 40,
   },
   {
     country: "德国",
     countryCode: "DE",
     effectiveDate: "2025-01-01",
+    hoursBasis: "hour",
+    isProxy: false,
     localCurrency: "欧元",
     localUnit: "欧元/小时",
     localWage: 12.82,
@@ -50,11 +82,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "欧洲",
     source: "德国联邦劳工部",
     sourceUrl: "https://ec.europa.eu/eurostat/web/labour-market/earnings/minimum-wages",
+    statutoryHours: null,
+    statutoryWeeklyHours: null,
   },
   {
     country: "法国",
     countryCode: "FR",
     effectiveDate: "2026-01-01",
+    hoursBasis: "hour",
+    isProxy: false,
     localCurrency: "欧元",
     localUnit: "欧元/小时",
     localWage: 11.65,
@@ -62,11 +98,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "欧洲",
     source: "法国劳工部 SMIC 标准",
     sourceUrl: "https://www.economie.gouv.fr",
+    statutoryHours: null,
+    statutoryWeeklyHours: 35,
   },
   {
     country: "荷兰",
     countryCode: "NL",
     effectiveDate: "2026-01-01",
+    hoursBasis: "hour",
+    isProxy: false,
     localCurrency: "欧元",
     localUnit: "欧元/小时",
     localWage: 14.71,
@@ -74,11 +114,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "欧洲",
     source: "荷兰社会事务部；Eurostat",
     sourceUrl: "https://www.government.nl",
+    statutoryHours: null,
+    statutoryWeeklyHours: 38,
   },
   {
     country: "英国",
     countryCode: "GB",
     effectiveDate: "2025-04-01",
+    hoursBasis: "hour",
+    isProxy: false,
     localCurrency: "英镑",
     localUnit: "英镑/小时",
     localWage: 11.44,
@@ -86,11 +130,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "欧洲",
     source: "UK Government",
     sourceUrl: "https://www.gov.uk/national-minimum-wage-rates",
+    statutoryHours: null,
+    statutoryWeeklyHours: null,
   },
   {
     country: "新西兰",
     countryCode: "NZ",
     effectiveDate: "2026-04-01",
+    hoursBasis: "hour",
+    isProxy: false,
     localCurrency: "新西兰元",
     localUnit: "新西兰元/小时",
     localWage: 23.15,
@@ -98,11 +146,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "大洋洲",
     source: "MBIE 新西兰商业创新与就业部",
     sourceUrl: "https://www.employment.govt.nz",
+    statutoryHours: null,
+    statutoryWeeklyHours: 40,
   },
   {
     country: "加拿大",
     countryCode: "CA",
     effectiveDate: "2025-01-01",
+    hoursBasis: "hour",
+    isProxy: true,
     localCurrency: "加元",
     localUnit: "加元/小时",
     localWage: 16,
@@ -110,11 +162,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "北美",
     source: "加拿大各省劳工厅；OECD",
     sourceUrl: "https://www.canada.ca",
+    statutoryHours: null,
+    statutoryWeeklyHours: null,
   },
   {
     country: "美国",
     countryCode: "US",
     effectiveDate: "2025-01-01",
+    hoursBasis: "hour",
+    isProxy: true,
     localCurrency: "美元",
     localUnit: "美元/小时",
     localWage: 11,
@@ -122,11 +178,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "北美",
     source: "美国劳工部 DOL；OECD",
     sourceUrl: "https://www.dol.gov",
+    statutoryHours: null,
+    statutoryWeeklyHours: null,
   },
   {
     country: "韩国",
     countryCode: "KR",
     effectiveDate: "2026-01-01",
+    hoursBasis: "hour",
+    isProxy: false,
     localCurrency: "韩元",
     localUnit: "韩元/小时",
     localWage: 9860,
@@ -134,11 +194,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "亚洲",
     source: "韩国雇佣劳动部",
     sourceUrl: "https://www.moel.go.kr",
+    statutoryHours: null,
+    statutoryWeeklyHours: null,
   },
   {
     country: "日本",
     countryCode: "JP",
     effectiveDate: "2025-01-01",
+    hoursBasis: "hour",
+    isProxy: true,
     localCurrency: "日元",
     localUnit: "日元/小时",
     localWage: 1004,
@@ -146,11 +210,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "亚洲",
     source: "日本厚生劳动省",
     sourceUrl: "https://www.mhlw.go.jp",
+    statutoryHours: null,
+    statutoryWeeklyHours: null,
   },
   {
     country: "西班牙",
     countryCode: "ES",
     effectiveDate: "2026-01-01",
+    hoursBasis: "month",
+    isProxy: false,
     localCurrency: "欧元",
     localUnit: "欧元/小时",
     localWage: 7.07,
@@ -158,11 +226,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "欧洲",
     source: "西班牙劳工部；Eurostat",
     sourceUrl: "https://ec.europa.eu/eurostat/web/labour-market/earnings/minimum-wages",
+    statutoryHours: 160,
+    statutoryWeeklyHours: null,
   },
   {
     country: "中国",
     countryCode: "CN",
     effectiveDate: "2026-01-01",
+    hoursBasis: "month",
+    isProxy: true,
     localCurrency: "人民币",
     localUnit: "元/小时",
     localWage: 23,
@@ -170,11 +242,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "亚洲",
     source: "人社部《全国各省、自治区、直辖市最低工资标准情况》",
     sourceUrl: "https://www.mohrss.gov.cn/SYrlzyhshbzb/laodongguanxi_/fwyd/202601/t20260112_565296.html",
+    statutoryHours: null,
+    statutoryWeeklyHours: null,
   },
   {
     country: "印度",
     countryCode: "IN",
     effectiveDate: "2026-04-01",
+    hoursBasis: "day",
+    isProxy: true,
     localCurrency: "印度卢比",
     localUnit: "印度卢比/小时",
     localWage: 86.63,
@@ -182,11 +258,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "亚洲",
     source: "印度劳工与就业部；Chief Labour Commissioner (Central)",
     sourceUrl: "https://clc.gov.in/clc/min-wages",
+    statutoryHours: 8,
+    statutoryWeeklyHours: null,
   },
   {
     country: "墨西哥",
     countryCode: "MX",
     effectiveDate: "2026-01-01",
+    hoursBasis: "day",
+    isProxy: true,
     localCurrency: "墨西哥比索",
     localUnit: "墨西哥比索/小时",
     localWage: 39.38,
@@ -194,11 +274,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "北美",
     source: "墨西哥全国最低工资委员会 CONASAMI",
     sourceUrl: "https://www.gob.mx/conasami/articulos/incremento-a-los-salarios-minimos-para-2026?idiom=es",
+    statutoryHours: 8,
+    statutoryWeeklyHours: null,
   },
   {
     country: "波兰",
     countryCode: "PL",
     effectiveDate: "2026-01-01",
+    hoursBasis: "month",
+    isProxy: false,
     localCurrency: "波兰兹罗提",
     localUnit: "波兰兹罗提/小时",
     localWage: 30.04,
@@ -206,11 +290,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "欧洲",
     source: "波兰部长会议最低工资条例（Dz.U. 2025 poz. 1242）",
     sourceUrl: "https://isap.sejm.gov.pl/isap.nsf/DocDetails.xsp?id=WDU20250001242",
+    statutoryHours: 160,
+    statutoryWeeklyHours: null,
   },
   {
     country: "马来西亚",
     countryCode: "MY",
     effectiveDate: "2025-02-01",
+    hoursBasis: "hour",
+    isProxy: false,
     localCurrency: "马来西亚林吉特",
     localUnit: "马来西亚林吉特/小时",
     localWage: 8.72,
@@ -218,11 +306,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "亚洲",
     source: "马来西亚人力资源部《2024 年最低工资法令》P.U.(A) 376/2024",
     sourceUrl: "https://oneasia.legal/en/wp-content/themes/standard_black_cmspro/img/EN_02-2025MWO-2024.pdf",
+    statutoryHours: null,
+    statutoryWeeklyHours: null,
   },
   {
     country: "泰国",
     countryCode: "TH",
     effectiveDate: "2025-07-01",
+    hoursBasis: "day",
+    isProxy: true,
     localCurrency: "泰铢",
     localUnit: "泰铢/小时",
     localWage: 44.63,
@@ -230,11 +322,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "亚洲",
     source: "泰国劳工部工资委员会《最低工资率公告（第 14 号）》",
     sourceUrl: "https://www.mol.go.th/wp-content/uploads/sites/2/2025/07/%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%81%E0%B8%B2%E0%B8%A8-%E0%B8%84%E0%B8%88.%E0%B8%82%E0%B8%B1%E0%B9%89%E0%B8%99%E0%B8%95%E0%B9%88%E0%B8%B3-%E0%B8%8914-%E0%B8%A3%E0%B8%A7%E0%B8%A1.pdf",
+    statutoryHours: 8,
+    statutoryWeeklyHours: null,
   },
   {
     country: "比利时",
     countryCode: "BE",
     effectiveDate: "2026-07-01",
+    hoursBasis: "month",
+    isProxy: false,
     localCurrency: "欧元",
     localUnit: "欧元/小时",
     localWage: 13.96,
@@ -242,11 +338,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "欧洲",
     source: "比利时指数化最低工资 GGMMI；KPMG 全球流动服务简报",
     sourceUrl: "https://kpmg.com/xx/en/our-insights/gms-flash-alert/2026/flash-alert-2026-232.html",
+    statutoryHours: 160,
+    statutoryWeeklyHours: 38,
   },
   {
     country: "葡萄牙",
     countryCode: "PT",
     effectiveDate: "2026-01-01",
+    hoursBasis: "month",
+    isProxy: false,
     localCurrency: "欧元",
     localUnit: "欧元/小时",
     localWage: 5.75,
@@ -254,11 +354,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "欧洲",
     source: "葡萄牙就业与职业培训研究所 Dgert（Decreto-Lei n.º 139/2025）",
     sourceUrl: "https://www.dgert.gov.pt/retribuicao-minima-mensal-garantida-para-2026",
+    statutoryHours: 160,
+    statutoryWeeklyHours: null,
   },
   {
     country: "爱尔兰",
     countryCode: "IE",
     effectiveDate: "2026-01-01",
+    hoursBasis: "hour",
+    isProxy: false,
     localCurrency: "欧元",
     localUnit: "欧元/小时",
     localWage: 14.15,
@@ -266,11 +370,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "欧洲",
     source: "爱尔兰企业、旅游与就业部（低薪委员会建议）",
     sourceUrl: "https://www.gov.ie/en/department-of-enterprise-tourism-and-employment/publications/national-minimum-wage-increase-on-1-january-2025/",
+    statutoryHours: null,
+    statutoryWeeklyHours: null,
   },
   {
     country: "希腊",
     countryCode: "GR",
     effectiveDate: "2026-04-01",
+    hoursBasis: "month",
+    isProxy: false,
     localCurrency: "欧元",
     localUnit: "欧元/小时",
     localWage: 5.75,
@@ -278,11 +386,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "欧洲",
     source: "希腊劳工与社会庇护部（共同部长级决定 8934/2026）",
     sourceUrl: "https://ypergasias.gov.gr/se-ischy-apo-simera-o-neos-katotatos-misthos-ofelei-15-ekatommyrio-polites/",
+    statutoryHours: 160,
+    statutoryWeeklyHours: null,
   },
   {
     country: "菲律宾",
     countryCode: "PH",
     effectiveDate: "2026-07-25",
+    hoursBasis: "day",
+    isProxy: true,
     localCurrency: "菲律宾比索",
     localUnit: "菲律宾比索/小时",
     localWage: 94.38,
@@ -290,11 +402,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "亚洲",
     source: "菲律宾劳工就业部 DOLE；地区三方工资与生产力委员会（RTWPB-NCR）",
     sourceUrl: "https://nwpc.dole.gov.ph/ncr",
+    statutoryHours: 8,
+    statutoryWeeklyHours: null,
   },
   {
     country: "捷克",
     countryCode: "CZ",
     effectiveDate: "2026-01-01",
+    hoursBasis: "week",
+    isProxy: false,
     localCurrency: "捷克克朗",
     localUnit: "捷克克朗/小时",
     localWage: 134.4,
@@ -302,11 +418,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "欧洲",
     source: "捷克劳工与社会事务部（MPSV）公告第 356/2025 Sb. 号",
     sourceUrl: "https://www.mpsv.cz/web/cz/minimalni-mzda",
+    statutoryHours: 40,
+    statutoryWeeklyHours: 40,
   },
   {
     country: "匈牙利",
     countryCode: "HU",
     effectiveDate: "2026-01-01",
+    hoursBasis: "month",
+    isProxy: false,
     localCurrency: "匈牙利福林",
     localUnit: "匈牙利福林/小时",
     localWage: 2017.5,
@@ -314,11 +434,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "欧洲",
     source: "匈牙利政府令第 426/2025 (XII. 23.) 号；RSM Hungary",
     sourceUrl: "https://www.rsm.hu/blogs/payroll/minimum-wage-and-guaranteed-minimum-wage-2026-this-is-how-much-the-lowest-wage-will",
+    statutoryHours: 160,
+    statutoryWeeklyHours: null,
   },
   {
     country: "智利",
     countryCode: "CL",
     effectiveDate: "2026-01-01",
+    hoursBasis: "week",
+    isProxy: false,
     localCurrency: "智利比索",
     localUnit: "智利比索/小时",
     localWage: 2961.54,
@@ -326,11 +450,15 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "南美",
     source: "智利劳动与社会福利部（DT）；第 21.751 号法",
     sourceUrl: "https://www.dt.gob.cl/",
+    statutoryHours: 42,
+    statutoryWeeklyHours: 42,
   },
   {
     country: "以色列",
     countryCode: "IL",
     effectiveDate: "2026-04-01",
+    hoursBasis: "month",
+    isProxy: false,
     localCurrency: "新谢克尔",
     localUnit: "新谢克尔/小时",
     localWage: 34.64,
@@ -338,15 +466,27 @@ const rawWages: Omit<WageEntry, "cnyEquivalent">[] = [
     region: "中东",
     source: "以色列国家保险协会《最低工资》；《最低工资法》5747-1987",
     sourceUrl: "https://www.btl.gov.il/English%20Homepage/Mediniyut/GeneralInformation/Pages/MinimumWage.aspx",
+    statutoryHours: 186,
+    statutoryWeeklyHours: null,
   },
 ];
 
 /**
  * 人民币折算使用构建时拉取的最新汇率（scripts/fetch-rates.mjs）。
+ * 保留 1 位小数：低工资国家取整后误差可达数个百分点。
  */
 export const wages: WageEntry[] = rawWages.map(entry => ({
   ...entry,
-  cnyEquivalent: Math.round(entry.localWage * cnyPerUnit[entry.localCurrency]),
+  cnyEquivalent: Math.round(entry.localWage * cnyPerUnit[entry.localCurrency] * 10) / 10,
 }));
 
 export const sortedByWage = wages.toSorted((a, b) => b.cnyEquivalent - a.cnyEquivalent);
+
+const wageByCode = new Map(wages.map(entry => [entry.countryCode, entry]));
+
+/**
+ * 按 ISO 国家码取工资记录
+ */
+export function wageBy(countryCode: string): undefined | WageEntry {
+  return wageByCode.get(countryCode);
+}

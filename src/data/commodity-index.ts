@@ -1,4 +1,6 @@
 import type { CommodityItem } from "@/data/commodity";
+import type { Region } from "@/lib/region";
+
 import { commodities, COMMODITY_SOURCE } from "@/data/commodity";
 import { cnyPerUnit } from "@/data/exchange-rates";
 import { wages } from "@/data/wages";
@@ -23,14 +25,14 @@ export interface CommodityIndexEntry {
   country: string;
   countryCode: string;
   /**
-   * Minimum hourly wage in CNY
+   * Minimum hourly wage in CNY; null if no wage data
    */
-  hourlyWage: number;
+  hourlyWage: null | number;
   /**
-   * Hours of minimum-wage work to buy the basket
+   * Hours of minimum-wage work to buy the basket; null if no wage data
    */
-  hoursToBuy: number;
-  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
+  hoursToBuy: null | number;
+  region: Region;
   wageSource: string;
   wageSourceUrl: string;
 }
@@ -60,12 +62,13 @@ function basketUSD(item: CommodityItem): number {
 export const commodityIndex: CommodityIndexEntry[] = commodities
   .map((item) => {
     const wage = wageByCode.get(item.countryCode);
-    const hourlyWage = wage?.cnyEquivalent ?? 0;
+    const hourlyWage = wage?.cnyEquivalent ?? null;
     const bUSD = Math.round(basketUSD(item) * 100) / 100;
     const bCNY = Math.round(bUSD * usdToCny * 100) / 100;
-    const hours = hourlyWage > 0
-      ? Math.round((bCNY / hourlyWage) * 100) / 100
-      : 0;
+    // 无工资数据时必须是 null：0 会被排到"最便宜"一侧，等于伪造一个观测值
+    const hours = hourlyWage === null || hourlyWage <= 0
+      ? null
+      : Math.round((bCNY / hourlyWage) * 100) / 100;
 
     return {
       basketCNY: bCNY,
@@ -82,8 +85,17 @@ export const commodityIndex: CommodityIndexEntry[] = commodities
   });
 
 /**
- * Sorted by hours ascending (fewest hours = most affordable).
+ * Sorted by hours ascending (fewest hours = most affordable). Nulls (no data) go last.
  */
-export const sortedByHours = commodityIndex.toSorted(
-  (a, b) => a.hoursToBuy - b.hoursToBuy,
-);
+export const sortedByHours = commodityIndex.toSorted((a, b) => {
+  if (a.hoursToBuy === null && b.hoursToBuy === null) {
+    return 0;
+  }
+  if (a.hoursToBuy === null) {
+    return 1;
+  }
+  if (b.hoursToBuy === null) {
+    return -1;
+  }
+  return a.hoursToBuy - b.hoursToBuy;
+});

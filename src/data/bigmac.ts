@@ -1,3 +1,5 @@
+import type { Region } from "@/lib/region";
+
 export const BIGMAC_SOURCE = {
   name: "The Economist Big Mac Data (GitHub)",
   note: "美元价与估值偏差沿用来源数据集发布值，不按构建时汇率重算；来源数据集无逐国行的 9 个欧元区国家（卢森堡、德国、法国、荷兰、西班牙、比利时、葡萄牙、爱尔兰、希腊）统一采用其 2026-07-01 快照的 Euro area 汇总行",
@@ -11,7 +13,7 @@ export interface BigMacEntry {
   localCurrency: string;
   localPrice: number;
   localPriceFormatted: string;
-  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
+  region: Region;
   usdPrice: number;
   valuationPct: number;
 }

@@ -1,3 +1,5 @@
+import type { Region } from "@/lib/region";
+
 import { cnyPerUnit } from "@/data/exchange-rates";
 
 export const IPHONE_SOURCE = {
@@ -12,7 +14,7 @@ export interface IPhoneEntry {
   countryCode: string;
   localCurrency: string;
   localPrice: number;
-  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
+  region: Region;
   source: string;
   sourceUrl: string;
   taxNote: string;

@@ -6,13 +6,14 @@ import { bigmacExploreRoute } from "@/routes/bigmac-explore";
 import { commodityRoute } from "@/routes/commodity";
 import { commodityExploreRoute } from "@/routes/commodity-explore";
 import { exploreRoute } from "@/routes/explore";
+import { hourlyRoute } from "@/routes/hourly";
 import { indexRoute } from "@/routes/index";
 import { iphoneRoute } from "@/routes/iphone";
 import { iphoneExploreRoute } from "@/routes/iphone-explore";
 import { modelyRoute } from "@/routes/modely";
 import { modelyExploreRoute } from "@/routes/modely-explore";
 
-const routeTree = rootRoute.addChildren([indexRoute, exploreRoute, aboutRoute, iphoneRoute, iphoneExploreRoute, bigmacRoute, bigmacExploreRoute, commodityRoute, commodityExploreRoute, modelyRoute, modelyExploreRoute]);
+const routeTree = rootRoute.addChildren([indexRoute, hourlyRoute, exploreRoute, aboutRoute, iphoneRoute, iphoneExploreRoute, bigmacRoute, bigmacExploreRoute, commodityRoute, commodityExploreRoute, modelyRoute, modelyExploreRoute]);
 
 const router = createRouter({ routeTree, scrollRestoration: true });
 

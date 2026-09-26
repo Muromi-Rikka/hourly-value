@@ -1,7 +1,12 @@
+import type { Region } from "@/lib/region";
+
 import { bigmac } from "@/data/bigmac";
 import { wages } from "@/data/wages";
 
 export interface BigMacPurchasingPower {
+  /**
+   * 最低时薪 ÷ 当地售价，全部在本币内完成，不经过汇率
+   */
   bigMacPerHour: number;
   country: string;
   countryCode: string;
@@ -9,7 +14,7 @@ export interface BigMacPurchasingPower {
   localPriceFormatted: string;
   localWage: number;
   localWageFormatted: string;
-  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
+  region: Region;
 }
 
 const currencySymbol: Record<string, string> = {

@@ -9,6 +9,7 @@ import { ModelYTooltip } from "@/components/index-tooltips";
 import { RankBarChart } from "@/components/rank-bar-chart";
 import { RegionBadge } from "@/components/region-badge";
 import { modelyIndex } from "@/data/modely-index";
+import { cnyHour, DASH, hourNumber, hours } from "@/lib/format";
 
 const columns: DataTableColumn<ModelYIndexEntry>[] = [
   {
@@ -40,47 +41,47 @@ const columns: DataTableColumn<ModelYIndexEntry>[] = [
     id: "modelyPrice",
   },
   {
-    accessorFn: row => row.hourlyWage,
+    accessorFn: row => row.hourlyWage ?? -1,
     cell: ({ row }) => (
       <span className="tabular-nums text-muted-foreground">
-        ¥
-        {row.original.hourlyWage}
+        {cnyHour(row.original.hourlyWage)}
         /h
       </span>
     ),
-    header: "最低时薪",
+    header: "最低时薪（税前）",
     id: "hourlyWage",
-  },
-  {
-    accessorFn: row => row.daysToBuy,
-    cell: ({ row }) => (
-      row.original.daysToBuy === null
-        ? <span className="text-muted-foreground">—</span>
-        : (
-            <span className="font-semibold tabular-nums text-primary">
-              {row.original.daysToBuy}
-              天
-            </span>
-          )
-    ),
-    header: "所需天数",
-    id: "daysToBuy",
     sortFn: "basic",
   },
   {
-    accessorFn: row => row.hoursToBuy,
+    accessorFn: row => row.hoursToBuy ?? Infinity,
     cell: ({ row }) => (
       row.original.hoursToBuy === null
-        ? <span className="text-muted-foreground">—</span>
+        ? <span className="text-muted-foreground">{DASH}</span>
         : (
-            <span className="tabular-nums text-muted-foreground">
-              {row.original.hoursToBuy}
+            <span className="font-semibold tabular-nums text-primary">
+              {hourNumber(row.original.hoursToBuy)}
               h
             </span>
           )
     ),
     header: "所需工时",
     id: "hoursToBuy",
+    sortFn: "basic",
+  },
+  {
+    accessorFn: row => row.daysToBuy ?? Infinity,
+    cell: ({ row }) => (
+      row.original.daysToBuy === null
+        ? <span className="text-muted-foreground">{DASH}</span>
+        : (
+            <span className="tabular-nums text-muted-foreground">
+              {row.original.daysToBuy}
+              天
+            </span>
+          )
+    ),
+    header: "折合天数（按 8 小时/天）",
+    id: "daysToBuy",
     sortFn: "basic",
   },
   {
@@ -104,29 +105,29 @@ const columns: DataTableColumn<ModelYIndexEntry>[] = [
 ];
 
 export function ModelYExplore() {
-  const chartData = modelyIndex.filter(item => item.daysToBuy !== null);
+  const chartData = modelyIndex.filter(item => item.hoursToBuy !== null);
 
   return (
     <ExploreView
       chart={(
         <RankBarChart
           data={chartData}
-          formatTick={value => `${value}天`}
-          formatValue={value => `${value}天`}
+          formatTick={value => `${Math.round(value)}h`}
+          formatValue={value => hours(value)}
           tooltip={ModelYTooltip}
-          valueKey="daysToBuy"
+          valueKey="hoursToBuy"
         />
       )}
-      chartCaption="全部国家 · 购买 Model Y 所需工作天数"
+      chartCaption="全部国家 · 购买 Model Y 所需工时（天数为按每天 8 小时的换算）"
       columns={columns}
       data={modelyIndex}
-      defaultSort={[{ desc: false, id: "daysToBuy" }]}
+      defaultSort={[{ desc: false, id: "hoursToBuy" }]}
       description={(
         <>
-          排序并深入查看
-          {modelyIndex.length}
+          默认按工时排序
           {" "}
-          个国家/地区的 Tesla Model Y 购买力数据
+          {modelyIndex.length}
+          {" 个国家/地区的 Tesla Model Y 购买力数据。工时是跨地区可比的主口径，天数只是换算值。"}
         </>
       )}
       renderExpanded={row => (

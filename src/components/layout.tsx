@@ -3,13 +3,16 @@ import { ArrowUp, BarChart3, Globe, Info, Menu, X } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
+import { ratesUpdatedAt } from "@/data/exchange-rates";
 import { wages } from "@/data/wages";
 import { cn } from "@/lib/utilities";
 
 /**
- * 单一指数入口（首页/落地页）；short 供 md–lg 窄宽度导航使用
+ * 单一数据入口（首页/落地页）；short 供 md–lg 窄宽度导航使用。
+ * 「一小时购买力」是主线，排在五个指数之前。
 */
 const indexItems = [
+  { href: "/hourly", label: "一小时购买力", short: "一小时" },
   { href: "/explore", label: "最低工资", short: "最低工资" },
   { href: "/iphone", label: "iPhone 指数", short: "iPhone" },
   { href: "/bigmac", label: "巨无霸指数", short: "巨无霸" },
@@ -21,13 +24,14 @@ const indexItems = [
  * 每个路由的文档标题，切页时同步更新
 */
 const pageTitles: Record<string, string> = {
-  "/": "全球最低工资对比",
+  "/": "一小时最低工资购买力",
   "/about": "关于本项目",
   "/bigmac": "巨无霸指数",
   "/bigmac-explore": "巨无霸指数 · 数据探索",
   "/commodity": "物资指数",
   "/commodity-explore": "物资指数 · 数据探索",
   "/explore": "最低工资 · 数据探索",
+  "/hourly": "一小时购买力",
   "/iphone": "iPhone 指数",
   "/iphone-explore": "iPhone 指数 · 数据探索",
   "/modely": "Model Y 指数",
@@ -121,7 +125,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
               首页
             </Link>
 
-            <p className="border-t px-4 pt-4 pb-1 text-xs text-muted-foreground">指数</p>
+            <p className="border-t px-4 pt-4 pb-1 text-xs text-muted-foreground">数据</p>
             {indexItems.map(item => (
               <Link
                 className={cn(
@@ -167,7 +171,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <span className="font-display text-base">全球最低工资对比</span>
               </div>
               <p className="mt-3 text-xs leading-relaxed">
-                数据来源：各国政府官方机构 · 2025-2026
+                数据来源：各国政府官方机构 · 2025-2026 · 已收录
+                {" "}
+                {wages.length}
+                {" 个国家/地区"}
+              </p>
+              <p className="mt-1 text-[11px] leading-relaxed opacity-80">
+                税前法定最低工资，按
+                {" "}
+                {ratesUpdatedAt}
+                {" 市场汇率折算人民币，不等于购买力平价"}
               </p>
               <div className="mt-3 flex items-center gap-1 text-xs">
                 <BarChart3 className="h-3.5 w-3.5" />
@@ -252,7 +265,7 @@ function useDocumentTitle(pathname: string) {
   React.useEffect(() => {
     const page = pageTitles[pathname];
     document.title = page === undefined
-      ? "全球最低工资对比"
-      : (page === "/" ? page : `${page} · 全球购买力`);
+      ? "一小时最低工资购买力"
+      : (page === "/" ? page : `${page} · 一小时购买力`);
   }, [pathname]);
 }

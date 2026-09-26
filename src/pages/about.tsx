@@ -9,7 +9,9 @@ import { Separator } from "@/components/ui/separator";
 import { BIGMAC_SOURCE } from "@/data/bigmac";
 import { COMMODITY_SOURCE } from "@/data/commodity";
 import { ratesProvider, ratesUpdatedAt } from "@/data/exchange-rates";
+import { commonCodes } from "@/data/hourly-power";
 import { IPHONE_SOURCE, iphones } from "@/data/iphone";
+import { METHOD_NOTES } from "@/data/methodology";
 import { MODELY_SOURCE, modelys } from "@/data/modely";
 import { wages } from "@/data/wages";
 
@@ -19,6 +21,11 @@ const RATES_PROVIDER_HREF = ratesProvider.includes("Frankfurter")
   : "https://open.er-api.com";
 
 const ABOUT_INDEXES = [
+  {
+    desc: `把工资与四项消费指标放在同一张表里对比，可选两个国家逐项比较，并只看五项数据齐备的 ${commonCodes.length} 个国家。`,
+    link: "/hourly",
+    title: "一小时购买力",
+  },
   {
     desc: `以各国货币对人民币的即期汇率折算法定时薪，横向对比 ${wages.length} 个国家/地区的最低时薪水平。`,
     link: "/explore",
@@ -80,7 +87,7 @@ export function About() {
         <section className="max-w-prose space-y-3 pb-10 text-sm leading-relaxed text-muted-foreground">
           <p>
             所有数据均以各国家/地区政府官方公布的法定最低时薪为基准。
-            对于按月设定最低工资的国家（如西班牙、中国），按法定月工作小时数折算为时薪。
+            对于按月设定最低工资的国家（如西班牙、比利时、智利），按法定工时数折算为时薪。
           </p>
           <p>
             人民币折算使用构建时自动拉取的最新市场参考汇率（详见下方「汇率来源与更新」），
@@ -95,6 +102,26 @@ export function About() {
             来自公开的全球价格数据，逐条出处见下方各指数数据来源，
             也可在各指数「探索」页的展开行中查看。
           </p>
+          <p>
+            想直接看「同样工作一小时能买到什么」，请前往
+            <Link className="mx-1 text-primary underline underline-offset-2" to="/hourly">一小时购买力</Link>
+            对比页。
+          </p>
+        </section>
+      </AnimatedContent>
+
+      {/* Method notes — 与首页口径卡共用同一份文案 */}
+      <AnimatedContent delay={0.05} distance={30} duration={0.6}>
+        <section className="border-t pt-8 pb-10">
+          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">这些数字该怎么读</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {METHOD_NOTES.map(note => (
+              <div className="rounded-xl bg-muted/50 p-4" key={note.title}>
+                <p className="text-sm font-medium">{note.title}</p>
+                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{note.body}</p>
+              </div>
+            ))}
+          </div>
         </section>
       </AnimatedContent>
 
@@ -134,7 +161,7 @@ export function About() {
       {/* Five indices */}
       <AnimatedContent delay={0.05} distance={25} duration={0.6}>
         <section className="border-t pt-8 pb-2">
-          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">五大指数</h2>
+          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">数据入口</h2>
           <ul className="space-y-4">
             {ABOUT_INDEXES.map(item => (
               <li key={item.link}>
@@ -254,7 +281,8 @@ export function About() {
             <p className="text-xs leading-relaxed text-muted-foreground">
               本项目仅用于信息展示和学习目的，不构成任何法律、劳动或投资建议。
               各国最低工资标准可能因地区、行业、年龄等因素存在差异。
-              请以各国政府官方发布为准。
+              请以各国政府官方发布为准。站内金额按市场汇率折算，不等于购买力平价，
+              也不构成对任何货币真实价值的判断。
             </p>
           </div>
         </section>

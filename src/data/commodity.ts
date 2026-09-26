@@ -1,3 +1,5 @@
+import type { Region } from "@/lib/region";
+
 /**
  * 各国常见生活物资零售价格（USD）
  * 数据来源：GlobalProductPrices.com
@@ -34,7 +36,7 @@ export interface CommodityItem {
    * 食用油 1L（常用烹饪油）
    */
   oil1l: number;
-  region: "中东" | "亚洲" | "北美" | "南美" | "大洋洲" | "欧洲";
+  region: Region;
   /**
    * 大米 1kg
    */

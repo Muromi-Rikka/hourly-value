@@ -6,10 +6,10 @@ const wageByCode = new Map(wages.map(w => [w.countryCode, w]));
 
 export const iphoneDuoIndex: IPhoneIndexEntry[] = iphonesDuo.map((phone) => {
   const wage = wageByCode.get(phone.countryCode);
-  const hourlyWage = wage?.cnyEquivalent ?? 0;
-  const hoursToBuy = wage
-    ? Math.round((phone.cnyEquivalent / hourlyWage) * 10) / 10
-    : null;
+  const hourlyWage = wage?.cnyEquivalent ?? null;
+  const hoursToBuy = hourlyWage === null || hourlyWage <= 0
+    ? null
+    : Math.round((phone.cnyEquivalent / hourlyWage) * 10) / 10;
   return {
     country: phone.country,
     countryCode: phone.countryCode,

@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
+import type { CommodityIndexEntry } from "@/data/commodity-index";
+
 import { CountryFlag } from "@/components/country-flag";
 import { CommodityTooltip } from "@/components/index-tooltips";
 import { RankBarChart } from "@/components/rank-bar-chart";
@@ -11,16 +13,19 @@ import { SplitText } from "@/components/react-bits/SplitText/SplitText";
 import { SourceBlock } from "@/components/source-block";
 import { Button } from "@/components/ui/button";
 import { COMMODITY_SOURCE } from "@/data/commodity";
-import { commodityIndex, sortedByHours } from "@/data/commodity-index";
+import { sortedByHours } from "@/data/commodity-index";
+import { hourNumber } from "@/lib/format";
 import { regionAverages } from "@/lib/region";
 
 export function Commodity() {
-  const cheapest = sortedByHours[0];
-  const mostExpensive = sortedByHours[sortedByHours.length - 1];
-  const count = sortedByHours.length;
-  const ratio = Number((mostExpensive.hoursToBuy / cheapest.hoursToBuy).toFixed(1));
-  const regionData = regionAverages(commodityIndex, entry => entry.hoursToBuy, { decimals: 1 });
-  const maxRegionAvg = Math.max(...regionData.map(r => r.avg));
+  // 无工资数据的国家不参与任何「最贵/最便宜」结论
+  const withHours = sortedByHours.filter((entry): entry is CommodityIndexEntry & { hoursToBuy: number } => entry.hoursToBuy !== null);
+  const cheapest = withHours[0];
+  const mostExpensive = withHours[withHours.length - 1];
+  const count = withHours.length;
+  const ratio = mostExpensive.hoursToBuy / cheapest.hoursToBuy;
+  const regionData = regionAverages(withHours, entry => entry.hoursToBuy, { decimals: 1 });
+  const maxRegionMedian = Math.max(...regionData.map(r => r.median));
 
   return (
     <div>
@@ -50,8 +55,14 @@ export function Commodity() {
       <AnimatedContent direction="vertical" distance={40} duration={0.8}>
         <section className="-mx-4 border-y sm:-mx-6">
           <div className="px-4 py-5 sm:px-6">
+            <p className="mb-3 text-xs text-muted-foreground">
+              购买
+              {" "}
+              {COMMODITY_SOURCE.date}
+              {" 的价格快照 · 税前最低时薪 ÷ 篮子总价"}
+            </p>
             <RankBarChart
-              data={sortedByHours}
+              data={withHours}
               formatTick={value => `${value}h`}
               formatValue={value => `${value}h`}
               layout="horizontal"
@@ -81,7 +92,7 @@ export function Commodity() {
                 <div className="inline-flex items-center gap-1.5">
                   <CountryFlag className="h-5 w-5" countryCode={mostExpensive.countryCode} />
                   <span className="font-display text-xl">
-                    {mostExpensive.hoursToBuy}
+                    {hourNumber(mostExpensive.hoursToBuy)}
                     h
                   </span>
                   <span className="text-xs text-muted-foreground">{mostExpensive.country}</span>
@@ -90,7 +101,7 @@ export function Commodity() {
                 <div className="inline-flex items-center gap-1.5">
                   <CountryFlag className="h-5 w-5" countryCode={cheapest.countryCode} />
                   <span className="font-display text-xl">
-                    {cheapest.hoursToBuy}
+                    {hourNumber(cheapest.hoursToBuy)}
                     h
                   </span>
                   <span className="text-xs text-muted-foreground">{cheapest.country}</span>
@@ -106,7 +117,8 @@ export function Commodity() {
 
             {/* Right — region breakdown */}
             <div className="sm:col-span-7">
-              <p className="mb-3 text-sm text-muted-foreground">区域平均所需工时</p>
+              <p className="mb-1 text-sm text-muted-foreground">区域所需工时中位数</p>
+              <p className="mb-3 text-xs text-muted-foreground">中位数不受极值国家影响，括号内为该区域收录国家数</p>
               <FadeContent blur duration={800} threshold={0.2}>
                 <div className="space-y-2.5">
                   {regionData.map(r => (
@@ -116,12 +128,17 @@ export function Commodity() {
                         <div
                           className="absolute inset-y-0 left-0 rounded-sm bg-primary transition-all duration-700"
                           style={{
-                            width: `${(r.avg / maxRegionAvg) * 100}%`,
+                            width: `${(r.median / maxRegionMedian) * 100}%`,
                           }}
                         />
                         <span className="absolute inset-y-0 right-2 flex items-center text-xs font-semibold tabular-nums">
-                          {r.avg}
+                          {r.median}
                           h
+                          <span className="ml-1 font-normal text-muted-foreground">
+                            （
+                            {r.count}
+                            ）
+                          </span>
                         </span>
                       </div>
                     </div>
@@ -138,11 +155,11 @@ export function Commodity() {
                   {" 个区域"}
                 </p>
                 <div className="flex flex-wrap gap-1">
-                  {sortedByHours.map(w => (
+                  {withHours.map(w => (
                     <span
                       className="flex h-7 w-7 items-center justify-center rounded-sm transition-transform hover:scale-110"
                       key={w.countryCode}
-                      title={`${w.country} · ${w.hoursToBuy}h`}
+                      title={`${w.country} · ${hourNumber(w.hoursToBuy)}h`}
                     >
                       <CountryFlag className="h-5 w-5" countryCode={w.countryCode} />
                     </span>
