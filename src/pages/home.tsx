@@ -21,6 +21,7 @@ import { AnimatedContent } from "@/components/react-bits/AnimatedContent/Animate
 import { CountUp } from "@/components/react-bits/CountUp/CountUp";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
 import { RegionLegend } from "@/components/region-legend";
+import { SectionHeading } from "@/components/section-heading";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { hourlyPower, hourlyPowerOf } from "@/data/hourly-power";
@@ -66,10 +67,10 @@ export function Home() {
   return (
     <div>
       {/* 1 — 首屏问题 */}
-      <section className="relative overflow-hidden pb-10 pt-6 sm:pb-14 sm:pt-8">
+      <section className="hero overflow-hidden pb-12 pt-6 sm:pb-16 sm:pt-8">
         <div className="rule-top mb-6" />
         <SplitText
-          className="max-w-4xl text-balance font-display text-[clamp(2.3rem,5.2vw,4.2rem)] font-normal leading-[1.06] tracking-[-0.03em]"
+          className="hero-title max-w-4xl"
           delay={80}
           duration={1}
           ease="power3.out"
@@ -87,13 +88,13 @@ export function Home() {
           </p>
           <div className="mt-4 flex flex-wrap gap-1.5">
             {SCOPE_CHIPS.map(chip => (
-              <span className="rounded-full border px-2.5 py-0.5 text-[11px] text-muted-foreground" key={chip}>
+              <span className="rounded-full border bg-card px-2.5 py-0.5 text-[11px] text-muted-foreground" key={chip}>
                 {chip}
               </span>
             ))}
           </div>
           <div className="mt-6 flex flex-wrap gap-2">
-            <Link className={cn(buttonVariants({ size: "lg" }), "group rounded-full")} to="/hourly">
+            <Link className={cn(buttonVariants({ size: "lg" }), "group")} to="/hourly">
               选择两个国家比较
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
@@ -134,19 +135,17 @@ export function Home() {
 
       {/* 3 — 一小时对一小时 */}
       <AnimatedContent delay={0.1} distance={40} duration={0.6} threshold={0.1}>
-        <section className="mt-12 sm:mt-16">
-          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p className="text-xs font-medium tracking-wider text-muted-foreground">一小时对一小时</p>
-              <h2 className="mt-2 text-balance font-display text-[clamp(1.6rem,3vw,2.4rem)] font-normal leading-tight tracking-[-0.02em]">
-                同样一小时，谁更宽裕
-              </h2>
-            </div>
-            <Link className="group inline-flex items-center gap-1 text-sm text-primary hover:underline underline-offset-2" to="/hourly">
-              完整对比页
-              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          </div>
+        <section className="section">
+          <SectionHeading
+            action={(
+              <Link className="group inline-flex items-center gap-1 text-sm text-primary hover:underline underline-offset-2" to="/hourly">
+                完整对比页
+                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            )}
+            eyebrow="一小时对一小时"
+            title="同样一小时，谁更宽裕"
+          />
           <HourlyCompare
             a={a}
             b={b}
@@ -163,23 +162,19 @@ export function Home() {
 
       {/* 4 — 日常与耐用品分层 */}
       <AnimatedContent delay={0.1} distance={60} duration={0.8} threshold={0.15}>
-        <section className="mt-12 sm:mt-16">
-          <div className="mb-5">
-            <p className="text-xs font-medium tracking-wider text-muted-foreground">五项指标</p>
-            <h2 className="mt-2 text-balance font-display text-[clamp(1.6rem,3vw,2.4rem)] font-normal leading-tight tracking-[-0.02em]">
-              从一顿饭到一辆车
-            </h2>
-            <p className="mt-2 max-w-lg text-sm leading-relaxed text-pretty text-muted-foreground">
-              日常饮食、随身物品、大件耐用品的压力完全不同，分开看才不会互相抵消。
-            </p>
-          </div>
+        <section className="section">
+          <SectionHeading
+            description="日常饮食、随身物品、大件耐用品的压力完全不同，分开看才不会互相抵消。"
+            eyebrow="五项指标"
+            title="从一顿饭到一辆车"
+          />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {stats.map((stat) => {
               const Icon = ICONS[stat.icon];
               return (
                 <Card className="flex flex-col" key={stat.id}>
                   <CardHeader>
-                    <p className="text-[11px] tracking-wider text-muted-foreground">{stat.group}</p>
+                    <p className="eyebrow">{stat.group}</p>
                     <CardTitle className="flex items-center gap-2 text-lg font-display">
                       <span className="rounded-full bg-primary/10 p-2">
                         <Icon className="h-5 w-5 text-primary" />
@@ -222,18 +217,18 @@ export function Home() {
 
       {/* 5 — 排行刻度尺 */}
       <AnimatedContent delay={0.15} distance={40} duration={0.6} threshold={0.1}>
-        <section className="mt-12 sm:mt-16">
+        <section className="section">
           <WageRuler />
         </section>
       </AnimatedContent>
 
       {/* 数据亮点 */}
       <AnimatedContent delay={0.15} distance={40} duration={0.6} threshold={0.1}>
-        <section className="mt-10 sm:mt-12">
-          <p className="mb-4 text-xs font-medium tracking-wider text-muted-foreground">数据亮点</p>
+        <section className="section">
+          <p className="eyebrow mb-4">数据亮点</p>
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-2xl border bg-card p-5">
-              <p className="stat-number text-4xl leading-none tracking-tight">
+            <Card className="p-5">
+              <p className="stat-number stat-lg">
                 <CountUp duration={1.5} to={highlights.countryCount} />
                 <span className="ml-1 text-sm text-muted-foreground">国家/地区</span>
               </p>
@@ -241,9 +236,9 @@ export function Home() {
                 {highlights.regionCount}
                 {" 个区域 · 5 项指标"}
               </p>
-            </div>
-            <div className="rounded-2xl border bg-card p-5">
-              <p className="stat-number flex items-center gap-2 text-4xl leading-none tracking-tight">
+            </Card>
+            <Card className="p-5">
+              <p className="flex items-center gap-2 font-display stat-lg">
                 <CountryFlag className="h-8 w-8" countryCode={highlights.topCountry.countryCode} />
                 {highlights.topCountry.country}
               </p>
@@ -252,9 +247,9 @@ export function Home() {
                 <CountUp duration={1} to={highlights.topCountry.count} />
                 {" 项消费指标中排名前三"}
               </p>
-            </div>
-            <div className="rounded-2xl border bg-card p-5">
-              <p className="stat-number text-4xl leading-none tracking-tight">
+            </Card>
+            <Card className="p-5">
+              <p className="stat-number stat-lg">
                 <CountUp duration={2} to={highlights.maxGap.ratio} />
                 <span className="text-[0.4em] text-muted-foreground">×</span>
               </p>
@@ -262,21 +257,19 @@ export function Home() {
                 {highlights.maxGap.label}
                 {" 指标的首尾差距"}
               </p>
-            </div>
+            </Card>
           </div>
         </section>
       </AnimatedContent>
 
       {/* 6 — 三分钟读懂口径 */}
-      <div className="mt-12 sm:mt-16">
-        <FeaturedMethodNotes />
-      </div>
+      <FeaturedMethodNotes />
 
       {/* 7 — 进入完整探索 */}
       <AnimatedContent delay={0.1} distance={30} duration={0.6}>
-        <section className="mt-12 pb-4 sm:mt-16">
+        <section className="section pb-4">
           <div className="flex flex-wrap items-center gap-3">
-            <Link className={cn(buttonVariants({ size: "lg" }), "group rounded-full")} to="/hourly">
+            <Link className={cn(buttonVariants({ size: "lg" }), "group")} to="/hourly">
               进入一小时购买力
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
@@ -451,10 +444,10 @@ function WageRuler() {
   const tickCount = 21;
 
   return (
-    <div className="mt-6">
+    <div>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-medium tracking-wider text-muted-foreground">时薪刻度尺</p>
+          <p className="eyebrow">时薪刻度尺</p>
           <p className="mt-1 text-xs text-muted-foreground">
             税前法定最低工资 · 按市场汇率折算人民币
           </p>

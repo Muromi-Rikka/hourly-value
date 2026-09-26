@@ -79,9 +79,10 @@ export function RankBarChart<T extends { country: string; countryCode: string; r
       <div>
         <ResponsiveContainer height={Math.max(300, rows.length * 40)} width="100%">
           <BarChart data={rows} layout="vertical" margin={{ bottom: 8, left: 8, right: 40, top: 8 }}>
-            <CartesianGrid horizontal={false} strokeDasharray="3 3" />
+            <CartesianGrid horizontal={false} stroke="var(--color-border)" strokeDasharray="3 3" />
             <XAxis
-              axisLine={false}
+              axisLine={{ stroke: "var(--color-border)" }}
+              tick={{ fill: "var(--color-muted-foreground)", fontSize: 12 }}
               tickFormatter={formatTick}
               tickLine={false}
               type="number"
@@ -89,6 +90,7 @@ export function RankBarChart<T extends { country: string; countryCode: string; r
             <YAxis
               axisLine={false}
               dataKey="country"
+              tick={{ fill: "var(--color-foreground)", fontSize: 12 }}
               tickLine={false}
               type="category"
               width={80}
@@ -125,18 +127,19 @@ export function RankBarChart<T extends { country: string; countryCode: string; r
     <div>
       <ResponsiveContainer height={400} width="100%">
         <BarChart data={rows} margin={{ bottom: 40, left: 8, right: 8, top: 24 }}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+          <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" vertical={false} />
           <XAxis
             angle={-45}
-            axisLine={false}
+            axisLine={{ stroke: "var(--color-border)" }}
             dataKey="country"
             height={60}
             textAnchor="end"
-            tick={{ fontSize: 12 }}
+            tick={{ fill: "var(--color-muted-foreground)", fontSize: 12 }}
             tickLine={false}
           />
           <YAxis
             axisLine={false}
+            tick={{ fill: "var(--color-muted-foreground)", fontSize: 12 }}
             tickFormatter={formatTick}
             tickLine={false}
           />

@@ -28,7 +28,7 @@ export function HourlyWallet({ children, className, entry }: HourlyWalletPropert
     .filter((metric): metric is HourlyMetric => metric !== undefined);
 
   return (
-    <div className={cn("rounded-2xl border bg-card p-5 sm:p-6", className)}>
+    <div className={cn("rounded-xl border bg-card p-5 shadow-panel sm:p-6", className)}>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <CountryFlag className="h-9 w-9" countryCode={entry.countryCode} />
@@ -62,7 +62,7 @@ export function HourlyWallet({ children, className, entry }: HourlyWalletPropert
 
       {wageMetric
         ? (
-            <div className="mt-5 rounded-xl bg-primary/8 p-4">
+            <div className="mt-5 rounded-lg bg-primary/8 p-4">
               <p className="text-xs text-muted-foreground">{METRIC_GROUP_LABEL[wageMetric.group]}</p>
               <p className="mt-1 flex flex-wrap items-baseline gap-2">
                 <span className="stat-number text-3xl leading-none text-primary">
@@ -89,8 +89,8 @@ function MetricTile({ entry, metric }: { entry: HourlyPowerEntry; metric: Hourly
   const isMissing = value === null;
 
   return (
-    <div className="rounded-xl bg-muted/40 p-4">
-      <p className="text-[11px] tracking-wider text-muted-foreground">
+    <div className="rounded-lg bg-muted/40 p-4">
+      <p className="eyebrow">
         {METRIC_GROUP_LABEL[metric.group]}
       </p>
       <p className="mt-1 text-xs text-muted-foreground">{metric.label}</p>

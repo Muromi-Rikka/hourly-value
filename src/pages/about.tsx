@@ -2,16 +2,16 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, ExternalLink, Info } from "lucide-react";
 
 import { CountryFlag } from "@/components/country-flag";
+import { MethodNotes } from "@/components/method-notes";
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
-import { BlurText } from "@/components/react-bits/BlurText/BlurText";
 import { FadeContent } from "@/components/react-bits/FadeContent/FadeContent";
+import { SplitText } from "@/components/react-bits/SplitText/SplitText";
 import { Separator } from "@/components/ui/separator";
 import { BIGMAC_SOURCE } from "@/data/bigmac";
 import { COMMODITY_SOURCE } from "@/data/commodity";
 import { ratesProvider, ratesUpdatedAt } from "@/data/exchange-rates";
 import { commonCodes } from "@/data/hourly-power";
 import { IPHONE_SOURCE, iphones } from "@/data/iphone";
-import { METHOD_NOTES } from "@/data/methodology";
 import { MODELY_SOURCE, modelys } from "@/data/modely";
 import { wages } from "@/data/wages";
 
@@ -69,14 +69,17 @@ export function About() {
       {/* Header */}
       <div className="pb-8">
         <div className="rule-top mb-6" />
-        <BlurText
-          animateBy="words"
-          className="text-balance font-display text-[clamp(2rem,4vw,3rem)] font-normal leading-[1.1] tracking-[-0.02em]"
-          delay={150}
+        <SplitText
+          className="page-title"
+          delay={80}
+          duration={0.8}
+          ease="power3.out"
+          splitType="words"
+          tag="h1"
           text="关于本项目"
         />
         <AnimatedContent delay={0.1} distance={20} duration={0.5}>
-          <p className="mt-2 max-w-lg text-sm leading-relaxed text-pretty text-muted-foreground">
+          <p className="mt-3 max-w-lg text-sm leading-relaxed text-pretty text-muted-foreground">
             数据来源、折算方法与使用说明
           </p>
         </AnimatedContent>
@@ -84,7 +87,7 @@ export function About() {
 
       {/* Methodology */}
       <AnimatedContent distance={30} duration={0.6}>
-        <section className="max-w-prose space-y-3 pb-10 text-sm leading-relaxed text-pretty text-muted-foreground">
+        <section className="section max-w-prose space-y-3 pb-10 text-sm leading-relaxed text-pretty text-muted-foreground">
           <p>
             所有数据均以各国家/地区政府官方公布的法定最低时薪为基准。
             对于按月设定最低工资的国家（如西班牙、比利时、智利），按法定工时数折算为时薪。
@@ -112,24 +115,14 @@ export function About() {
 
       {/* Method notes — 与首页口径卡共用同一份文案 */}
       <AnimatedContent delay={0.05} distance={30} duration={0.6}>
-        <section className="border-t pt-8 pb-10">
-          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">这些数字该怎么读</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {METHOD_NOTES.map(note => (
-              <div className="rounded-xl bg-muted/50 p-4" key={note.title}>
-                <p className="text-sm font-medium">{note.title}</p>
-                <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{note.body}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        <MethodNotes title="这些数字该怎么读" />
       </AnimatedContent>
 
       {/* Exchange rates */}
       <AnimatedContent delay={0.05} distance={25} duration={0.6}>
-        <section className="border-t pt-8 pb-10">
-          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">汇率来源与更新</h2>
-          <div className="max-w-prose space-y-2 rounded-xl bg-muted/50 p-5 text-xs leading-relaxed text-pretty text-muted-foreground">
+        <section className="section pb-10">
+          <h2 className="minor-title mb-5">汇率来源与更新</h2>
+          <div className="max-w-prose space-y-2 rounded-lg bg-muted/50 p-5 text-xs leading-relaxed text-pretty text-muted-foreground">
             <p>
               人民币折算所用汇率于每次构建与开发启动时自动拉取，当前生效汇率更新于
               {" "}
@@ -160,8 +153,8 @@ export function About() {
 
       {/* Five indices */}
       <AnimatedContent delay={0.05} distance={25} duration={0.6}>
-        <section className="border-t pt-8 pb-2">
-          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">数据入口</h2>
+        <section className="section pb-2">
+          <h2 className="minor-title mb-5">数据入口</h2>
           <ul className="space-y-4">
             {ABOUT_INDEXES.map(item => (
               <li key={item.link}>
@@ -181,8 +174,8 @@ export function About() {
 
       {/* Sources — wages */}
       <AnimatedContent delay={0.1} distance={20} duration={0.5}>
-        <section className="border-t pt-8">
-          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">最低工资数据来源</h2>
+        <section className="section">
+          <h2 className="minor-title mb-5">最低工资数据来源</h2>
           <ul className="space-y-4">
             {wages.map((entry, index) => (
               <SourceRow
@@ -202,8 +195,8 @@ export function About() {
 
       {/* Sources — iPhone */}
       <AnimatedContent delay={0.1} distance={20} duration={0.5}>
-        <section className="border-t pt-8">
-          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">iPhone 指数数据来源</h2>
+        <section className="section">
+          <h2 className="minor-title mb-5">iPhone 指数数据来源</h2>
           <p className="mb-5 max-w-prose text-xs leading-relaxed text-pretty text-muted-foreground">
             {IPHONE_SOURCE_NOTE}
           </p>
@@ -226,8 +219,8 @@ export function About() {
 
       {/* Sources — commodity */}
       <AnimatedContent delay={0.1} distance={20} duration={0.5}>
-        <section className="border-t pt-8">
-          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">物资篮子指数数据来源</h2>
+        <section className="section">
+          <h2 className="minor-title mb-5">物资篮子指数数据来源</h2>
           <SourceCard
             date={COMMODITY_SOURCE.date}
             name={COMMODITY_SOURCE.name}
@@ -239,8 +232,8 @@ export function About() {
 
       {/* Sources — Big Mac */}
       <AnimatedContent delay={0.1} distance={20} duration={0.5}>
-        <section className="border-t pt-8">
-          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">巨无霸指数数据来源</h2>
+        <section className="section">
+          <h2 className="minor-title mb-5">巨无霸指数数据来源</h2>
           <SourceCard
             name={BIGMAC_SOURCE.name}
             note={`${BIGMAC_SOURCE.note}。估值以美国基准价 $6.22 为锚。`}
@@ -251,8 +244,8 @@ export function About() {
 
       {/* Sources — Model Y */}
       <AnimatedContent delay={0.1} distance={20} duration={0.5}>
-        <section className="border-t pt-8">
-          <h2 className="mb-5 font-display text-xl font-normal tracking-tight">Model Y 指数数据来源</h2>
+        <section className="section">
+          <h2 className="minor-title mb-5">Model Y 指数数据来源</h2>
           <p className="mb-5 max-w-prose text-xs leading-relaxed text-pretty text-muted-foreground">
             {MODELY_SOURCE_NOTE}
           </p>
@@ -275,8 +268,8 @@ export function About() {
 
       {/* Disclaimer */}
       <FadeContent duration={800}>
-        <section className="mt-12 max-w-prose border-t pt-6 pb-4">
-          <div className="rounded-xl bg-muted/50 p-5 flex gap-3">
+        <section className="section max-w-prose pb-4">
+          <div className="rounded-lg bg-muted/50 p-5 flex gap-3">
             <Info className="h-4 w-4 shrink-0 mt-0.5 text-muted-foreground" />
             <p className="text-xs leading-relaxed text-muted-foreground">
               本项目仅用于信息展示和学习目的，不构成任何法律、劳动或投资建议。
@@ -301,7 +294,7 @@ function SourceCard({ date, name, note, url }: {
   url: string;
 }) {
   return (
-    <div className="rounded-xl bg-muted/50 p-5">
+    <div className="rounded-lg bg-muted/50 p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-base font-medium">{name}</p>
         <a

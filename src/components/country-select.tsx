@@ -32,7 +32,7 @@ export function CountrySelect({ className, id, label, onChange, options, value }
           : null}
         <div className="relative min-w-0 flex-1">
           <select
-            className="w-full appearance-none truncate rounded-lg border border-border bg-card py-2 pr-8 pl-3 text-sm font-medium transition-colors hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="w-full appearance-none truncate rounded-md border border-border bg-card py-2 pr-8 pl-3 text-sm font-medium transition-colors hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             id={id}
             onChange={event => onChange(event.target.value)}
             value={value}

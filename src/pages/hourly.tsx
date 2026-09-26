@@ -15,6 +15,7 @@ import { MethodNotes } from "@/components/method-notes";
 import { RankBarChart } from "@/components/rank-bar-chart";
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
+import { SectionHeading } from "@/components/section-heading";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   commonCodes,
@@ -188,10 +189,10 @@ export function Hourly() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative overflow-hidden pb-10 pt-6 sm:pb-14 sm:pt-8">
+      <section className="hero overflow-hidden pb-12 pt-6 sm:pb-16 sm:pt-8">
         <div className="rule-top mb-6" />
         <SplitText
-          className="max-w-3xl text-balance font-display text-[clamp(2.5rem,5.5vw,4.5rem)] font-normal leading-[1.05] tracking-[-0.03em]"
+          className="hero-title max-w-3xl"
           delay={80}
           duration={1}
           ease="power3.out"
@@ -209,7 +210,7 @@ export function Hourly() {
           </p>
           <div className="mt-4 flex flex-wrap gap-1.5">
             {SCOPE_CHIPS.map(chip => (
-              <span className="rounded-full border px-2.5 py-0.5 text-[11px] text-muted-foreground" key={chip}>
+              <span className="rounded-full border bg-card px-2.5 py-0.5 text-[11px] text-muted-foreground" key={chip}>
                 {chip}
               </span>
             ))}
@@ -232,7 +233,7 @@ export function Hourly() {
       {/* Matrix */}
       <AnimatedContent delay={0.1} distance={40} duration={0.6} threshold={0.05}>
         {/* key 跟随当前指标：切换排行指标时表格同步换成该指标的默认排序 */}
-        <div className="mt-12 sm:mt-16" key={metric.key}>
+        <div className="section" key={metric.key}>
           <ExploreView
             chart={(
               <RankBarChart
@@ -262,6 +263,7 @@ export function Hourly() {
             onColumnFiltersChange={setColumnFilters}
             renderExpanded={row => <DetailPanel entry={row} />}
             title="各国一小时购买力矩阵"
+            titleTag="h2"
             toolbar={(
               <TableToolbar
                 coverage={coverageFilter === undefined ? "" : String(coverageFilter)}
@@ -280,18 +282,15 @@ export function Hourly() {
 
       {/* Region medians */}
       <AnimatedContent delay={0.1} distance={40} duration={0.6} threshold={0.1}>
-        <section className="mt-12 sm:mt-16">
-          <p className="text-xs font-medium tracking-wider text-muted-foreground">区域中位数</p>
-          <h2 className="mt-2 text-balance font-display text-[clamp(1.5rem,2.6vw,2rem)] font-normal leading-tight">
-            各区域的
-            {metric.label}
-          </h2>
-          <p className="mt-2 text-xs text-muted-foreground">
-            中位数不受极值国家影响；括号内为该区域参与统计的国家数
-          </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="section">
+          <SectionHeading
+            description="中位数不受极值国家影响；括号内为该区域参与统计的国家数"
+            eyebrow="区域中位数"
+            title={`各区域的${metric.label}`}
+          />
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {regionData.map(row => (
-              <div className="rounded-xl border bg-card p-4" key={row.region}>
+              <div className="rounded-lg border bg-card p-4 shadow-card" key={row.region}>
                 <p className="text-sm font-medium">
                   {row.region}
                   <span className="ml-1.5 text-xs font-normal text-muted-foreground">
@@ -316,9 +315,7 @@ export function Hourly() {
 
       {/* Methodology */}
       <AnimatedContent delay={0.1} distance={40} duration={0.6} threshold={0.1}>
-        <div className="mt-12 sm:mt-16">
-          <MethodNotes title="这些数字该怎么读" />
-        </div>
+        <MethodNotes title="这些数字该怎么读" />
       </AnimatedContent>
 
       {/* Coverage note */}
@@ -338,8 +335,8 @@ export function Hourly() {
 
       {/* CTA to the five indices */}
       <AnimatedContent delay={0.1} distance={30} duration={0.6}>
-        <section className="mt-12 pb-4 sm:mt-16">
-          <p className="mb-4 text-xs font-medium tracking-wider text-muted-foreground">想看单个指数</p>
+        <section className="section pb-4">
+          <p className="eyebrow mb-4">想看单个指数</p>
           <div className="flex flex-wrap gap-2">
             {[
               { href: "/explore", label: "最低工资" },
@@ -482,7 +479,7 @@ function TableToolbar({
         <Search aria-hidden="true" className="absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
           aria-label="搜索国家"
-          className="w-full rounded-lg border border-border bg-card py-2 pr-3 pl-8 text-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="w-full rounded-md border border-border bg-card py-2 pr-3 pl-8 text-sm transition-colors placeholder:text-muted-foreground hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           onChange={event => onQuery(event.target.value)}
           placeholder="搜索国家"
           type="search"
@@ -491,7 +488,7 @@ function TableToolbar({
       </div>
       <select
         aria-label="按区域筛选"
-        className="rounded-lg border border-border bg-card px-2.5 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="rounded-md border border-border bg-card px-2.5 py-2 text-sm transition-colors hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onChange={event => onRegion(event.target.value)}
         value={region}
       >
@@ -502,7 +499,7 @@ function TableToolbar({
       </select>
       <select
         aria-label="按数据完整度筛选"
-        className="rounded-lg border border-border bg-card px-2.5 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="rounded-md border border-border bg-card px-2.5 py-2 text-sm transition-colors hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onChange={event => onCoverage(event.target.value)}
         value={coverage}
       >

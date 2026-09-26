@@ -17,8 +17,8 @@ export function SourceBlock({
   title = "数据来源",
 }: SourceBlockProperties) {
   return (
-    <section className="border-t pt-8">
-      <h2 className="mb-3 font-display text-xl font-normal tracking-tight">{title}</h2>
+    <section className="section-minor">
+      <h2 className="minor-title mb-3">{title}</h2>
       <a
         className="inline-flex items-center gap-1 text-sm text-primary hover:text-primary/80 decoration-primary/50 underline underline-offset-2 hover:underline"
         href={sourceUrl}

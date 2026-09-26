@@ -31,7 +31,7 @@ function TableRow({ className, ...properties }: React.HTMLAttributes<HTMLTableRo
 TableRow.displayName = "TableRow";
 
 function TableHead({ className, ...properties }: React.ThHTMLAttributes<HTMLTableCellElement>) {
-  return <th className={cn("h-10 px-2 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]", className)} {...properties} />;
+  return <th className={cn("eyebrow h-10 px-2 text-left align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]", className)} {...properties} />;
 }
 TableHead.displayName = "TableHead";
 

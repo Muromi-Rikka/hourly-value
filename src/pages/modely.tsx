@@ -14,7 +14,7 @@ import { SourceBlock } from "@/components/source-block";
 import { buttonVariants } from "@/components/ui/button";
 import { MODELY_SOURCE } from "@/data/modely";
 import { sortedByHours } from "@/data/modely-index";
-import { hourNumber, hours } from "@/lib/format";
+import { hourNumber, hours, round1 } from "@/lib/format";
 import { regionAverages } from "@/lib/region";
 import { cn } from "@/lib/utilities";
 
@@ -24,17 +24,18 @@ export function ModelY() {
   const cheapest = withHours[0];
   const mostExpensive = withHours[withHours.length - 1];
   const count = withHours.length;
-  const ratio = mostExpensive.hoursToBuy / cheapest.hoursToBuy;
+  // 与物资页同一条规则：裸除法必须先舍入，否则 CountUp 会数出十几位小数
+  const ratio = round1(mostExpensive.hoursToBuy / cheapest.hoursToBuy);
   const regionData = regionAverages(withHours, entry => entry.hoursToBuy, { decimals: 1 });
   const maxRegionMedian = Math.max(...regionData.map(r => r.median));
 
   return (
     <div>
       {/* Hero — editorial statement */}
-      <section className="pb-12 pt-6 sm:pb-16 sm:pt-8">
+      <section className="hero overflow-hidden pb-12 pt-6 sm:pb-16 sm:pt-8">
         <div className="rule-top mb-6" />
         <SplitText
-          className="max-w-3xl text-balance font-display text-[clamp(2.8rem,6vw,5rem)] font-normal leading-[1.05] tracking-[-0.03em]"
+          className="hero-title max-w-3xl"
           delay={80}
           duration={1}
           ease="power3.out"
@@ -74,10 +75,10 @@ export function ModelY() {
 
       {/* Insight — editorial spread */}
       <AnimatedContent distance={50} duration={0.8} threshold={0.15}>
-        <section>
+        <section className="mt-10 sm:mt-12">
           {/* Headline row */}
-          <div className="mt-10 mb-6 sm:mt-12">
-            <p className="text-xs font-medium tracking-wider text-muted-foreground">数据洞察</p>
+          <div className="mb-6">
+            <p className="eyebrow">数据洞察</p>
           </div>
 
           {/* Two-column editorial layout */}
@@ -85,15 +86,14 @@ export function ModelY() {
             {/* Left — the headline number */}
             <div className="sm:col-span-5">
               <p className="mb-2 text-sm text-muted-foreground">买一辆 Model Y，最贵需要工作最便宜的</p>
-              {" "}
-              <p className="font-display text-[clamp(3rem,8vw,6rem)] font-normal leading-none tracking-[-0.04em]">
+              <p className="stat-number stat-xl">
                 <CountUp duration={2} to={ratio} />
                 <span className="text-[0.4em] text-muted-foreground">×</span>
               </p>
               <div className="mt-4 space-y-2">
                 <div className="inline-flex items-center gap-1.5">
                   <CountryFlag className="h-5 w-5" countryCode={mostExpensive.countryCode} />
-                  <span className="font-display text-xl">
+                  <span className="stat-number text-xl">
                     {hourNumber(mostExpensive.hoursToBuy)}
                     h
                   </span>
@@ -107,7 +107,7 @@ export function ModelY() {
                 <div className="text-xs text-muted-foreground">—</div>
                 <div className="inline-flex items-center gap-1.5">
                   <CountryFlag className="h-5 w-5" countryCode={cheapest.countryCode} />
-                  <span className="font-display text-xl">
+                  <span className="stat-number text-xl">
                     {hourNumber(cheapest.hoursToBuy)}
                     h
                   </span>
@@ -196,8 +196,8 @@ export function ModelY() {
 
       {/* CTA */}
       <AnimatedContent delay={0.1} distance={30} duration={0.6}>
-        <section className="mt-12 pb-4 sm:mt-16">
-          <Link className={cn(buttonVariants({ size: "lg" }), "group rounded-full")} to="/modely-explore">
+        <section className="section pb-4">
+          <Link className={cn(buttonVariants({ size: "lg" }), "group")} to="/modely-explore">
             开始探索数据
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>

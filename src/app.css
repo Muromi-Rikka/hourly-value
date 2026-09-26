@@ -44,6 +44,11 @@
   --color-stamp: oklch(0.493 0.158 32);
   --color-accent-warm: oklch(0.62 0.11 165);
 
+  /* ── Elevation（带色阴影：取墨色而非纯黑，亮/暗两套）── */
+  --shadow-card: 0 1px 2px oklch(0.209 0.006 157 / 0.05), 0 8px 24px -16px oklch(0.209 0.006 157 / 0.22);
+  --shadow-panel: 0 1px 2px oklch(0.209 0.006 157 / 0.06), 0 18px 44px -26px oklch(0.209 0.006 157 / 0.3);
+  --shadow-float: 0 2px 6px oklch(0.209 0.006 157 / 0.12), 0 22px 50px -26px oklch(0.209 0.006 157 / 0.35);
+
   /* ── Region colors ── */
   --color-region-asia: oklch(0.511 0.126 42);
   --color-region-europe: oklch(0.489 0.133 259);
@@ -86,6 +91,11 @@
     --color-surface: oklch(0.222 0.007 160);
     --color-surface-raised: oklch(0.256 0.007 164);
     --color-surface-overlay: oklch(0.327 0.009 160);
+
+    /* Elevation — dark：暗底上阴影只负责压边，保持极轻 */
+    --shadow-card: 0 1px 2px oklch(0.08 0.005 157 / 0.45), 0 8px 24px -16px oklch(0.08 0.005 157 / 0.55);
+    --shadow-panel: 0 1px 2px oklch(0.08 0.005 157 / 0.5), 0 18px 44px -26px oklch(0.08 0.005 157 / 0.6);
+    --shadow-float: 0 2px 6px oklch(0.08 0.005 157 / 0.55), 0 22px 50px -26px oklch(0.08 0.005 157 / 0.65);
 
     /* Semantic accents — dark */
     --color-stamp: oklch(0.671 0.144 33);
@@ -139,4 +149,132 @@ html {
 /* 栏线：分隔结构而非装饰 */
 .rule-top {
   border-top: 1px solid var(--color-border);
+}
+
+/* 报头/报尾的双线：3px double = 上下各 1px + 中缝 1px */
+.rule-double {
+  border-top: 3px double var(--color-border);
+}
+
+.rule-double-b {
+  border-bottom: 3px double var(--color-border);
+}
+
+/*
+  标题尺度 —— 全站只有四档，不再逐页手写 clamp()：
+  hero-title（首屏陈述） / page-title（页标题） / section-title（章节标题）/ minor-title（长文次级小节）
+*/
+.hero-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.5rem, 5.6vw, 4.75rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* 长文页（关于 / 来源清单）里的次级小节标题 */
+.minor-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 1.25rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+/* 眉题：章节上方的分类小字，全站唯一写法 */
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  letter-spacing: 0.08em;
+  color: var(--color-muted-foreground);
+}
+
+/* 大数字（与 .stat-number 叠用）：Instrument Serif 的极限展示尺寸 */
+.stat-xl {
+  font-size: clamp(3rem, 8vw, 6rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.stat-lg {
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+/*
+  章节节律：栏线 + 上下留白一次给足（组内间距小于组间间距）
+  major —— 页面主章节；minor —— 长文页里的次级分节
+*/
+.section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--color-border);
+}
+
+@media (min-width: 640px) {
+  .section {
+    margin-top: 4rem;
+    padding-top: 2.5rem;
+  }
+}
+
+.section-minor {
+  padding-top: 2rem;
+  border-top: 1px solid var(--color-border);
+}
+
+/* 首屏氛围：账簿青 + 印章朱两道极淡的光晕，只在 hero 后面 */
+.hero {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: -30% 0 auto 0;
+  height: 24rem;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(45% 60% at 18% 30%, oklch(0.474 0.083 178 / 0.12), transparent 70%),
+    radial-gradient(35% 55% at 82% 10%, oklch(0.493 0.158 32 / 0.07), transparent 70%);
+}
+
+/* 纸面肌理：固定噪点层，压住纯色数字面板的塑料感 */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .grain {
+    opacity: 0.07;
+  }
 }

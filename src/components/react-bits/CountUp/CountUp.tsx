@@ -52,7 +52,13 @@ export function CountUp({
     return 0;
   };
 
-  const maxDecimals = Math.max(getDecimalPlaces(from), getDecimalPlaces(to));
+  /*
+   * 护栏：精度由传入值推导，但不给裸浮点数（如 45 / 3.96 = 11.363636363636363）
+   * 留出十几位小数的余地。调用方仍应先按 @/lib/format 舍入到自己要的口径，
+   * 这里只保证最坏情况下也不会把长尾整个画出来。
+   */
+  const MAX_DECIMALS = 2;
+  const maxDecimals = Math.min(MAX_DECIMALS, Math.max(getDecimalPlaces(from), getDecimalPlaces(to)));
 
   const formatValue = useCallback(
     (latest: number) => {

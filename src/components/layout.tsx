@@ -47,11 +47,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-dvh bg-background font-sans text-foreground antialiased">
+      <div aria-hidden="true" className="grain" />
       <a className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:font-semibold focus:text-primary-foreground" href="#main">
         跳到主要内容
       </a>
 
-      <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="rule-double-b sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Link className="flex items-center gap-2 font-semibold" to="/">
             <span className="rounded-full bg-primary/10 p-1.5">
@@ -60,18 +61,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <span className="font-display text-base">全球最低工资对比</span>
           </Link>
 
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav className="hidden items-center gap-0.5 md:flex">
             <Link
               className={cn(
-                "relative rounded-md px-3 py-2 text-sm transition-colors hover:text-primary",
-                location.pathname === "/" && "font-medium text-primary",
+                "rounded-full px-3 py-1.5 text-sm transition-colors hover:text-primary",
+                location.pathname === "/" && "bg-primary/10 font-medium text-primary",
               )}
               to="/"
             >
               首页
-              {location.pathname === "/" && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-primary" />
-              )}
             </Link>
 
             <span aria-hidden="true" className="mx-1 h-4 w-px bg-border" />
@@ -88,15 +86,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
             <Link
               className={cn(
-                "relative rounded-md px-3 py-2 text-sm transition-colors hover:text-primary",
-                location.pathname === "/about" && "font-medium text-primary",
+                "rounded-full px-3 py-1.5 text-sm transition-colors hover:text-primary",
+                location.pathname === "/about" && "bg-primary/10 font-medium text-primary",
               )}
               to="/about"
             >
               关于
-              {location.pathname === "/about" && (
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full bg-primary" />
-              )}
             </Link>
           </nav>
 
@@ -158,8 +153,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      <footer className="border-t bg-muted/50 text-sm text-muted-foreground">
-        <div className="rule-top" />
+      <footer className="rule-double bg-muted/50 text-sm text-muted-foreground">
         <div className="mx-auto max-w-6xl px-4 py-10">
           <div className="grid gap-8 sm:grid-cols-3">
             {/* Left — Logo & description */}
@@ -247,16 +241,13 @@ function IndexLink({ href, label, pathname, short }: { href: string; label: stri
   return (
     <Link
       className={cn(
-        "relative rounded-md px-3 py-2 text-sm transition-colors hover:text-primary",
-        active && "font-medium text-primary",
+        "rounded-full px-3 py-1.5 text-sm transition-colors hover:text-primary",
+        active && "bg-primary/10 font-medium text-primary",
       )}
       to={href}
     >
       <span className="hidden lg:inline">{label}</span>
       <span className="lg:hidden">{short}</span>
-      {active && (
-        <span className="absolute bottom-0 left-1/2 h-0.5 w-4 -translate-x-1/2 rounded-full bg-primary" />
-      )}
     </Link>
   );
 }

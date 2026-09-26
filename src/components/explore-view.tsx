@@ -5,7 +5,7 @@ import type { DataTableColumn } from "@/components/data-table";
 
 import { DataTable } from "@/components/data-table";
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
-import { BlurText } from "@/components/react-bits/BlurText/BlurText";
+import { SplitText } from "@/components/react-bits/SplitText/SplitText";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ExploreViewProperties<T extends RowData> {
@@ -40,6 +40,10 @@ interface ExploreViewProperties<T extends RowData> {
    */
   title: string;
   /**
+   * 标题层级：独立成页时 h1，嵌在其他页面里时 h2
+   */
+  titleTag?: "h1" | "h2";
+  /**
    * 表格工具条（搜索、区域筛选、覆盖率筛选）
    */
   toolbar?: React.ReactNode;
@@ -62,19 +66,25 @@ export function ExploreView<T extends RowData>({
   onColumnFiltersChange,
   renderExpanded,
   title,
+  titleTag = "h1",
   toolbar,
 }: ExploreViewProperties<T>) {
+  const titleClass = titleTag === "h1" ? "page-title" : "section-title";
+
   return (
     <div>
-      <div className="pb-6">
-        <BlurText
-          animateBy="words"
-          className="text-balance font-display text-[clamp(2rem,4vw,3rem)] font-normal leading-[1.1] tracking-[-0.02em]"
-          delay={150}
+      <div className="pb-2">
+        <SplitText
+          className={titleClass}
+          delay={80}
+          duration={0.8}
+          ease="power3.out"
+          splitType="words"
+          tag={titleTag}
           text={title}
         />
         <AnimatedContent delay={0.1} distance={20} duration={0.5}>
-          <p className="mt-2 max-w-lg text-sm leading-relaxed text-pretty text-muted-foreground">{description}</p>
+          <p className="mt-3 max-w-lg text-sm leading-relaxed text-pretty text-muted-foreground">{description}</p>
         </AnimatedContent>
       </div>
 

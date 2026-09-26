@@ -29,7 +29,7 @@ interface TooltipShellProperties {
  */
 export function TooltipShell({ children, country, countryCode, note, rank, region, total }: TooltipShellProperties) {
   return (
-    <div className="rounded-xl border bg-background p-3 shadow-lg backdrop-blur-md">
+    <div className="rounded-lg border bg-background/95 p-3 shadow-float backdrop-blur-md">
       <div className="flex items-center gap-2">
         <CountryFlag className="h-4 w-4" countryCode={countryCode} />
         <span className="font-semibold text-foreground">{country}</span>

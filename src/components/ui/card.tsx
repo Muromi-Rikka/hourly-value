@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/utilities";
 
 function Card({ className, ...properties }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("rounded-xl border bg-card text-card-foreground shadow", className)} {...properties} />;
+  return <div className={cn("rounded-xl border bg-card text-card-foreground shadow-card", className)} {...properties} />;
 }
 Card.displayName = "Card";
 

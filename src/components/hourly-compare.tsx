@@ -56,7 +56,7 @@ export function HourlyCompare({
   const verdict = verdictOf(rows);
 
   return (
-    <div className={cn("rounded-2xl border bg-card p-5 sm:p-6", className)}>
+    <div className={cn("rounded-xl border bg-card p-5 shadow-panel sm:p-6", className)}>
       <div className="grid items-end gap-3 sm:grid-cols-[1fr_auto_1fr]">
         <CountrySelect id="compare-a" label="国家 A" onChange={code => onChange("a", code)} options={options} value={a.countryCode} />
         <Button
@@ -78,10 +78,10 @@ export function HourlyCompare({
 
       <div className="mt-5 space-y-4 border-t pt-4">
         <div className="grid grid-cols-[1fr_auto_auto] items-baseline gap-3 sm:grid-cols-[1fr_auto_auto_auto] sm:gap-4">
-          <p className="text-[11px] tracking-wider text-muted-foreground">指标</p>
+          <p className="eyebrow">指标</p>
           <CountryTag country={a} />
           <CountryTag country={b} />
-          <p className="hidden w-24 text-right text-[11px] tracking-wider text-muted-foreground sm:block">差距</p>
+          <p className="eyebrow hidden w-24 text-right sm:block">差距</p>
         </div>
 
         {GROUP_ORDER.map((group) => {
@@ -91,7 +91,7 @@ export function HourlyCompare({
           }
           return (
             <div key={group}>
-              <p className="mb-1 text-[11px] tracking-wider text-muted-foreground">
+              <p className="eyebrow mb-1">
                 {METRIC_GROUP_LABEL[group]}
               </p>
               <div className="divide-y">
