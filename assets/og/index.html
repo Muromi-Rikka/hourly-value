@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>og</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@400;500;600&display=swap");
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body { background: #efefea; }
+
+      .og {
+        position: relative;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: #efefea;
+        color: #141715;
+        font-family: "Outfit", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 56px 64px 52px;
+      }
+
+      /* 纸面颗粒 + 账簿栏线 */
+      .og::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          repeating-linear-gradient(0deg, rgba(20, 23, 21, 0.05) 0 1px, transparent 1px 76px),
+          radial-gradient(circle at 12% 8%, rgba(15, 107, 92, 0.09), transparent 46%);
+        pointer-events: none;
+      }
+
+      .og > * { position: relative; z-index: 1; }
+
+      .top { display: flex; align-items: center; justify-content: space-between; }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 26px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        color: #0f6b5c;
+      }
+
+      .brand .dot {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #0f6b5c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .brand .dot i {
+        display: block;
+        width: 14px;
+        height: 14px;
+        border: 3px solid #efefea;
+        border-radius: 50%;
+      }
+
+      .domain { font-size: 24px; letter-spacing: 0.08em; color: #6d7a75; }
+
+      .mid { display: flex; align-items: flex-end; justify-content: space-between; gap: 48px; }
+
+      .headline {
+        font-size: 78px;
+        line-height: 1.22;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        max-width: 830px;
+      }
+
+      .headline em {
+        font-style: normal;
+        color: #0f6b5c;
+        border-bottom: 8px solid rgba(232, 179, 58, 0.85);
+        padding-bottom: 2px;
+      }
+
+      .sub { margin-top: 30px; font-size: 30px; color: #55625d; letter-spacing: 0.02em; }
+
+      .unit {
+        font-family: "Instrument Serif", ui-serif, Georgia, serif;
+        font-size: 220px;
+        line-height: 0.8;
+        color: #0f6b5c;
+        letter-spacing: -0.02em;
+        white-space: nowrap;
+      }
+
+      .unit span { font-size: 96px; }
+
+      .bottom { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+
+      .chips { display: flex; gap: 14px; flex-wrap: wrap; }
+
+      .chip {
+        font-size: 25px;
+        padding: 12px 24px;
+        border-radius: 999px;
+        background: rgba(15, 107, 92, 0.1);
+        color: #0f6b5c;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .rule { height: 4px; background: #141715; opacity: 0.85; width: 100%; }
+    </style>
+  </head>
+  <body>
+    <div class="og">
+      <div class="top">
+        <div class="brand"><span class="dot"><i></i></span>全球最低工资对比</div>
+        <div class="domain">hourly-value.pages.dev</div>
+      </div>
+
+      <div class="mid">
+        <div>
+          <h1 class="headline">同样工作 1 小时，<br />各国最低工资<em>能买到什么</em></h1>
+          <p class="sub">以人民币为统一基准 · 27 个国家 / 地区 · 五项指数交叉验证</p>
+        </div>
+        <div class="unit">1<span>h</span></div>
+      </div>
+
+      <div>
+        <div class="rule"></div>
+        <div class="bottom" style="margin-top: 22px">
+          <div class="chips">
+            <span class="chip">最低工资</span>
+            <span class="chip">巨无霸指数</span>
+            <span class="chip">物资篮</span>
+            <span class="chip">iPhone</span>
+            <span class="chip">Model Y</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

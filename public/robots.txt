@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hourly-value.pages.dev/sitemap.xml

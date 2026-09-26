@@ -1,4 +1,5 @@
 import { createRoute, lazyRouteComponent } from "@tanstack/react-router";
+import { routeHead } from "@/lib/seo";
 import { rootRoute } from "@/routes/__root";
 
 /**
@@ -15,6 +16,7 @@ export interface HourlySearch {
 const hourlyRoute = createRoute({
   component: lazyRouteComponent(() => import("@/pages/hourly"), "Hourly"),
   getParentRoute: () => rootRoute,
+  head: () => routeHead("/hourly"),
   path: "/hourly",
   validateSearch: (search: Record<string, unknown>): HourlySearch => ({
     a: typeof search.a === "string" ? search.a : undefined,

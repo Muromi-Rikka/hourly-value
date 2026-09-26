@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>icon</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        background: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* 尺寸由 query 控制，避免为 32 / 180 各写一份 */
+      #icon {
+        --size: 180px;
+        width: var(--size);
+        height: var(--size);
+        background: #0f6b5c;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* iOS 主屏图标不做圆角，整块填充 */
+      .touch #icon { border-radius: 0; }
+
+      .clock {
+        position: relative;
+        width: 62%;
+        height: 62%;
+        border: calc(var(--size) * 0.048) solid #efefea;
+        border-radius: 50%;
+      }
+
+      .clock::before,
+      .clock::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        background: #efefea;
+        border-radius: calc(var(--size) * 0.03);
+        transform-origin: 0 50%;
+      }
+
+      /* 时针：指向 1 点方向 */
+      .clock::before {
+        width: 24%;
+        height: calc(var(--size) * 0.048);
+        transform: rotate(-60deg);
+      }
+
+      /* 分针：指向 12 点方向 */
+      .clock::after {
+        width: 34%;
+        height: calc(var(--size) * 0.04);
+        transform: rotate(-90deg);
+      }
+
+      .pin {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: calc(var(--size) * 0.075);
+        height: calc(var(--size) * 0.075);
+        border-radius: 50%;
+        background: #e8b33a;
+        transform: translate(-50%, -50%);
+      }
+    </style>
+  </head>
+  <body class="touch">
+    <div id="icon"><div class="clock"><div class="pin"></div></div></div>
+    <script>
+      const params = new URLSearchParams(location.search);
+      document.getElementById("icon").style.setProperty("--size", `${params.get("s") ?? 180}px`);
+      if (params.get("touch") !== "1") document.body.classList.remove("touch");
+    </script>
+  </body>
+</html>

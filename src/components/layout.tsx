@@ -20,30 +20,11 @@ const indexItems = [
   { href: "/modely", label: "Model Y 指数", short: "Model Y" },
 ];
 
-/**
- * 每个路由的文档标题，切页时同步更新
-*/
-const pageTitles: Record<string, string> = {
-  "/": "一小时最低工资购买力",
-  "/about": "关于本项目",
-  "/bigmac": "巨无霸指数",
-  "/bigmac-explore": "巨无霸指数 · 数据探索",
-  "/commodity": "物资指数",
-  "/commodity-explore": "物资指数 · 数据探索",
-  "/explore": "最低工资 · 数据探索",
-  "/hourly": "一小时购买力",
-  "/iphone": "iPhone 指数",
-  "/iphone-explore": "iPhone 指数 · 数据探索",
-  "/modely": "Model Y 指数",
-  "/modely-explore": "Model Y 指数 · 数据探索",
-};
-
 const copyrightYear = new Date().getFullYear();
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const location = useLocation();
-  useDocumentTitle(location.pathname);
 
   return (
     <div className="min-h-dvh bg-background font-sans text-foreground antialiased">
@@ -250,13 +231,4 @@ function IndexLink({ href, label, pathname, short }: { href: string; label: stri
       <span className="lg:hidden">{short}</span>
     </Link>
   );
-}
-
-function useDocumentTitle(pathname: string) {
-  React.useEffect(() => {
-    const page = pageTitles[pathname];
-    document.title = page === undefined
-      ? "一小时最低工资购买力"
-      : (page === "/" ? page : `${page} · 一小时购买力`);
-  }, [pathname]);
 }

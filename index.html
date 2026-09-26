@@ -3,15 +3,66 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="全球最低工资标准购买力可视化 — 以人民币为基准，对比27个国家/地区的最低时薪购买力差异" />
-    <meta property="og:title" content="全球最低工资对比" />
-    <meta property="og:description" content="以人民币购买力为统一基准的全球最低工资可视化工具" />
+    <meta name="theme-color" content="#efefea" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#141715" media="(prefers-color-scheme: dark)" />
+
+    <!--
+      静态兜底：Facebook / Twitter / 微信等爬虫不执行 JS，只读这里的标签。
+      title 与 description 带 data-static-fallback，React 挂载后由根路由删掉，
+      改由 TanStack Router 按路由下发，避免同一页面出现两条（见 src/lib/seo.ts）。
+
+      这里**故意不写** <link rel="canonical"> 与 og:url：
+      纯 CSR 下静态 HTML 对 12 条路由完全相同，写死任何一条都会在其余 11 条上给出错误指向。
+      不执行 JS 的爬虫拿不到 canonical 时会直接采用所请求的 URL，反而正确；
+      能执行 JS 的爬虫（Googlebot 等）拿到的是路由级的准确值。
+    -->
+    <title data-static-fallback>一小时能买什么？· 全球最低工资对比</title>
+    <meta
+      data-static-fallback
+      name="description"
+      content="以人民币为统一基准，对比 27 个国家/地区的法定最低时薪能买到什么，并用巨无霸、基础物资、iPhone、Model Y 四类消费品交叉验证。"
+    />
+
+    <!-- Open Graph：社交卡片专用，React 不再重复输出 -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="全球最低工资对比" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:title" content="一小时能买什么？· 全球最低工资对比" />
+    <meta
+      property="og:description"
+      content="以人民币为统一基准，对比 27 个国家/地区的法定最低时薪能买到什么，并用巨无霸、基础物资、iPhone、Model Y 四类消费品交叉验证。"
+    />
+    <meta property="og:image" content="https://hourly-value.pages.dev/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="同样工作 1 小时，各国最低工资能买到什么" />
+
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="一小时能买什么？· 全球最低工资对比" />
+    <meta
+      name="twitter:description"
+      content="以人民币为统一基准，对比 27 个国家/地区的法定最低时薪能买到什么，并用巨无霸、基础物资、iPhone、Model Y 四类消费品交叉验证。"
+    />
+    <meta name="twitter:image" content="https://hourly-value.pages.dev/og-image.png" />
+    <meta name="twitter:image:alt" content="同样工作 1 小时，各国最低工资能买到什么" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "全球最低工资对比",
+        "alternateName": "一小时能买什么",
+        "url": "https://hourly-value.pages.dev/",
+        "inLanguage": "zh-CN",
+        "description": "以人民币为统一基准的全球最低时薪购买力可视化，覆盖 27 个国家/地区的五项指数对比。"
+      }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <title>全球最低工资对比</title>
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   </head>
   <body>
     <div id="root"></div>
