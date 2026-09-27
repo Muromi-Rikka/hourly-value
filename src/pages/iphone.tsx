@@ -8,8 +8,8 @@ import { createIPhoneTooltip } from "@/components/index-tooltips";
 import { RankBarChart } from "@/components/rank-bar-chart";
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
 import { CountUp } from "@/components/react-bits/CountUp/CountUp";
-import { FadeContent } from "@/components/react-bits/FadeContent/FadeContent";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
+import { RegionBreakdown } from "@/components/region-breakdown";
 import { SourceBlock } from "@/components/source-block";
 import { buttonVariants } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -146,49 +146,33 @@ export function IPhone() {
 
             {/* Right — region breakdown */}
             <div className="sm:col-span-7">
-              <p className="mb-3 text-sm text-muted-foreground">区域平均所需工时</p>
-              <FadeContent duration={800} threshold={0.2}>
-                <div className="space-y-2.5">
-                  {regionData.map(r => (
-                    <div className="flex items-center gap-3" key={r.region}>
-                      <span className="w-10 shrink-0 text-right text-xs text-muted-foreground">{r.region}</span>
-                      <div className="relative h-5 flex-1 overflow-hidden rounded-sm bg-muted">
-                        <div
-                          className="absolute inset-y-0 left-0 w-full origin-left rounded-sm bg-primary transition-transform duration-300 ease-out"
-                          style={{
-                            transform: `scaleX(${r.avg / maxRegionAvg})`,
-                          }}
-                        />
-                        <span className="absolute inset-y-0 right-2 flex items-center text-xs font-semibold tabular-nums">
-                          {r.avg}
-                          h
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </FadeContent>
-
-              {/* Flag strip */}
-              <div className="mt-5 border-t pt-4">
-                <p className="mb-2 text-xs text-muted-foreground">
-                  {count}
-                  {" 个国家/地区 · "}
-                  {regionData.length}
-                  {" 个区域"}
-                </p>
-                <div className="flex flex-wrap gap-1">
-                  {withHours.map(w => (
-                    <span
-                      className="flex h-7 w-7 items-center justify-center rounded-sm transition-transform hover:scale-110"
-                      key={w.countryCode}
-                      title={`${w.country} · ${w.hoursToBuy}h`}
-                    >
-                      <CountryFlag className="h-5 w-5" countryCode={w.countryCode} />
-                    </span>
-                  ))}
-                </div>
-              </div>
+              <RegionBreakdown
+                bars={regionData.map(r => ({
+                  key: r.region,
+                  label: r.region,
+                  scale: r.avg / maxRegionAvg,
+                  value: (
+                    <>
+                      {r.avg}
+                      h
+                    </>
+                  ),
+                }))}
+                caption={(
+                  <>
+                    {count}
+                    {" 个国家/地区 · "}
+                    {regionData.length}
+                    {" 个区域"}
+                  </>
+                )}
+                flags={withHours.map(w => ({
+                  countryCode: w.countryCode,
+                  key: w.countryCode,
+                  title: `${w.country} · ${w.hoursToBuy}h`,
+                }))}
+                title="区域平均所需工时"
+              />
             </div>
           </div>
         </section>
