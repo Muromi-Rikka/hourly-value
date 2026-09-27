@@ -1,0 +1,20 @@
+{
+  "ignore": {
+    "overrides": [
+      {
+        "files": [
+          "src/components/index-tooltips.tsx",
+          "src/components/ui/button.tsx"
+        ],
+        "rules": ["react-doctor/only-export-components"]
+      },
+      {
+        "files": ["src/components/react-bits/**"],
+        "rules": [
+          "react-doctor/exhaustive-deps",
+          "react-doctor/prefer-use-effect-event"
+        ]
+      }
+    ]
+  }
+}
