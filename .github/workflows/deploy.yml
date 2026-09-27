@@ -4,6 +4,8 @@ on:
   workflow_dispatch: {}
   push:
     branches: [master]
+  pull_request:
+    branches: [master]
 
 # Cancel in-flight runs for the same ref when a new run starts
 concurrency:
@@ -48,9 +50,11 @@ jobs:
       - name: Build website
         run: pnpm build
 
-      # dist/ 内没有 404.html，CF Pages 会按 SPA 模式把未知路径回落到 index.html
+      # PR 只做门禁 + 构建校验，不发布
       - name: Publish to CF Pages hourly-value
-        run: npx --yes wrangler@4 pages deploy dist --project-name=hourly-value --branch master
+        if: github.event_name != 'pull_request'
+        # dist/ 内没有 404.html，CF Pages 会按 SPA 模式把未知路径回落到 index.html
+        run: npx --yes wrangler@4 pages deploy dist --project-name=hourly-value --branch main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}

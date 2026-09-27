@@ -167,8 +167,7 @@ All user-facing text is in **Chinese (Simplified)**. Country names, labels, plac
 | `rsbuild.config.ts` | Build config: `@` alias, PostCSS (inline), Rsdoctor (conditional), TurboConsole (dev) |
 | `eslint.config.js` | Flat config: `@renton/eslint-config-react` + `@shadcn/lint` registered (no rules) |
 | `lint-staged.config.js` | Pre-commit: `eslint --cache --max-warnings=0 --no-warn-ignored` |
-| `.github/workflows/ci.yml` | push/PR 到 master 跑 `pnpm lint` + `tsc --noEmit`（ESLint 也检查 `.github` 下的 YAML，写 workflow 后必须跑 `pnpm lint`） |
-| `.github/workflows/deploy.yml` | push 到 master / 手动：门禁 → `pnpm build` → `wrangler pages deploy dist --project-name=hourly-value`；需 secrets `CLOUDFLARE_API_TOKEN` + `ACCOUNT_ID` |
+| `.github/workflows/deploy.yml` | push / PR 到 master、手动：门禁（lint + 类型检查）→ `pnpm build` → `wrangler pages deploy dist --project-name=hourly-value --branch main`（PR 不发布）；需 secrets `CLOUDFLARE_API_TOKEN` + `ACCOUNT_ID`；ESLint 也检查 `.github` 下的 YAML，改 workflow 后必须跑 `pnpm lint` |
 | `docs/薪资.md` | NOT in repo (whole `docs/` dir is gitignored) — local scratch only; canonical data lives in `src/data/wages.ts` |
 
 ## Runtime/Tooling Preferences

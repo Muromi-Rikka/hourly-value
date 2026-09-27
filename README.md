@@ -47,8 +47,7 @@ pnpm dev        # 开发服务器（热更新）
 
 | Workflow | 触发 | 步骤 |
 |---|---|---|
-| `.github/workflows/ci.yml` | push / PR 到 `master` | `pnpm lint` + `tsc --noEmit` |
-| `.github/workflows/deploy.yml` | push 到 `master`、手动触发 | 门禁（lint + 类型检查）→ `pnpm build`（先拉汇率）→ `wrangler pages deploy dist` |
+| `.github/workflows/deploy.yml` | push / PR 到 `master`、手动触发 | 门禁（`pnpm lint` + `tsc --noEmit`）→ `pnpm build`（先拉汇率）→ `wrangler pages deploy dist`（PR 只跑门禁与构建，不发布） |
 
 首次启用需在仓库 **Settings → Secrets and variables → Actions** 添加：
 
@@ -61,7 +60,7 @@ pnpm dev        # 开发服务器（热更新）
 
 ```bash
 pnpm build
-npx wrangler pages deploy dist --project-name=hourly-value --branch master
+npx wrangler pages deploy dist --project-name=hourly-value --branch main
 ```
 
 ## 技术栈
