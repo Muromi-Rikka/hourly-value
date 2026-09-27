@@ -1,0 +1,56 @@
+name: Deploy to CF Pages
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [master]
+
+# Cancel in-flight runs for the same ref when a new run starts
+concurrency:
+  group: deploy-pages-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: "true"
+      HUSKY: "0" # CI 不安装 git hooks
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "26"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # rsbuild 用 SWC 剥离类型不做类型检查，构建不会暴露类型错误，因此先过一遍质量门禁
+      - name: Quality gate (lint + typecheck)
+        run: |
+          pnpm lint
+          pnpm exec tsc --noEmit --ignoreDeprecations 6.0
+
+      # pnpm build 会先执行 scripts/fetch-rates.mjs 拉取最新 ECB 汇率 → 输出 dist/
+      - name: Build website
+        run: pnpm build
+
+      # dist/ 内没有 404.html，CF Pages 会按 SPA 模式把未知路径回落到 index.html
+      - name: Publish to CF Pages hourly-value
+        run: npx --yes wrangler@4 pages deploy dist --project-name=hourly-value --branch master
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}

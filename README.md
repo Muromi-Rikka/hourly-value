@@ -41,6 +41,29 @@ pnpm dev        # 开发服务器（热更新）
 
 类型检查：`npx tsc --noEmit --ignoreDeprecations 6.0`（`tsconfig.json` 的 `baseUrl` 在 TS 7 将被移除，需保留该 flag）。
 
+## 部署
+
+产物是纯静态站点（`dist/`），发布到 Cloudflare Pages → [hourly-value.pages.dev](https://hourly-value.pages.dev)。`dist/` 里**故意不放 `404.html`**：Cloudflare Pages 会因此按 SPA 模式把未知路径回落到 `index.html`，客户端路由才能深链直达。
+
+| Workflow | 触发 | 步骤 |
+|---|---|---|
+| `.github/workflows/ci.yml` | push / PR 到 `master` | `pnpm lint` + `tsc --noEmit` |
+| `.github/workflows/deploy.yml` | push 到 `master`、手动触发 | 门禁（lint + 类型检查）→ `pnpm build`（先拉汇率）→ `wrangler pages deploy dist` |
+
+首次启用需在仓库 **Settings → Secrets and variables → Actions** 添加：
+
+| Secret | 说明 |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | API Token，权限含 `Cloudflare Pages: Edit` |
+| `ACCOUNT_ID` | Cloudflare 账户 ID |
+
+等价的手动发布：
+
+```bash
+pnpm build
+npx wrangler pages deploy dist --project-name=hourly-value --branch master
+```
+
 ## 技术栈
 
 **React 19** · **TypeScript 6** · **Tailwind CSS v4** · **Rsbuild 2**（rspack）· **Recharts 3** · **TanStack Router** · **TanStack Table v9** · **shadcn/ui** 组件模式
