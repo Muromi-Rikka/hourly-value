@@ -8,7 +8,7 @@ import { ExploreView } from "@/components/explore-view";
 import { RankBarChart } from "@/components/rank-bar-chart";
 import { RegionBadge } from "@/components/region-badge";
 import { TooltipShell } from "@/components/tooltip-shell";
-import { wages } from "@/data/wages";
+import { sortedByWage, wages } from "@/data/wages";
 import { cnyHour, dateOnly } from "@/lib/format";
 import { cn } from "@/lib/utilities";
 
@@ -160,7 +160,7 @@ function WageTooltip({ active, payload }: { active?: boolean; payload?: Array<{ 
   if (!active || !entry) {
     return null;
   }
-  const rank = wages.findIndex(item => item.countryCode === entry.countryCode) + 1;
+  const rank = sortedByWage.findIndex(item => item.countryCode === entry.countryCode) + 1;
 
   return (
     <TooltipShell
@@ -169,7 +169,7 @@ function WageTooltip({ active, payload }: { active?: boolean; payload?: Array<{ 
       note={`${entry.effectiveDate} 生效`}
       rank={rank}
       region={entry.region}
-      total={wages.length}
+      total={sortedByWage.length}
     >
       <p className="text-sm text-muted-foreground">
         {entry.localWage.toLocaleString()}

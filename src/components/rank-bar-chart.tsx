@@ -26,7 +26,7 @@ export interface RankTooltipProperties<T> {
 
 interface RankBarChartProperties<T> {
   /**
-  * 已按业务口径筛掉空值的数据；本组件负责升序排序
+  * 图表数据源；null/undefined 的值在本组件内剔除（不画 0 值柱），剩余部分由本组件升序排序
   */
   data: T[];
   /**
@@ -70,6 +70,7 @@ export function RankBarChart<T extends { country: string; countryCode: string; r
   valueKey,
 }: RankBarChartProperties<T>) {
   const rows = data
+    .filter(row => row[valueKey] !== null && row[valueKey] !== undefined)
     .map(row => ({ ...row, __value: Number(row[valueKey]) }))
     .toSorted((a, b) => a.__value - b.__value);
   const TooltipContent = tooltip;

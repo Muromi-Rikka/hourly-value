@@ -135,6 +135,21 @@ export function Hourly() {
 
   const options = isCommonOnly ? commonHourlyPower : hourlyPower;
 
+  // 「五项齐备」范围下，URL 带进来的选中国家可能不在 options 里：原生 <select> 没有匹配
+  // option 会渲染成空框（country-select.tsx:24 的 current 也会取不到 → 国旗一起消失）。
+  // 这里只给对比选择器补候选，搜索/排名/区域统计仍用原 options。
+  const compareOptions = React.useMemo(() => {
+    const seen = new Set(options.map(option => option.countryCode));
+    const extra = [a, b].filter((entry) => {
+      if (seen.has(entry.countryCode)) {
+        return false;
+      }
+      seen.add(entry.countryCode);
+      return true;
+    });
+    return extra.length === 0 ? options : [...options, ...extra];
+  }, [a, b, options]);
+
   const searched = React.useMemo(() => {
     const keyword = query.trim().toLowerCase();
     if (!keyword) {
@@ -225,15 +240,16 @@ export function Hourly() {
           b={b}
           onChange={(side, code) => setSearch(side === "a" ? { a: code } : { b: code })}
           onSwap={() => setSearch({ a: b.countryCode, b: a.countryCode })}
-          options={options}
+          options={compareOptions}
           shareHref={shareHref}
         />
       </AnimatedContent>
 
       {/* Matrix */}
       <AnimatedContent delay={0.1} distance={40} duration={0.6} threshold={0.05}>
-        {/* key 跟随当前指标：切换排行指标时表格同步换成该指标的默认排序 */}
-        <div className="section" key={metric.key}>
+        {/* 表格的 key 走 ExploreView 的 tableKey：切指标时只重挂表格拿到新的默认排序。
+            整块重挂会连标题动画、图表视图状态和 MetricSwitcher 的焦点一起丢 */}
+        <div className="section">
           <ExploreView
             chart={(
               <RankBarChart
@@ -259,9 +275,11 @@ export function Hourly() {
                 {" 个国家/地区在同一张表里对照。展开任意一行可看该国的工时折算口径与来源。"}
               </>
             )}
+            getRowId={entry => entry.countryCode}
             onClearFilters={clearFilters}
             onColumnFiltersChange={setColumnFilters}
             renderExpanded={row => <DetailPanel entry={row} />}
+            tableKey={metric.key}
             title="各国一小时购买力矩阵"
             titleTag="h2"
             toolbar={(

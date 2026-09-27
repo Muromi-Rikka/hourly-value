@@ -147,6 +147,7 @@ export function IPhoneExplore() {
             购买力数据
           </>
         )}
+        getRowId={entry => entry.countryCode}
         key={model}
         renderExpanded={row => (
           <div className="grid gap-3 sm:grid-cols-2">

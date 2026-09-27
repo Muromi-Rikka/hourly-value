@@ -1,4 +1,5 @@
 import { createRouter } from "@tanstack/react-router";
+import { RouteError, RoutePending } from "@/components/route-status";
 import { rootRoute } from "@/routes/__root";
 import { aboutRoute } from "@/routes/about";
 import { bigmacRoute } from "@/routes/bigmac";
@@ -15,7 +16,12 @@ import { modelyExploreRoute } from "@/routes/modely-explore";
 
 const routeTree = rootRoute.addChildren([indexRoute, hourlyRoute, exploreRoute, aboutRoute, iphoneRoute, iphoneExploreRoute, bigmacRoute, bigmacExploreRoute, commodityRoute, commodityExploreRoute, modelyRoute, modelyExploreRoute]);
 
-const router = createRouter({ routeTree, scrollRestoration: true });
+const router = createRouter({
+  defaultErrorComponent: RouteError,
+  defaultPendingComponent: RoutePending,
+  routeTree,
+  scrollRestoration: true,
+});
 
 declare module "@tanstack/react-router" {
   interface Register {

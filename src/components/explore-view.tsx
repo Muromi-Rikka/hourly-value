@@ -30,11 +30,20 @@ interface ExploreViewProperties<T extends RowData> {
    */
   description: React.ReactNode;
   /**
+   * 行 id 取值，透传给 DataTable；筛选/换数据后展开状态按身份而非行序保持
+   */
+  getRowId?: (row: T) => string;
+  /**
    * 表格空状态时的「清除筛选」回调；不传则不渲染按钮
    */
   onClearFilters?: () => void;
   onColumnFiltersChange?: (updater: React.SetStateAction<ColumnFiltersState>) => void;
   renderExpanded: (row: T) => React.ReactNode;
+  /**
+   * 传入后表格按它重挂，用于切换数据口径时换上新的默认排序；
+   * 不传则表格保持挂载（现有页面行为不变）
+   */
+  tableKey?: React.Key;
   /**
    * 页面标题（同时作为浏览器标签标题的一部分）
    */
@@ -62,9 +71,11 @@ export function ExploreView<T extends RowData>({
   data,
   defaultSort,
   description,
+  getRowId,
   onClearFilters,
   onColumnFiltersChange,
   renderExpanded,
+  tableKey,
   title,
   titleTag = "h1",
   toolbar,
@@ -101,6 +112,8 @@ export function ExploreView<T extends RowData>({
               columns={columns}
               data={data}
               defaultSort={defaultSort}
+              getRowId={getRowId}
+              key={tableKey}
               onClearFilters={onClearFilters}
               onColumnFiltersChange={onColumnFiltersChange}
               renderExpanded={renderExpanded}
