@@ -99,6 +99,9 @@ export function DataTable<T extends RowData>({
   const setFilters = onColumnFiltersChange ?? setInnerFilters;
 
   const table = useTable({
+    // data 换新引用（搜索、范围切换）时 TanStack 默认清空展开状态；
+    // 关掉自动重置，展开才真正按行 id（国家身份）跨筛选保持
+    autoResetExpanded: false,
     columns,
     data,
     features: tableFeatureSet,
