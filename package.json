@@ -27,6 +27,7 @@
   ],
   "scripts": {
     "rates": "node scripts/fetch-rates.mjs",
+    "flags": "node scripts/build-flags.mjs",
     "dev": "node scripts/fetch-rates.mjs && rsbuild dev --open",
     "build": "node scripts/fetch-rates.mjs && rsbuild build",
     "build:rsdoctor": "node scripts/fetch-rates.mjs && cross-env RSDOCTOR=true rsbuild build",
