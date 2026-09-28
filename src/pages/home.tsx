@@ -23,7 +23,7 @@ import { SplitText } from "@/components/react-bits/SplitText/SplitText";
 import { RegionLegend } from "@/components/region-legend";
 import { SectionHeading } from "@/components/section-heading";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent, CardDescription, CardFooter, CardHeader, CardTitle, cardVariants } from "@/components/ui/card";
 import { hourlyPower, hourlyPowerOf } from "@/data/hourly-power";
 import { SCOPE_CHIPS } from "@/data/methodology";
 import { cnyHour, DASH, ratio as formatRatio, hourNumber, round1 } from "@/lib/format";
@@ -172,43 +172,49 @@ export function Home() {
             {stats.map((stat) => {
               const Icon = ICONS[stat.icon];
               return (
-                <Card className="flex flex-col" key={stat.id}>
-                  <CardHeader>
-                    <p className="eyebrow">{stat.group}</p>
-                    <CardTitle className="flex items-center gap-2 text-lg font-display">
-                      <span className="rounded-full bg-primary/10 p-2">
-                        <Icon className="h-5 w-5 text-primary" />
+                <Link
+                  className={cn(cardVariants({ variant: "default" }), "group card-interactive flex flex-col")}
+                  key={stat.id}
+                  to={stat.link}
+                >
+                  <CardHeader className="space-y-3 p-5 sm:p-6">
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                        <Icon aria-hidden="true" className="h-5 w-5" />
                       </span>
-                      {stat.title}
-                    </CardTitle>
-                    <CardDescription>{stat.description}</CardDescription>
+                      <p className="eyebrow pt-1 text-right">{stat.group}</p>
+                    </div>
+                    <div>
+                      <CardTitle className="font-display text-lg leading-snug">{stat.title}</CardTitle>
+                      <CardDescription className="mt-1.5">{stat.description}</CardDescription>
+                    </div>
                   </CardHeader>
-                  <CardContent className="flex-1">
-                    <div className="space-y-3">
+                  <CardContent className="flex-1 p-0">
+                    <div className="divide-y divide-border/70 border-t border-border/70">
                       {stat.metrics.map(metric => (
-                        <div className="flex items-baseline justify-between" key={metric.label}>
-                          <span className="text-sm text-muted-foreground">{metric.label}</span>
-                          <div className="flex items-baseline gap-2">
-                            <span className="stat-number text-lg">{metric.value}</span>
+                        <div className="flex items-baseline justify-between gap-3 px-5 py-3 sm:px-6" key={metric.label}>
+                          <span className="text-xs text-muted-foreground">{metric.label}</span>
+                          <span className="flex items-baseline gap-2">
+                            <span className="stat-number text-xl">{metric.value}</span>
                             <span className="flex w-[4.5rem] shrink-0 items-center gap-1 text-xs text-muted-foreground">
                               <CountryFlag className="h-4 w-4 shrink-0" countryCode={metric.countryCode} />
                               <span className="truncate">{metric.country}</span>
                             </span>
-                          </div>
+                          </span>
                         </div>
                       ))}
                     </div>
                   </CardContent>
-                  <CardFooter className="mt-auto border-t border-border/30 pt-4">
-                    <div className="flex w-full items-center justify-between">
+                  <CardFooter className="mt-auto border-t border-border/70 p-5 pt-3 sm:p-6">
+                    <div className="flex w-full items-center justify-between gap-3">
                       <CoverageBadge coverage={stat.coverage} />
-                      <Link className={cn(buttonVariants({ size: "sm", variant: "ghost" }), "group")} to={stat.link}>
+                      <span className="inline-flex items-center gap-1 text-sm font-medium text-primary">
                         {stat.linkLabel}
-                        <ArrowRight className="ml-1 h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                      </Link>
+                        <ArrowRight aria-hidden="true" className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                      </span>
                     </div>
                   </CardFooter>
-                </Card>
+                </Link>
               );
             })}
           </div>
@@ -226,38 +232,38 @@ export function Home() {
       <AnimatedContent delay={0.15} distance={40} duration={0.6} threshold={0.1}>
         <section className="section">
           <p className="eyebrow mb-4">数据亮点</p>
-          <div className="grid gap-4 sm:grid-cols-3">
-            <Card className="p-5">
+          <div className={cn(cardVariants({ variant: "inverse" }), "grid overflow-hidden sm:grid-cols-3")}>
+            <div className="border-b border-background/15 p-5 sm:border-b-0 sm:border-r sm:p-6">
               <p className="stat-number stat-lg">
                 <CountUp duration={1.5} to={highlights.countryCount} />
-                <span className="ml-1 text-sm text-muted-foreground">国家/地区</span>
+                <span className="ml-1.5 font-sans text-sm text-background/70">国家/地区</span>
               </p>
-              <p className="mt-2 text-sm text-muted-foreground">
+              <p className="mt-2 text-sm text-background/70">
                 {highlights.regionCount}
                 {" 个区域 · 5 项指标"}
               </p>
-            </Card>
-            <Card className="p-5">
-              <p className="flex items-center gap-2 font-display stat-lg">
-                <CountryFlag className="h-8 w-8" countryCode={highlights.topCountry.countryCode} />
+            </div>
+            <div className="border-b border-background/15 p-5 sm:border-b-0 sm:border-r sm:p-6">
+              <p className="flex items-center gap-3 font-display stat-lg">
+                <CountryFlag className="h-10 w-10 shrink-0" countryCode={highlights.topCountry.countryCode} />
                 {highlights.topCountry.country}
               </p>
-              <p className="mt-2 text-sm text-muted-foreground">
+              <p className="mt-2 text-sm text-background/70">
                 在
                 <CountUp duration={1} to={highlights.topCountry.count} />
                 {" 项消费指标中排名前三"}
               </p>
-            </Card>
-            <Card className="p-5">
+            </div>
+            <div className="p-5 sm:p-6">
               <p className="stat-number stat-lg">
                 <CountUp duration={2} to={highlights.maxGap.ratio} />
-                <span className="text-[0.4em] text-muted-foreground">×</span>
+                <span className="ml-0.5 font-sans text-[0.4em] text-background/60">×</span>
               </p>
-              <p className="mt-2 text-sm text-muted-foreground">
+              <p className="mt-2 text-sm text-background/70">
                 {highlights.maxGap.label}
                 {" 指标的首尾差距"}
               </p>
-            </Card>
+            </div>
           </div>
         </section>
       </AnimatedContent>

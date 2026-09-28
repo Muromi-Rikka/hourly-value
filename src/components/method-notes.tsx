@@ -3,7 +3,9 @@ import { ArrowUpRight, Info } from "lucide-react";
 
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
 import { SectionHeading } from "@/components/section-heading";
+import { cardVariants } from "@/components/ui/card";
 import { METHOD_NOTES } from "@/data/methodology";
+import { cn } from "@/lib/utilities";
 
 interface MethodNotesProperties {
   /**
@@ -53,12 +55,18 @@ export function MethodNotes({ featuredOnly = false, title = "三分钟读懂口�
 
       <div className="grid gap-4 sm:grid-cols-2">
         {notes.map(note => (
-          <div className="rounded-xl border bg-card p-5 shadow-card" key={note.title}>
-            <p className="flex items-start gap-2 text-sm font-medium">
-              <Info aria-hidden="true" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
-              {note.title}
-            </p>
-            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">{note.body}</p>
+          <div className={cn(cardVariants({ variant: "default" }), "p-5")} key={note.title}>
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <Info aria-hidden="true" className="h-4 w-4" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-medium leading-snug">{note.title}</p>
+                <div className="mt-3 border-t border-border/70 pt-3">
+                  <p className="text-xs leading-relaxed text-muted-foreground">{note.body}</p>
+                </div>
+              </div>
+            </div>
           </div>
         ))}
       </div>

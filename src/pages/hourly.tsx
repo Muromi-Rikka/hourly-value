@@ -17,6 +17,7 @@ import { AnimatedContent } from "@/components/react-bits/AnimatedContent/Animate
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
 import { SectionHeading } from "@/components/section-heading";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { cardVariants } from "@/components/ui/card";
 import {
   commonCodes,
   commonHourlyPower,
@@ -28,7 +29,7 @@ import {
 } from "@/data/hourly-power";
 import { SCOPE_CHIPS } from "@/data/methodology";
 import { cnyHour, DASH, dateOnly, hourNumber, localAmount, round1 } from "@/lib/format";
-import { regionAverages } from "@/lib/region";
+import { regionAverages, regionColor } from "@/lib/region";
 import { cn } from "@/lib/utilities";
 import { hourlyRoute } from "@/routes/hourly";
 
@@ -302,13 +303,27 @@ export function Hourly() {
       <AnimatedContent delay={0.1} distance={40} duration={0.6} threshold={0.1}>
         <section className="section">
           <SectionHeading
-            description="中位数不受极值国家影响；括号内为该区域参与统计的国家数"
+            description="中位数不受极值国家影响；括号内为该区域参与统计的国家数。点击区域卡可筛选上方表格。"
             eyebrow="区域中位数"
             title={`各区域的${metric.label}`}
           />
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {regionData.map(row => (
-              <div className="rounded-lg border bg-card p-4 shadow-card" key={row.region}>
+              <button
+                aria-pressed={regionFilter === row.region}
+                className={cn(
+                  cardVariants({ variant: regionFilter === row.region ? "tinted" : "default" }),
+                  "card-interactive w-full cursor-pointer p-4 text-left",
+                )}
+                key={row.region}
+                onClick={() => setRegion(regionFilter === row.region ? "" : row.region)}
+                type="button"
+              >
+                <span
+                  aria-hidden="true"
+                  className="mb-3 block h-1.5 w-10 rounded-full"
+                  style={{ background: regionColor(row.region) }}
+                />
                 <p className="text-sm font-medium">
                   {row.region}
                   <span className="ml-1.5 text-xs font-normal text-muted-foreground">
@@ -317,7 +332,7 @@ export function Hourly() {
                     {" 国）"}
                   </span>
                 </p>
-                <p className="stat-number mt-1 text-xl text-primary">
+                <p className="stat-number mt-1 text-2xl text-primary">
                   {metric.format(row.median)}
                 </p>
                 <p className="mt-1 text-[11px] text-muted-foreground">
@@ -325,7 +340,7 @@ export function Hourly() {
                   {" "}
                   {metric.format(row.avg)}
                 </p>
-              </div>
+              </button>
             ))}
           </div>
         </section>

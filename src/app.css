@@ -121,6 +121,11 @@
   --shadow-card: 0 1px 2px oklch(0.209 0.006 157 / 0.05), 0 8px 24px -16px oklch(0.209 0.006 157 / 0.22);
   --shadow-panel: 0 1px 2px oklch(0.209 0.006 157 / 0.06), 0 18px 44px -26px oklch(0.209 0.006 157 / 0.3);
   --shadow-float: 0 2px 6px oklch(0.209 0.006 157 / 0.12), 0 22px 50px -26px oklch(0.209 0.006 157 / 0.35);
+  /* 可点卡片 hover 专用：分层衰减（近处紧、远处松），比 --shadow-card 深一档 */
+  --shadow-lift: 0 1px 2px oklch(0.209 0.006 157 / 0.06),
+    0 4px 8px -4px oklch(0.209 0.006 157 / 0.1),
+    0 14px 26px -14px oklch(0.209 0.006 157 / 0.26),
+    0 32px 52px -30px oklch(0.209 0.006 157 / 0.32);
 
   /* ── Region colors ── */
   --color-region-asia: oklch(0.511 0.126 42);
@@ -169,6 +174,11 @@
     --shadow-card: 0 1px 2px oklch(0.08 0.005 157 / 0.45), 0 8px 24px -16px oklch(0.08 0.005 157 / 0.55);
     --shadow-panel: 0 1px 2px oklch(0.08 0.005 157 / 0.5), 0 18px 44px -26px oklch(0.08 0.005 157 / 0.6);
     --shadow-float: 0 2px 6px oklch(0.08 0.005 157 / 0.55), 0 22px 50px -26px oklch(0.08 0.005 157 / 0.65);
+    /* Elevation — dark：hover 层同样只负责压边 */
+    --shadow-lift: 0 1px 2px oklch(0.08 0.005 157 / 0.5),
+      0 4px 10px -5px oklch(0.08 0.005 157 / 0.55),
+      0 16px 30px -16px oklch(0.08 0.005 157 / 0.6),
+      0 34px 56px -30px oklch(0.08 0.005 157 / 0.7);
 
     /* Semantic accents — dark */
     --color-stamp: oklch(0.671 0.144 33);
@@ -293,6 +303,35 @@ html {
   font-size: clamp(2.25rem, 5vw, 3.5rem);
   line-height: 1;
   letter-spacing: -0.03em;
+}
+
+/*
+  可点卡片 —— 全站唯一写法（指数卡 / 区域卡）。
+  整卡就是链接或按钮时套上它：200ms 上浮 + 深一档的阴影 + 描边转主色 + 清晰焦点环。
+  只在真有指针且用户允许动效时才动，reduced-motion 下退回静态反馈（描边仍变色）。
+*/
+.card-interactive {
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+/* 描边反馈不算动效：有指针就给 */
+@media (hover: hover) {
+  .card-interactive:hover {
+    border-color: color-mix(in oklab, var(--color-primary) 45%, transparent);
+  }
+}
+
+/* 上浮与阴影才是动效：reduced-motion 下不给 */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .card-interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+.card-interactive:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 3px;
 }
 
 /*

@@ -5,6 +5,7 @@ import type { HourlyMetric, HourlyPowerEntry } from "@/data/hourly-power";
 import { CountryFlag } from "@/components/country-flag";
 import { CoverageBadge } from "@/components/coverage-badge";
 import { RegionBadge } from "@/components/region-badge";
+import { cardVariants } from "@/components/ui/card";
 import { METRIC_GROUP_LABEL, metricFor, workWeeks } from "@/data/hourly-power";
 import { DASH, dateOnly, localAmount, round1 } from "@/lib/format";
 import { cn } from "@/lib/utilities";
@@ -28,12 +29,12 @@ export function HourlyWallet({ children, className, entry }: HourlyWalletPropert
     .filter((metric): metric is HourlyMetric => metric !== undefined);
 
   return (
-    <div className={cn("rounded-xl border bg-card p-5 shadow-panel sm:p-6", className)}>
+    <div className={cn(cardVariants({ variant: "raised" }), "p-5 sm:p-6", className)}>
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <CountryFlag className="h-9 w-9" countryCode={entry.countryCode} />
+          <CountryFlag className="h-11 w-11" countryCode={entry.countryCode} />
           <div>
-            <p className="flex items-center gap-2 font-display text-xl">
+            <p className="flex items-center gap-2 font-display text-2xl">
               {entry.country}
               <CoverageBadge coverage={entry.coverage} />
             </p>
@@ -62,14 +63,14 @@ export function HourlyWallet({ children, className, entry }: HourlyWalletPropert
 
       {wageMetric
         ? (
-            <div className="mt-5 rounded-lg bg-primary/8 p-4">
-              <p className="text-xs text-muted-foreground">{METRIC_GROUP_LABEL[wageMetric.group]}</p>
+            <div className="mt-5 rounded-lg bg-primary p-4 text-primary-foreground">
+              <p className="text-xs">{METRIC_GROUP_LABEL[wageMetric.group]}</p>
               <p className="mt-1 flex flex-wrap items-baseline gap-2">
-                <span className="stat-number text-3xl leading-none text-primary">
+                <span className="stat-number text-3xl leading-none">
                   {wageMetric.format(entry.cnyHour)}
                 </span>
-                <span className="text-xs text-muted-foreground">/ 小时</span>
-                <span className="text-xs text-muted-foreground">· 市场汇率折算，不是购买力平价</span>
+                <span className="text-xs">/ 小时</span>
+                <span className="text-xs">· 市场汇率折算，不是购买力平价</span>
               </p>
             </div>
           )
@@ -89,7 +90,7 @@ function MetricTile({ entry, metric }: { entry: HourlyPowerEntry; metric: Hourly
   const isMissing = value === null;
 
   return (
-    <div className="rounded-lg bg-muted/40 p-4">
+    <div className={cn("rounded-lg border border-border/60 bg-muted/40 p-4", isMissing && "border-dashed")}>
       <p className="eyebrow">
         {METRIC_GROUP_LABEL[metric.group]}
       </p>

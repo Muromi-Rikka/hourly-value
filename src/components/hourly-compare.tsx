@@ -5,6 +5,7 @@ import type { HourlyMetric, HourlyPowerEntry, MetricGroup } from "@/data/hourly-
 import { CountryFlag } from "@/components/country-flag";
 import { CountrySelect } from "@/components/country-select";
 import { Button } from "@/components/ui/button";
+import { cardVariants } from "@/components/ui/card";
 import { comparePair, METRIC_GROUP_LABEL, verdictOf } from "@/data/hourly-power";
 import { DASH, ratio as formatRatio } from "@/lib/format";
 import { cn } from "@/lib/utilities";
@@ -56,7 +57,7 @@ export function HourlyCompare({
   const verdict = verdictOf(rows);
 
   return (
-    <div className={cn("rounded-xl border bg-card p-5 shadow-panel sm:p-6", className)}>
+    <div className={cn(cardVariants({ variant: "raised" }), "p-5 sm:p-6", className)}>
       <div className="grid items-end gap-3 sm:grid-cols-[1fr_auto_1fr]">
         <CountrySelect id="compare-a" label="国家 A" onChange={code => onChange("a", code)} options={options} value={a.countryCode} />
         <Button
@@ -113,7 +114,13 @@ export function HourlyCompare({
         })}
       </div>
 
-      {verdict ? <p className="mt-5 border-t pt-4 text-sm leading-relaxed">{verdict}</p> : null}
+      {verdict
+        ? (
+            <p className="mt-5 rounded-lg border border-primary/20 bg-primary/6 px-4 py-3 text-sm leading-relaxed">
+              {verdict}
+            </p>
+          )
+        : null}
 
       {shareHref
         ? (
@@ -141,11 +148,15 @@ function CompareRow({ a, b, compact, metric, ratio, valueA, valueB }: CompareRow
         <p className="truncate text-sm">{metric.label}</p>
         {compact ? null : <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">{metric.note}</p>}
       </div>
-      <p className={cn("stat-number w-20 text-right text-base whitespace-nowrap sm:w-24", isALeads ? "font-semibold text-primary" : "text-muted-foreground")}>
-        {valueA === null ? DASH : metric.format(valueA)}
+      <p className="stat-number w-20 text-right text-base whitespace-nowrap sm:w-24">
+        <span className={cn("inline-block rounded px-1.5 py-0.5", isALeads ? "bg-primary/10 text-primary" : "text-muted-foreground")}>
+          {valueA === null ? DASH : metric.format(valueA)}
+        </span>
       </p>
-      <p className={cn("stat-number w-20 text-right text-base whitespace-nowrap sm:w-24", !isALeads && lead !== null ? "font-semibold text-primary" : "text-muted-foreground")}>
-        {valueB === null ? DASH : metric.format(valueB)}
+      <p className="stat-number w-20 text-right text-base whitespace-nowrap sm:w-24">
+        <span className={cn("inline-block rounded px-1.5 py-0.5", !isALeads && lead !== null ? "bg-primary/10 text-primary" : "text-muted-foreground")}>
+          {valueB === null ? DASH : metric.format(valueB)}
+        </span>
       </p>
       <p className="hidden w-24 text-right text-xs whitespace-nowrap text-muted-foreground sm:block">
         {lead === null

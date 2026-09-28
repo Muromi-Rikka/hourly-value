@@ -6,6 +6,7 @@ import { MethodNotes } from "@/components/method-notes";
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
 import { FadeContent } from "@/components/react-bits/FadeContent/FadeContent";
 import { SplitText } from "@/components/react-bits/SplitText/SplitText";
+import { cardVariants } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { BIGMAC_SOURCE } from "@/data/bigmac";
 import { COMMODITY_SOURCE } from "@/data/commodity";
@@ -14,6 +15,7 @@ import { commonCodes } from "@/data/hourly-power";
 import { IPHONE_SOURCE, iphones } from "@/data/iphone";
 import { MODELY_SOURCE, modelys } from "@/data/modely";
 import { wages } from "@/data/wages";
+import { cn } from "@/lib/utilities";
 
 // 汇率来源链接跟随实际生效的 provider（主源 Frankfurter / 备用源 open.er-api.com）
 const RATES_PROVIDER_HREF = ratesProvider.includes("Frankfurter")
@@ -122,7 +124,7 @@ export function About() {
       <AnimatedContent delay={0.05} distance={25} duration={0.6}>
         <section className="section pb-10">
           <h2 className="minor-title mb-5">汇率来源与更新</h2>
-          <div className="max-w-prose space-y-2 rounded-lg bg-muted/50 p-5 text-xs leading-relaxed text-pretty text-muted-foreground">
+          <div className={cn(cardVariants({ variant: "tinted" }), "max-w-prose space-y-2 p-5 text-xs leading-relaxed text-pretty text-muted-foreground")}>
             <p>
               人民币折算所用汇率于每次构建与开发启动时自动拉取，当前生效汇率更新于
               {" "}
@@ -269,8 +271,10 @@ export function About() {
       {/* Disclaimer */}
       <FadeContent duration={800}>
         <section className="section max-w-prose pb-4">
-          <div className="rounded-lg bg-muted/50 p-5 flex gap-3">
-            <Info className="h-4 w-4 shrink-0 mt-0.5 text-muted-foreground" />
+          <div className={cn(cardVariants({ variant: "default" }), "flex gap-3 border-stamp/30 bg-stamp/6 p-5")}>
+            <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-stamp/10 text-stamp">
+              <Info aria-hidden="true" className="h-3.5 w-3.5" />
+            </span>
             <p className="text-xs leading-relaxed text-muted-foreground">
               本项目仅用于信息展示和学习目的，不构成任何法律、劳动或投资建议。
               各国最低工资标准可能因地区、行业、年龄等因素存在差异。
@@ -294,7 +298,7 @@ function SourceCard({ date, name, note, url }: {
   url: string;
 }) {
   return (
-    <div className="rounded-lg bg-muted/50 p-5">
+    <div className={cn(cardVariants({ variant: "tinted" }), "p-5")}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-base font-medium">{name}</p>
         <a
