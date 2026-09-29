@@ -44,7 +44,7 @@ jobs:
       - name: Quality gate (lint + typecheck)
         run: |
           pnpm lint
-          pnpm exec tsc --noEmit --ignoreDeprecations 6.0
+          pnpm typecheck
 
       # pnpm build 会先执行 scripts/fetch-rates.mjs 拉取最新 ECB 汇率 → 输出 dist/
       - name: Build website

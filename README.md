@@ -38,8 +38,9 @@ pnpm dev        # 开发服务器（热更新）
 | `pnpm build` | 生产构建（会先拉取汇率） |
 | `pnpm preview` | 预览生产构建 |
 | `pnpm lint` | ESLint 检查（零警告） |
+| `pnpm typecheck` | 类型检查（`tsc --noEmit`，无 flag） |
 
-类型检查：`npx tsc --noEmit --ignoreDeprecations 6.0`（`tsconfig.json` 的 `baseUrl` 在 TS 7 将被移除，需保留该 flag）。
+`tsconfig.json` 已按 TypeScript 6/7 整理：无 `baseUrl`（`paths` 直接写相对路径），并显式固定 `noUncheckedSideEffectImports` / `rootDir` / `types` / `stableTypeOrdering`，因此 `tsc` 在 TS 6 与 TS 7 下都能零 flag 运行。
 
 ## 部署
 
@@ -47,7 +48,7 @@ pnpm dev        # 开发服务器（热更新）
 
 | Workflow | 触发 | 步骤 |
 |---|---|---|
-| `.github/workflows/deploy.yml` | push / PR 到 `master`、手动触发 | 门禁（`pnpm lint` + `tsc --noEmit`）→ `pnpm build`（先拉汇率）→ `wrangler pages deploy dist`（PR 只跑门禁与构建，不发布） |
+| `.github/workflows/deploy.yml` | push / PR 到 `master`、手动触发 | 门禁（`pnpm lint` + `pnpm typecheck`）→ `pnpm build`（先拉汇率）→ `wrangler pages deploy dist`（PR 只跑门禁与构建，不发布） |
 
 首次启用需在仓库 **Settings → Secrets and variables → Actions** 添加：
 

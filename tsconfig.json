@@ -4,14 +4,16 @@
     "jsx": "react-jsx",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "useDefineForClassFields": true,
+    "rootDir": "./src",
 
-    "baseUrl": ".",
     /* modules */
+    /* 不设 baseUrl：TS 6 起弃用、TS 7 移除，paths 一律写相对 tsconfig 的路径 */
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "paths": { "@/*": ["./src/*"] },
     "resolveJsonModule": true,
-    "allowImportingTsExtensions": true,
+    /* TS 6+ 默认空数组；rsbuild 类型由 src/environment.d.ts 显式引用 */
+    "types": [],
 
     /* type checking */
     "strict": true,
@@ -19,6 +21,10 @@
     "noUnusedParameters": true,
     "noEmit": true,
     "isolatedModules": true,
+    /* 以下两项显式写出，避免依赖 TS 6/7 的默认值漂移 */
+    "noUncheckedSideEffectImports": true,
+    /* TS 6 可选 / TS 7 强制开启：让两个版本给出完全一致的判定 */
+    "stableTypeOrdering": true,
     "skipLibCheck": true
   },
   "include": ["src"]

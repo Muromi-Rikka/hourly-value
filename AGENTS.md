@@ -205,7 +205,7 @@ The ESLint config transitively pulls `@vitest/eslint-plugin` (from `@renton/esli
 
 **Pre-commit quality gate**: Husky runs `pnpm lint-staged` which executes ESLint on staged `*.{ts,tsx,js,css}` files with zero-warning tolerance.
 
-**Typecheck**: `npx tsc --noEmit --ignoreDeprecations 6.0`. The flag is required — `tsconfig.json` still sets `baseUrl`, which TypeScript 6 reports as `TS5101` and refuses to run without that flag. Rsbuild does not typecheck (SWC strips types), so run this explicitly after touching data shapes.
+**Typecheck**: `pnpm typecheck` (= `tsc --noEmit`, **no flags**). Rsbuild does not typecheck (SWC strips types), so run this explicitly after touching data shapes. The config is already TS 6/7-clean: no `baseUrl` (`paths` are written relative to the tsconfig), and `noUncheckedSideEffectImports` / `rootDir` / `types` / `stableTypeOrdering` are pinned explicitly so TS 6 and TS 7 agree. Do not reintroduce `baseUrl` or any other option TS 6 deprecated — `--ignoreDeprecations` is gone for good, and those options are hard errors in TS 7.
 
 **Verifying derived numbers**: Node 26 runs `.ts` directly. A throwaway `register()` resolve hook that maps `@/` → `src/*.ts` is enough to import the data modules and print real values — cheaper and more reliable than eyeballing a chart when a formula changes.
 
