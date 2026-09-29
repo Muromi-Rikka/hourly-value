@@ -13,6 +13,7 @@ import { RegionBadge } from "@/components/region-badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { iphoneDuoIndex } from "@/data/iphone-duo-index";
 import { iphoneIndex } from "@/data/iphone-index";
+import { cnyHour, DASH, hourNumber } from "@/lib/format";
 
 type ModelKey = "duo" | "pro18";
 
@@ -51,25 +52,29 @@ const columns: DataTableColumn<IPhoneIndexEntry>[] = [
     id: "iphonePrice",
   },
   {
-    accessorFn: row => row.hourlyWage,
+    accessorFn: row => row.hourlyWage ?? undefined,
     cell: ({ row }) => (
-      <span className="tabular-nums text-muted-foreground">
-        ¥
-        {row.original.hourlyWage}
-        /h
-      </span>
+      row.original.hourlyWage === null
+        ? <span className="text-muted-foreground">{DASH}</span>
+        : (
+            <span className="tabular-nums text-muted-foreground">
+              {cnyHour(row.original.hourlyWage)}
+              /h
+            </span>
+          )
     ),
     header: "最低时薪",
     id: "hourlyWage",
+    sortUndefined: "last",
   },
   {
-    accessorFn: row => row.hoursToBuy,
+    accessorFn: row => row.hoursToBuy ?? undefined,
     cell: ({ row }) => (
       row.original.hoursToBuy === null
-        ? <span className="text-muted-foreground">—</span>
+        ? <span className="text-muted-foreground">{DASH}</span>
         : (
             <span className="font-semibold tabular-nums text-primary">
-              {row.original.hoursToBuy}
+              {hourNumber(row.original.hoursToBuy)}
               h
             </span>
           )
@@ -77,6 +82,7 @@ const columns: DataTableColumn<IPhoneIndexEntry>[] = [
     header: "所需工时",
     id: "hoursToBuy",
     sortFn: "basic",
+    sortUndefined: "last",
   },
   {
     accessorFn: row => row.taxNote,
@@ -103,6 +109,12 @@ export function IPhoneExplore() {
   const activeData = MODEL_DATA[model].data;
   const activeLabel = MODEL_DATA[model].label;
   const chartData = activeData.filter(item => item.hoursToBuy !== null);
+  // 稳定引用：每次渲染都新建 tooltip 组件会让 Recharts 反复卸载重挂
+  // （同 hourly.tsx:196）。依赖写 activeData 而不是 chartData —— 后者每渲染都是新数组
+  const IPhoneTooltip = React.useMemo(
+    () => createIPhoneTooltip(activeData.filter(item => item.hoursToBuy !== null)),
+    [activeData],
+  );
 
   return (
     <div>
@@ -121,7 +133,7 @@ export function IPhoneExplore() {
             data={chartData}
             formatTick={value => `${value}h`}
             formatValue={value => `${value}h`}
-            tooltip={createIPhoneTooltip(chartData)}
+            tooltip={IPhoneTooltip}
             valueKey="hoursToBuy"
           />
         )}
@@ -148,7 +160,6 @@ export function IPhoneExplore() {
           </>
         )}
         getRowId={entry => entry.countryCode}
-        key={model}
         renderExpanded={row => (
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
@@ -185,6 +196,7 @@ export function IPhoneExplore() {
             </div>
           </div>
         )}
+        rowLabel={entry => entry.country}
         title="iPhone 数据探索"
       />
     </div>

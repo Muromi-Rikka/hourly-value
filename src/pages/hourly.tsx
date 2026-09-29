@@ -28,6 +28,7 @@ import {
   workWeeks,
 } from "@/data/hourly-power";
 import { SCOPE_CHIPS } from "@/data/methodology";
+import { basisLabel } from "@/data/wages";
 import { cnyHour, DASH, dateOnly, hourNumber, localAmount, round1 } from "@/lib/format";
 import { regionAverages, regionColor } from "@/lib/region";
 import { cn } from "@/lib/utilities";
@@ -35,6 +36,14 @@ import { hourlyRoute } from "@/routes/hourly";
 
 const DEFAULT_A = "CN";
 const DEFAULT_B = "DE";
+
+/**
+ * 表头文案取自唯一指标注册表（HOURLY_METRICS），页面不再手写第二套指标名。
+ * 同一个指标在矩阵、切换器、tooltip 里必须叫同一个名字。
+ */
+const METRIC_LABEL = Object.fromEntries(
+  HOURLY_METRICS.map(metric => [metric.key, metric.label] as const),
+);
 
 const columns: DataTableColumn<HourlyPowerEntry>[] = [
   {
@@ -66,35 +75,39 @@ const columns: DataTableColumn<HourlyPowerEntry>[] = [
   {
     accessorFn: row => row.cnyHour,
     cell: ({ row }) => <span className="stat-number text-primary">{cnyHour(row.original.cnyHour)}</span>,
-    header: "人民币时薪",
+    header: METRIC_LABEL.cnyHour,
     id: "cnyHour",
     sortFn: "basic",
   },
   {
     accessorFn: row => row.bigMacPerHour,
     cell: ({ row }) => <span className="stat-number">{numberOrDash(row.original.bigMacPerHour)}</span>,
-    header: "1 小时能买巨无霸",
+    header: METRIC_LABEL.bigMacPerHour,
     id: "bigMacPerHour",
     sortFn: "basic",
   },
   {
-    accessorFn: row => row.basketHours,
+    // 缺失值交回 undefined：`sortUndefined: "last"` 只认 undefined，不认 null；
+    // 单元格仍读 original 的 null，显示 DASH 不受影响
+    accessorFn: row => row.basketHours ?? undefined,
     cell: ({ row }) => <span className="stat-number">{numberOrDash(row.original.basketHours)}</span>,
-    header: "买物资篮",
+    header: METRIC_LABEL.basketHours,
     id: "basketHours",
     sortFn: "basic",
+    sortUndefined: "last",
   },
   {
-    accessorFn: row => row.iphoneHours,
+    accessorFn: row => row.iphoneHours ?? undefined,
     cell: ({ row }) => <span className="stat-number">{numberOrDash(row.original.iphoneHours)}</span>,
-    header: "买 iPhone",
+    header: METRIC_LABEL.iphoneHours,
     id: "iphoneHours",
     sortFn: "basic",
+    sortUndefined: "last",
   },
   {
     accessorFn: row => row.modelyHours,
     cell: ({ row }) => <span className="stat-number">{numberOrDash(row.original.modelyHours)}</span>,
-    header: "买 Model Y",
+    header: METRIC_LABEL.modelyHours,
     id: "modelyHours",
     sortFn: "basic",
   },
@@ -196,10 +209,14 @@ export function Hourly() {
   // 稳定引用：每次渲染都新建 tooltip 组件会让 Recharts 反复卸载重挂
   const HourlyTooltip = React.useMemo(() => createHourlyPowerTooltip(metric, ranked), [metric, ranked]);
 
-  const regionData = regionAverages(
-    searched.filter(entry => metric.get(entry) !== null),
-    entry => metric.get(entry) ?? 0,
-    { decimals: 1, order: metric.higherIsBetter ? "desc" : "asc" },
+  const regionData = React.useMemo(
+    () =>
+      regionAverages(
+        searched.filter(entry => metric.get(entry) !== null),
+        entry => metric.get(entry) ?? 0,
+        { decimals: 1, order: metric.higherIsBetter ? "desc" : "asc" },
+      ),
+    [metric, searched],
   );
 
   return (
@@ -280,6 +297,7 @@ export function Hourly() {
             onClearFilters={clearFilters}
             onColumnFiltersChange={setColumnFilters}
             renderExpanded={row => <DetailPanel entry={row} />}
+            rowLabel={entry => entry.country}
             tableKey={metric.key}
             title="各国一小时购买力矩阵"
             titleTag="h2"
@@ -388,23 +406,6 @@ export function Hourly() {
       </AnimatedContent>
     </div>
   );
-}
-
-function basisLabel(basis: "day" | "hour" | "month" | "week", statutoryHours: null | number): string {
-  switch (basis) {
-    case "day": {
-      return `按日薪折算（每天 ${statutoryHours ?? "—"} 小时）`;
-    }
-    case "hour": {
-      return "官方直接公布时薪";
-    }
-    case "month": {
-      return `按月薪折算（每月 ${statutoryHours ?? "—"} 小时）`;
-    }
-    case "week": {
-      return `按周薪折算（每周 ${statutoryHours ?? "—"} 小时）`;
-    }
-  }
 }
 
 function DetailPanel({ entry }: { entry: HourlyPowerEntry }) {

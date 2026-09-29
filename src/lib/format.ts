@@ -137,6 +137,17 @@ export function round2(value: number): number {
 }
 
 /**
+ * 美元金额，如 `$6.42`、`$249,900`
+ */
+export function usd(value: null | number | undefined, decimals = 2): string {
+  if (value === null || value === undefined) {
+    return DASH;
+  }
+  const shown = decimals === 0 ? Math.round(value) : Number(value.toFixed(decimals));
+  return `$${numeric(shown, decimals)}`;
+}
+
+/**
  * 千分位数字。`maxDecimals` 为最大小数位，最小小数位恒为 0。
  * 整数值不带多余的小数尾数（23.0 → 23），但保留有效精度（6.24 → 6.2）。
  */

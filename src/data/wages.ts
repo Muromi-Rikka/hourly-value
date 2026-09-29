@@ -1,5 +1,6 @@
 import type { Region } from "@/lib/region";
 import { cnyPerUnit } from "@/data/exchange-rates";
+import { DASH } from "@/lib/format";
 
 /**
  * 当地最低工资的公布单位，决定时薪是如何得到的
@@ -483,6 +484,27 @@ export const wages: WageEntry[] = rawWages.map(entry => ({
 export const sortedByWage = wages.toSorted((a, b) => b.cnyEquivalent - a.cnyEquivalent);
 
 const wageByCode = new Map(wages.map(entry => [entry.countryCode, entry]));
+
+/**
+ * 工资公布单位 → 中文口径说明。
+ * 全站唯一实现：`/hourly` 与工资 explore 页共用，避免同一句口径写两遍。
+ */
+export function basisLabel(basis: HoursBasis, statutoryHours: null | number): string {
+  switch (basis) {
+    case "day": {
+      return `按日薪折算（每天 ${statutoryHours ?? DASH} 小时）`;
+    }
+    case "hour": {
+      return "官方直接公布时薪";
+    }
+    case "month": {
+      return `按月薪折算（每月 ${statutoryHours ?? DASH} 小时）`;
+    }
+    case "week": {
+      return `按周薪折算（每周 ${statutoryHours ?? DASH} 小时）`;
+    }
+  }
+}
 
 /**
  * 按 ISO 国家码取工资记录

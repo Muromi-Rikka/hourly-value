@@ -10,6 +10,7 @@ import { RankBarChart } from "@/components/rank-bar-chart";
 import { RegionBadge } from "@/components/region-badge";
 import { COMMODITY_SOURCE } from "@/data/commodity";
 import { commodityIndex } from "@/data/commodity-index";
+import { cnyHour, DASH, hourNumber } from "@/lib/format";
 
 const columns: DataTableColumn<CommodityIndexEntry>[] = [
   {
@@ -52,28 +53,37 @@ const columns: DataTableColumn<CommodityIndexEntry>[] = [
     id: "basketCNY",
   },
   {
-    accessorFn: row => row.hourlyWage,
+    accessorFn: row => row.hourlyWage ?? undefined,
     cell: ({ row }) => (
-      <span className="tabular-nums text-muted-foreground">
-        ¥
-        {row.original.hourlyWage}
-        /h
-      </span>
+      row.original.hourlyWage === null
+        ? <span className="text-muted-foreground">{DASH}</span>
+        : (
+            <span className="tabular-nums text-muted-foreground">
+              {cnyHour(row.original.hourlyWage)}
+              /h
+            </span>
+          )
     ),
     header: "最低时薪",
     id: "hourlyWage",
+    sortUndefined: "last",
   },
   {
-    accessorFn: row => row.hoursToBuy,
+    accessorFn: row => row.hoursToBuy ?? undefined,
     cell: ({ row }) => (
-      <span className="font-semibold tabular-nums text-primary">
-        {row.original.hoursToBuy}
-        h
-      </span>
+      row.original.hoursToBuy === null
+        ? <span className="text-muted-foreground">{DASH}</span>
+        : (
+            <span className="font-semibold tabular-nums text-primary">
+              {hourNumber(row.original.hoursToBuy)}
+              h
+            </span>
+          )
     ),
     header: "所需工时",
     id: "hoursToBuy",
     sortFn: "basic",
+    sortUndefined: "last",
   },
   {
     accessorFn: row => row.commoditySource,
@@ -149,6 +159,7 @@ export function CommodityExplore() {
           </div>
         </div>
       )}
+      rowLabel={entry => entry.country}
       title="物资篮子数据探索"
     />
   );

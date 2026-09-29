@@ -72,6 +72,10 @@ interface DataTableProperties<T extends RowData> {
    */
   renderExpanded: (row: T) => React.ReactNode;
   /**
+   * 行的显示名（如国家名），用于展开按钮的无障碍名，避免全表按钮同名
+   */
+  rowLabel?: (row: T) => string;
+  /**
    * 表格上方的工具条（搜索、筛选器）
    */
   toolbar?: React.ReactNode;
@@ -90,6 +94,7 @@ export function DataTable<T extends RowData>({
   onClearFilters,
   onColumnFiltersChange,
   renderExpanded,
+  rowLabel,
   toolbar,
 }: DataTableProperties<T>) {
   const [sorting, setSorting] = React.useState<SortingState>(defaultSort);
@@ -114,6 +119,7 @@ export function DataTable<T extends RowData>({
   });
 
   const rows = table.getRowModel().rows;
+  const isFiltered = rows.length > 0 && rows.length < data.length;
 
   return (
     <div>
@@ -124,7 +130,12 @@ export function DataTable<T extends RowData>({
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow className="bg-muted/30" key={headerGroup.id}>
                 {headerGroup.headers.map(header => (
-                  <TableHead className="whitespace-nowrap" colSpan={header.colSpan} key={header.id}>
+                  <TableHead
+                    aria-sort={ariaSortOf(header.column.getIsSorted())}
+                    className="whitespace-nowrap"
+                    colSpan={header.colSpan}
+                    key={header.id}
+                  >
                     {header.isPlaceholder
                       ? null
                       : (
@@ -173,7 +184,18 @@ export function DataTable<T extends RowData>({
                   <React.Fragment key={row.id}>
                     <TableRow
                       className="cursor-pointer transition-colors hover:bg-muted/50"
+                      // 整行可点但 <tr> 原本不可聚焦：补 tabIndex + Enter/Space，
+                      // 否则鼠标能展开、键盘不能（规则 click-events-have-key-events）。
+                      // 不加 role="button"：那会覆盖 <tr> 的 row 角色，破坏表格语义。
                       onClick={() => row.toggleExpanded()}
+                      onKeyDown={(event) => {
+                        if (event.key !== "Enter" && event.key !== " ") {
+                          return;
+                        }
+                        event.preventDefault();
+                        row.toggleExpanded();
+                      }}
+                      tabIndex={0}
                     >
                       {row.getVisibleCells().map(cell => (
                         <TableCell className="whitespace-nowrap" key={cell.id}>
@@ -183,7 +205,9 @@ export function DataTable<T extends RowData>({
                       <TableCell>
                         <Button
                           aria-expanded={row.getIsExpanded()}
-                          aria-label={row.getIsExpanded() ? "收起详情" : "展开详情"}
+                          aria-label={row.getIsExpanded()
+                            ? `收起${rowLabel ? rowLabel(row.original) : ""}详情`
+                            : `展开${rowLabel ? rowLabel(row.original) : ""}详情`}
                           className="h-7 w-7"
                           onClick={(event) => {
                             event.stopPropagation();
@@ -211,20 +235,34 @@ export function DataTable<T extends RowData>({
           </TableBody>
         </Table>
       </div>
-      {rows.length > 0 && rows.length < data.length
-        ? (
-            <p className="mt-2 text-xs text-muted-foreground">
-              当前显示
-              {" "}
-              {rows.length}
-              {" / "}
-              {data.length}
-              {" 个国家/地区"}
-            </p>
-          )
-        : null}
+      <p className={cn("text-xs text-muted-foreground", isFiltered && "mt-2")} role="status">
+        {isFiltered
+          ? (
+              <>
+                当前显示
+                {" "}
+                {rows.length}
+                {" / "}
+                {data.length}
+                {" 个国家/地区"}
+              </>
+            )
+          : null}
+      </p>
     </div>
   );
+}
+
+/**
+ * TanStack 的 `getIsSorted()` → `aria-sort` 取值。
+ * 未排序时不输出属性：`aria-sort="none"` 会让读屏把「可排序但当前没排」
+ * 和「已确认未排序」混为一谈，规范推荐只在有序时声明。
+ */
+function ariaSortOf(sorted: "asc" | "desc" | false): "ascending" | "descending" | undefined {
+  if (sorted === "asc") {
+    return "ascending";
+  }
+  return sorted === "desc" ? "descending" : undefined;
 }
 
 function sortIcon(direction: "asc" | "desc" | false, canSort: boolean) {

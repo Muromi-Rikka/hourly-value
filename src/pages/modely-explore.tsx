@@ -41,19 +41,24 @@ const columns: DataTableColumn<ModelYIndexEntry>[] = [
     id: "modelyPrice",
   },
   {
-    accessorFn: row => row.hourlyWage ?? -1,
+    accessorFn: row => row.hourlyWage ?? undefined,
     cell: ({ row }) => (
-      <span className="tabular-nums text-muted-foreground">
-        {cnyHour(row.original.hourlyWage)}
-        /h
-      </span>
+      row.original.hourlyWage === null
+        ? <span className="text-muted-foreground">{DASH}</span>
+        : (
+            <span className="tabular-nums text-muted-foreground">
+              {cnyHour(row.original.hourlyWage)}
+              /h
+            </span>
+          )
     ),
     header: "最低时薪（税前）",
     id: "hourlyWage",
     sortFn: "basic",
+    sortUndefined: "last",
   },
   {
-    accessorFn: row => row.hoursToBuy ?? Infinity,
+    accessorFn: row => row.hoursToBuy ?? undefined,
     cell: ({ row }) => (
       row.original.hoursToBuy === null
         ? <span className="text-muted-foreground">{DASH}</span>
@@ -67,9 +72,10 @@ const columns: DataTableColumn<ModelYIndexEntry>[] = [
     header: "所需工时",
     id: "hoursToBuy",
     sortFn: "basic",
+    sortUndefined: "last",
   },
   {
-    accessorFn: row => row.daysToBuy ?? Infinity,
+    accessorFn: row => row.daysToBuy ?? undefined,
     cell: ({ row }) => (
       row.original.daysToBuy === null
         ? <span className="text-muted-foreground">{DASH}</span>
@@ -83,6 +89,7 @@ const columns: DataTableColumn<ModelYIndexEntry>[] = [
     header: "折合天数（按 8 小时/天）",
     id: "daysToBuy",
     sortFn: "basic",
+    sortUndefined: "last",
   },
   {
     accessorFn: row => row.taxNote,
@@ -166,6 +173,7 @@ export function ModelYExplore() {
           </div>
         </div>
       )}
+      rowLabel={entry => entry.country}
       title="Model Y 数据探索"
     />
   );

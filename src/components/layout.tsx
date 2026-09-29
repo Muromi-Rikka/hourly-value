@@ -5,6 +5,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { ratesUpdatedAt } from "@/data/exchange-rates";
 import { wages } from "@/data/wages";
+import { shouldReduceMotion } from "@/lib/reduced-motion";
 import { cn } from "@/lib/utilities";
 
 /**
@@ -25,6 +26,18 @@ const copyrightYear = new Date().getFullYear();
 export function Layout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const location = useLocation();
+
+  // 抽屉只有内部链接会自己关；点页面里的 CTA 或浏览器前进/后退都不走那些 onClick，
+  // 因此路径一变就收起（Layout 挂在 __root，不会随路由卸载，状态不会自愈）。
+  //
+  // 用「渲染期比对上一次路径」而不是 useEffect：effect 里同步 setState 会多跑一次
+  // 渲染，且违反 react/set-state-in-effect。React 官方推荐的调整状态写法就是
+  // 在渲染中比对并 setState —— 它会在提交前重渲，用户看不到中间态。
+  const [lastPathname, setLastPathname] = React.useState(location.pathname);
+  if (lastPathname !== location.pathname) {
+    setLastPathname(location.pathname);
+    setMobileOpen(false);
+  }
 
   return (
     <div className="min-h-dvh bg-background font-sans text-foreground antialiased">
@@ -165,7 +178,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
             {/* Center — Data sources */}
             <div>
-              <h3 className="mb-3 text-xs font-medium text-foreground">数据来源</h3>
+              <h2 className="mb-3 text-xs font-medium text-foreground">数据来源</h2>
               <ul className="space-y-1.5 text-xs">
                 {wages.slice(0, 4).map(entry => (
                   <li className="flex items-center gap-1.5" key={entry.countryCode}>
@@ -178,7 +191,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
             {/* Right — Quick links */}
             <div>
-              <h3 className="mb-3 text-xs font-medium text-foreground">快速导航</h3>
+              <h2 className="mb-3 text-xs font-medium text-foreground">快速导航</h2>
               <ul className="space-y-1.5 text-xs">
                 {[...indexItems, { href: "/about", label: "关于" }].map(item => (
                   <li key={item.href}>
@@ -203,7 +216,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Button
               aria-label="回到顶部"
               className="h-7 w-7 rounded-full"
-              onClick={() => scrollTo({ behavior: "smooth", top: 0 })}
+              onClick={() => scrollTo({ behavior: shouldReduceMotion() ? "auto" : "smooth", top: 0 })}
               size="icon"
               variant="outline"
             >

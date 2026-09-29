@@ -1,4 +1,4 @@
-import type * as React from "react";
+import * as React from "react";
 import {
   Bar,
   BarChart,
@@ -15,6 +15,14 @@ import {
 import { RegionLegend } from "@/components/region-legend";
 import { shouldReduceMotion } from "@/lib/reduced-motion";
 import { regionColor } from "@/lib/region";
+
+/**
+ * 图表静态 props 提到模块级：字面量对象每渲染新建，会让 Recharts 的轴每次都拿到新引用
+ */
+const HORIZONTAL_MARGIN = { bottom: 8, left: 8, right: 40, top: 8 };
+const VERTICAL_MARGIN = { bottom: 40, left: 8, right: 8, top: 24 };
+const MUTED_TICK = { fill: "var(--color-muted-foreground)", fontSize: 12 };
+const FOREGROUND_TICK = { fill: "var(--color-foreground)", fontSize: 12 };
 
 /**
  * 各指数 tooltip 的公共入参形状
@@ -69,21 +77,25 @@ export function RankBarChart<T extends { country: string; countryCode: string; r
   tooltip,
   valueKey,
 }: RankBarChartProperties<T>) {
-  const rows = data
-    .filter(row => row[valueKey] !== null && row[valueKey] !== undefined)
-    .map(row => ({ ...row, __value: Number(row[valueKey]) }))
-    .toSorted((a, b) => a.__value - b.__value);
+  const rows = React.useMemo(
+    () =>
+      data
+        .filter(row => row[valueKey] !== null && row[valueKey] !== undefined)
+        .map(row => ({ ...row, __value: Number(row[valueKey]) }))
+        .toSorted((a, b) => a.__value - b.__value),
+    [data, valueKey],
+  );
   const TooltipContent = tooltip;
 
   if (layout === "horizontal") {
     return (
       <div>
         <ResponsiveContainer height={Math.max(300, rows.length * 40)} width="100%">
-          <BarChart data={rows} layout="vertical" margin={{ bottom: 8, left: 8, right: 40, top: 8 }}>
+          <BarChart data={rows} layout="vertical" margin={HORIZONTAL_MARGIN}>
             <CartesianGrid horizontal={false} stroke="var(--color-border)" strokeDasharray="3 3" />
             <XAxis
               axisLine={{ stroke: "var(--color-border)" }}
-              tick={{ fill: "var(--color-muted-foreground)", fontSize: 12 }}
+              tick={MUTED_TICK}
               tickFormatter={formatTick}
               tickLine={false}
               type="number"
@@ -91,7 +103,7 @@ export function RankBarChart<T extends { country: string; countryCode: string; r
             <YAxis
               axisLine={false}
               dataKey="country"
-              tick={{ fill: "var(--color-foreground)", fontSize: 12 }}
+              tick={FOREGROUND_TICK}
               tickLine={false}
               type="category"
               width={80}
@@ -127,7 +139,7 @@ export function RankBarChart<T extends { country: string; countryCode: string; r
   return (
     <div>
       <ResponsiveContainer height={400} width="100%">
-        <BarChart data={rows} margin={{ bottom: 40, left: 8, right: 8, top: 24 }}>
+        <BarChart data={rows} margin={VERTICAL_MARGIN}>
           <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" vertical={false} />
           <XAxis
             angle={-45}
@@ -135,12 +147,12 @@ export function RankBarChart<T extends { country: string; countryCode: string; r
             dataKey="country"
             height={60}
             textAnchor="end"
-            tick={{ fill: "var(--color-muted-foreground)", fontSize: 12 }}
+            tick={MUTED_TICK}
             tickLine={false}
           />
           <YAxis
             axisLine={false}
-            tick={{ fill: "var(--color-muted-foreground)", fontSize: 12 }}
+            tick={MUTED_TICK}
             tickFormatter={formatTick}
             tickLine={false}
           />

@@ -54,7 +54,7 @@ jobs:
       - name: Publish to CF Pages hourly-value
         if: github.event_name != 'pull_request'
         # dist/ 内没有 404.html，CF Pages 会按 SPA 模式把未知路径回落到 index.html
-        run: npx --yes wrangler@4 pages deploy dist --project-name=hourly-value --branch main
+        run: npx --yes wrangler@4.142.0 pages deploy dist --project-name=hourly-value --branch main
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.ACCOUNT_ID }}

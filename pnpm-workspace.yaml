@@ -1,7 +1,14 @@
-minimumReleaseAge: 0
+blockExoticSubdeps: true
+
+minimumReleaseAge: 10080
 
 shellEmulator: true
 
+# 刻意保持 off：react-doctor/require-pnpm-hardening 建议 no-downgrade，但本仓库锁文件里
+# 有 2 条传递依赖（semver@6.3.1 ← @babel/core@7.29.7、undici-types@6.21.0 ← @types/node@22.20.3）
+# 被判定为 High-risk trust downgrade / possible package takeover，全新解析同样复现，
+# 而 pnpm 只提供全局 --trust-lockfile 开关、无定点放行。2026-09-28 决定接受现状：
+# 保留另外两项加固，容忍该条诊断常驻。追溯清楚这两个包后，可重新评估是否升级。
 trustPolicy: off
 
 onlyBuiltDependencies:

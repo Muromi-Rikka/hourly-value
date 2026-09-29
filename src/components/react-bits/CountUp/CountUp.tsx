@@ -1,5 +1,5 @@
 import { useInView, useMotionValue, useSpring } from "motion/react";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { shouldReduceMotion } from "@/lib/reduced-motion";
 
@@ -60,21 +60,32 @@ export function CountUp({
   const MAX_DECIMALS = 2;
   const maxDecimals = Math.min(MAX_DECIMALS, Math.max(getDecimalPlaces(from), getDecimalPlaces(to)));
 
-  const formatValue = useCallback(
-    (latest: number) => {
+  /*
+   * Intl.NumberFormat 的构造开销远大于 format()：springValue 的 change 回调
+   * 每帧都会走一次 formatValue，逐帧 new 就是把构造成本乘上帧数
+   * （首页三个 CountUp 并发、duration=2 时一秒内约 360 次）。
+   * maxDecimals 与 separator 在组件生命周期内都是常量，按它俩缓存即可。
+   */
+  const formatter = useMemo(
+    () => {
       const hasDecimals = maxDecimals > 0;
 
-      const options: Intl.NumberFormatOptions = {
+      return new Intl.NumberFormat("en-US", {
         maximumFractionDigits: hasDecimals ? maxDecimals : 0,
         minimumFractionDigits: hasDecimals ? maxDecimals : 0,
         useGrouping: !!separator,
-      };
+      });
+    },
+    [maxDecimals, separator],
+  );
 
-      const formattedNumber = new Intl.NumberFormat("en-US", options).format(latest);
+  const formatValue = useCallback(
+    (latest: number) => {
+      const formattedNumber = formatter.format(latest);
 
       return separator ? formattedNumber.replaceAll(",", separator) : formattedNumber;
     },
-    [maxDecimals, separator],
+    [formatter, separator],
   );
 
   useEffect(() => {

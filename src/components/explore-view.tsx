@@ -40,6 +40,10 @@ interface ExploreViewProperties<T extends RowData> {
   onColumnFiltersChange?: (updater: React.SetStateAction<ColumnFiltersState>) => void;
   renderExpanded: (row: T) => React.ReactNode;
   /**
+   * 行的显示名（如国家名），透传给 DataTable 用于展开按钮的无障碍名
+   */
+  rowLabel?: (row: T) => string;
+  /**
    * 传入后表格按它重挂，用于切换数据口径时换上新的默认排序；
    * 不传则表格保持挂载（现有页面行为不变）
    */
@@ -75,6 +79,7 @@ export function ExploreView<T extends RowData>({
   onClearFilters,
   onColumnFiltersChange,
   renderExpanded,
+  rowLabel,
   tableKey,
   title,
   titleTag = "h1",
@@ -117,6 +122,7 @@ export function ExploreView<T extends RowData>({
               onClearFilters={onClearFilters}
               onColumnFiltersChange={onColumnFiltersChange}
               renderExpanded={renderExpanded}
+              rowLabel={rowLabel}
               toolbar={toolbar}
             />
           </TabsContent>

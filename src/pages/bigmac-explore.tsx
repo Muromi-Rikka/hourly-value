@@ -44,7 +44,7 @@ const columns: DataTableColumn<Row>[] = [
     id: "region",
   },
   {
-    accessorFn: row => row.bigMacPerHour ?? -1,
+    accessorFn: row => row.bigMacPerHour ?? undefined,
     cell: ({ row }) => (
       <span className="font-semibold tabular-nums text-primary">
         {bigMacCount(row.original.bigMacPerHour)}
@@ -53,6 +53,7 @@ const columns: DataTableColumn<Row>[] = [
     header: "1 小时能买巨无霸",
     id: "bigMacPerHour",
     sortFn: "basic",
+    sortUndefined: "last",
   },
   {
     accessorFn: row => row.localPriceFormatted,
@@ -169,6 +170,7 @@ export function BigMacExplore() {
           </div>
         </div>
       )}
+      rowLabel={entry => entry.country}
       title="巨无霸指数 · 数据探索"
     />
   );

@@ -12,7 +12,7 @@ import { sortedByBigMacPerHour } from "@/data/bigmac-ppp";
 import { COMMODITY_SOURCE } from "@/data/commodity";
 import { sortedByHours } from "@/data/commodity-index";
 import { sortedByHours as sortedByModelYHours } from "@/data/modely-index";
-import { cnyHour, localAmount } from "@/lib/format";
+import { cny, cnyHour, localAmount, usd } from "@/lib/format";
 
 /**
  * 五大指数 tooltip 的唯一实现，落地页与探索页共用。
@@ -73,8 +73,9 @@ export function BigMacTooltip({ active, payload }: RankTooltipProperties<BigMacE
         {entry.localPriceFormatted}
       </p>
       <p className="text-sm font-medium text-primary">
-        ≈ $
-        {entry.usdPrice.toFixed(2)}
+        ≈
+        {" "}
+        {usd(entry.usdPrice)}
         {" USD"}
       </p>
       <p
@@ -111,10 +112,11 @@ export function CommodityTooltip({ active, payload }: RankTooltipProperties<Comm
       total={sortedByHours.length}
     >
       <p className="text-sm text-muted-foreground">
-        篮子总价 $
-        {entry.basketUSD.toFixed(2)}
-        {" / ¥"}
-        {entry.basketCNY.toFixed(0)}
+        篮子总价
+        {" "}
+        {usd(entry.basketUSD)}
+        {" / "}
+        {cny(entry.basketCNY, 0)}
       </p>
       {entry.hoursToBuy === null
         ? <p className="text-sm text-muted-foreground">无最低工资数据</p>
@@ -200,8 +202,9 @@ export function createIPhoneTooltip(ranked: IPhoneIndexEntry[]) {
         total={withHours.length}
       >
         <p className="text-sm text-muted-foreground">
-          iPhone ¥
-          {entry.iphonePrice.toLocaleString()}
+          iPhone
+          {" "}
+          {cny(entry.iphonePrice, 0)}
         </p>
         {entry.hoursToBuy === null
           ? <p className="text-sm text-muted-foreground">无最低工资数据</p>
@@ -237,8 +240,9 @@ export function ModelYTooltip({ active, payload }: RankTooltipProperties<ModelYI
       total={withHours.length}
     >
       <p className="text-sm text-muted-foreground">
-        Model Y ¥
-        {entry.modelyPrice.toLocaleString()}
+        Model Y
+        {" "}
+        {cny(entry.modelyPrice, 0)}
       </p>
       {entry.hoursToBuy === null
         ? <p className="text-sm text-muted-foreground">无最低工资数据</p>

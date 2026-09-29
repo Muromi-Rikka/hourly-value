@@ -39,6 +39,12 @@ export function IPhone() {
 
   // Only entries with actual hours data
   const withHours = sorted.filter(entry => entry.hoursToBuy !== null);
+  // 稳定引用：每次渲染都新建 tooltip 组件会让 Recharts 反复卸载重挂
+  // （同 hourly.tsx:196）。依赖写 model 而不是 withHours —— 后者每渲染都是新数组
+  const IPhoneTooltip = React.useMemo(
+    () => createIPhoneTooltip(MODEL_CONFIG[model].sorted.filter(entry => entry.hoursToBuy !== null)),
+    [model],
+  );
   const cheapest = withHours[0];
   const mostExpensive = withHours[withHours.length - 1];
   const count = withHours.length;
@@ -93,7 +99,7 @@ export function IPhone() {
               formatValue={value => `${value}h`}
               key={model}
               layout="horizontal"
-              tooltip={createIPhoneTooltip(withHours)}
+              tooltip={IPhoneTooltip}
               valueKey="hoursToBuy"
             />
           </div>

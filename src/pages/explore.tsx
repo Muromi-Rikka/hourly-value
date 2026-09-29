@@ -1,36 +1,16 @@
 import { ExternalLink } from "lucide-react";
 
 import type { DataTableColumn } from "@/components/data-table";
-import type { HoursBasis, WageEntry } from "@/data/wages";
+import type { WageEntry } from "@/data/wages";
 
 import { CountryFlag } from "@/components/country-flag";
 import { ExploreView } from "@/components/explore-view";
 import { RankBarChart } from "@/components/rank-bar-chart";
 import { RegionBadge } from "@/components/region-badge";
 import { TooltipShell } from "@/components/tooltip-shell";
-import { sortedByWage, wages } from "@/data/wages";
-import { cnyHour, dateOnly } from "@/lib/format";
+import { basisLabel, sortedByWage, wages } from "@/data/wages";
+import { cnyHour, dateOnly, localAmount } from "@/lib/format";
 import { cn } from "@/lib/utilities";
-
-/**
- * 工资公布单位 → 中文口径说明
- */
-function basisLabel(basis: HoursBasis, statutoryHours: null | number): string {
-  switch (basis) {
-    case "day": {
-      return `按日薪折算（每天 ${statutoryHours ?? "—"} 小时）`;
-    }
-    case "hour": {
-      return "官方直接公布时薪";
-    }
-    case "month": {
-      return `按月薪折算（每月 ${statutoryHours ?? "—"} 小时）`;
-    }
-    case "week": {
-      return `按周薪折算（每周 ${statutoryHours ?? "—"} 小时）`;
-    }
-  }
-}
 
 const columns: DataTableColumn<WageEntry>[] = [
   {
@@ -54,9 +34,7 @@ const columns: DataTableColumn<WageEntry>[] = [
     accessorFn: row => row.localWage,
     cell: ({ row }) => (
       <span className="text-muted-foreground">
-        {row.original.localWage.toLocaleString()}
-        {" "}
-        {row.original.localUnit}
+        {localAmount(row.original.localWage, row.original.localUnit)}
       </span>
     ),
     header: "本币时薪（税前法定）",
@@ -150,6 +128,7 @@ export function Explore() {
           </div>
         </div>
       )}
+      rowLabel={entry => entry.country}
       title="数据探索"
     />
   );
@@ -172,9 +151,7 @@ function WageTooltip({ active, payload }: { active?: boolean; payload?: Array<{ 
       total={sortedByWage.length}
     >
       <p className="text-sm text-muted-foreground">
-        {entry.localWage.toLocaleString()}
-        {" "}
-        {entry.localUnit}
+        {localAmount(entry.localWage, entry.localUnit)}
       </p>
       <p className="text-sm font-medium text-primary">
         ≈

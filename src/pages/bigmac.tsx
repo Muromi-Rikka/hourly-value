@@ -13,6 +13,7 @@ import { SourceBlock } from "@/components/source-block";
 import { buttonVariants } from "@/components/ui/button";
 import { bigmac, BIGMAC_SOURCE, sortedByUsdPrice, sortedByValuation } from "@/data/bigmac";
 import { sortedByBigMacPerHour } from "@/data/bigmac-ppp";
+import { usd } from "@/lib/format";
 import { regionAverages } from "@/lib/region";
 import { cn } from "@/lib/utilities";
 
@@ -181,16 +182,14 @@ export function BigMac() {
                     <CountryFlag className="h-4 w-4" countryCode={mostExpensive.countryCode} />
                     <span className="text-sm font-medium">{mostExpensive.country}</span>
                     <span className="ml-auto stat-number text-lg">
-                      $
-                      {mostExpensive.usdPrice.toFixed(2)}
+                      {usd(mostExpensive.usdPrice)}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CountryFlag className="h-4 w-4" countryCode={cheapest.countryCode} />
                     <span className="text-sm font-medium">{cheapest.country}</span>
                     <span className="ml-auto stat-number text-lg">
-                      $
-                      {cheapest.usdPrice.toFixed(2)}
+                      {usd(cheapest.usdPrice)}
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground">

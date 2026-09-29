@@ -80,13 +80,34 @@ const FALLBACK_DATE = "2026-09-23";
 const FALLBACK_PROVIDER = "内置兜底汇率（2026-09 近似值）";
 
 /**
+ * 汇率必须是「有限的正数」。
+ *
+ * 不能写成 `typeof x !== "number" || x <= 0`：`typeof NaN === "number"` 而
+ * `NaN <= 0` 为 false，NaN/Infinity 会一路通过，最终把 `NaN` 写进生成文件，
+ * 全站人民币值变成「¥NaN」。
+ */
+function isPositiveFinite(value) {
+  return typeof value === "number" && Number.isFinite(value) && value > 0;
+}
+
+/**
+ * 生成文件里 `ratesUpdatedAt` 必须是 `YYYY-MM-DD`。
+ * `JSON.stringify(undefined)` 返回 undefined（不是字符串），
+ * 模板会写出 `export const ratesUpdatedAt = undefined;`。
+ */
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/**
  * 交叉汇率：1 单位币种 = X 人民币（以 EUR 基准换算）。
  *
  * @throws {Error} 源数据缺少 CNY 或所需币种的汇率时抛出。
  */
 function buildCnyPerUnit(rates, sourceLabel) {
+  if (rates === null || typeof rates !== "object" || Array.isArray(rates)) {
+    throw new Error(`${sourceLabel} 返回的 rates 不是对象`);
+  }
   const cnyPerEur = rates.CNY;
-  if (typeof cnyPerEur !== "number" || cnyPerEur <= 0) {
+  if (!isPositiveFinite(cnyPerEur)) {
     throw new Error(`${sourceLabel} 返回缺少 CNY 汇率`);
   }
   const result = {};
@@ -96,7 +117,7 @@ function buildCnyPerUnit(rates, sourceLabel) {
       continue;
     }
     const perEur = code === "EUR" ? 1 : rates[code];
-    if (typeof perEur !== "number" || perEur <= 0) {
+    if (!isPositiveFinite(perEur)) {
       throw new Error(`${sourceLabel} 返回缺少 ${code} 汇率`);
     }
     result[name] = round6(cnyPerEur / perEur);
@@ -209,8 +230,22 @@ async function main() {
 
 /**
  * 渲染生成文件内容。
+ *
+ * @throws {Error} 日期、汇率表或数值不合法时抛出。
  */
 function renderFile({ cnyPerUnit, date, provider }) {
+  if (typeof date !== "string" || !ISO_DATE.test(date)) {
+    throw new Error(`汇率数据日期不合法：${String(date)}`);
+  }
+  const entries = Object.entries(cnyPerUnit);
+  if (entries.length === 0) {
+    throw new Error("汇率表为空，拒绝生成文件");
+  }
+  for (const [name, value] of entries) {
+    if (!isPositiveFinite(value)) {
+      throw new Error(`汇率 ${name} 不是有限正数：${String(value)}`);
+    }
+  }
   // eslint perfectionist/sort-objects 默认 locales: 'en-US'，必须同序，否则 pnpm lint 报错
   const keys = Object.keys(cnyPerUnit).toSorted((a, b) => a.localeCompare(b, "en-US"));
   const lines = keys.map(key => `  ${key}: ${cnyPerUnit[key]},`);

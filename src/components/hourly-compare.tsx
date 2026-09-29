@@ -149,11 +149,20 @@ function CompareRow({ a, b, compact, metric, ratio, valueA, valueB }: CompareRow
         {compact ? null : <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">{metric.note}</p>}
       </div>
       <p className="stat-number w-20 text-right text-base whitespace-nowrap sm:w-24">
+        {/* 归属只靠表头 CountryTag 的视觉对齐；线性朗读时两个裸数字分不出谁是谁 */}
+        <span className="sr-only">
+          {a.country}
+          ：
+        </span>
         <span className={cn("inline-block rounded px-1.5 py-0.5", isALeads ? "bg-primary/10 text-primary" : "text-muted-foreground")}>
           {valueA === null ? DASH : metric.format(valueA)}
         </span>
       </p>
       <p className="stat-number w-20 text-right text-base whitespace-nowrap sm:w-24">
+        <span className="sr-only">
+          {b.country}
+          ：
+        </span>
         <span className={cn("inline-block rounded px-1.5 py-0.5", !isALeads && lead !== null ? "bg-primary/10 text-primary" : "text-muted-foreground")}>
           {valueB === null ? DASH : metric.format(valueB)}
         </span>
