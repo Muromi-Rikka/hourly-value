@@ -2,6 +2,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { ArrowUp, BarChart3, Globe, Info, Menu, X } from "lucide-react";
 import * as React from "react";
 
+import { GitHubStarButton } from "@/components/github-star-button";
 import { Button } from "@/components/ui/button";
 import { ratesUpdatedAt } from "@/data/exchange-rates";
 import { wages } from "@/data/wages";
@@ -89,16 +90,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
             </Link>
           </nav>
 
-          <Button
-            aria-expanded={mobileOpen}
-            aria-label={mobileOpen ? "关闭菜单" : "打开菜单"}
-            className="md:hidden"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            size="icon"
-            variant="ghost"
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
+          <div className="flex items-center gap-2">
+            <GitHubStarButton />
+            <Button
+              aria-expanded={mobileOpen}
+              aria-label={mobileOpen ? "关闭菜单" : "打开菜单"}
+              className="md:hidden"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              size="icon"
+              variant="ghost"
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
         </div>
 
         {mobileOpen && (

@@ -43,6 +43,21 @@ export function cnyHour(value: null | number | undefined): string {
 }
 
 /**
+ * 计数缩写，四位及以上才缩，如 `1.2k`、`23k`；千位以内照常给千分位，
+ * 与表格口径一致（`1,234`），不为了排版把 4 位数也塞成 `1.2k`。
+ */
+export function compactNumber(value: null | number | undefined): string {
+  if (value === null || value === undefined) {
+    return DASH;
+  }
+  if (value < 10000) {
+    return numeric(Math.round(value), 0);
+  }
+  const thousands = value / 1000;
+  return `${thousands >= 100 ? numeric(Math.round(thousands), 0) : numeric(round1(thousands), 1)}k`;
+}
+
+/**
  * ISO 日期 → `2026-01-01`；无法解析时原样返回
  */
 export function dateOnly(iso: null | string | undefined): string {
