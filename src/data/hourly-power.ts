@@ -11,6 +11,8 @@ import {
   cnyHour as formatCnyHour,
   hours as formatHours,
   ratio as formatRatio,
+  hourNumber,
+  number1,
 } from "@/lib/format";
 
 /**
@@ -137,8 +139,16 @@ export const METRIC_GROUP_LABEL: Record<MetricGroup, string> = {
 };
 
 export interface HourlyMetric {
+  /**
+   * 完整展示串，**自带单位**（`86.7 小时`），单独渲染即可
+   */
   format: (value: null | number) => string;
   formatAxis: (value: number) => string;
+  /**
+   * 纯数值，**不含单位**（`86.7`）。只给需要把数值与单位分开排版的地方用
+   * （大号数字 + 小号单位），必须与 `unit` 成对出现，不能再叠 `format`
+   */
+  formatValue: (value: null | number) => string;
   get: (entry: HourlyPowerEntry) => null | number;
   group: MetricGroup;
   /**
@@ -165,17 +175,19 @@ export const HOURLY_METRICS: HourlyMetric[] = [
   {
     format: formatCnyHour,
     formatAxis: value => `¥${Math.round(value)}`,
+    formatValue: number1,
     get: entry => entry.cnyHour,
     group: "wage",
     higherIsBetter: true,
     key: "cnyHour",
     label: "人民币时薪",
     note: "各国法定最低时薪按构建时市场汇率折算。这只是工资水平，不等于购买力。",
-    unit: "¥/小时",
+    unit: "元/小时",
   },
   {
     format: bigMacCount,
     formatAxis: value => `${value}个`,
+    formatValue: number1,
     get: entry => entry.bigMacPerHour,
     group: "food",
     higherIsBetter: true,
@@ -187,6 +199,7 @@ export const HOURLY_METRICS: HourlyMetric[] = [
   {
     format: formatHours,
     formatAxis: value => `${Math.round(value)}h`,
+    formatValue: hourNumber,
     get: entry => entry.basketHours,
     group: "food",
     higherIsBetter: false,
@@ -198,6 +211,7 @@ export const HOURLY_METRICS: HourlyMetric[] = [
   {
     format: formatHours,
     formatAxis: value => `${Math.round(value)}h`,
+    formatValue: hourNumber,
     get: entry => entry.iphoneHours,
     group: "goods",
     higherIsBetter: false,
@@ -209,6 +223,7 @@ export const HOURLY_METRICS: HourlyMetric[] = [
   {
     format: formatHours,
     formatAxis: value => `${Math.round(value)}h`,
+    formatValue: hourNumber,
     get: entry => entry.modelyHours,
     group: "car",
     higherIsBetter: false,

@@ -116,6 +116,18 @@ export function localAmount(value: null | number | undefined, unit: null | strin
 }
 
 /**
+ * 纯数值（1 位小数、带千分位），不含货币符号与任何单位。
+ * 供需要把数值与单位分开排版的地方使用 —— 不要与 `hours` / `bigMacCount`
+ * 这类已经带单位的格式函数叠加，否则单位会显示两遍。
+ */
+export function number1(value: null | number | undefined): string {
+  if (value === null || value === undefined) {
+    return DASH;
+  }
+  return numeric(round1(value), 1);
+}
+
+/**
  * 百分比，带正负号，如 `+12.3%`
  */
 export function percent(value: null | number | undefined, decimals = 1): string {

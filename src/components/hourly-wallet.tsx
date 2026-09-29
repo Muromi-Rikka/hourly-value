@@ -7,7 +7,7 @@ import { CoverageBadge } from "@/components/coverage-badge";
 import { RegionBadge } from "@/components/region-badge";
 import { cardVariants } from "@/components/ui/card";
 import { METRIC_GROUP_LABEL, metricFor, workWeeks } from "@/data/hourly-power";
-import { DASH, dateOnly, localAmount, round1 } from "@/lib/format";
+import { dateOnly, localAmount, round1 } from "@/lib/format";
 import { cn } from "@/lib/utilities";
 
 interface HourlyWalletProperties {
@@ -97,7 +97,7 @@ function MetricTile({ entry, metric }: { entry: HourlyPowerEntry; metric: Hourly
       <p className="mt-1 text-xs text-muted-foreground">{metric.label}</p>
       <p className="mt-1 flex items-baseline gap-1.5">
         <span className={cn("stat-number text-2xl leading-none", isMissing && "text-muted-foreground")}>
-          {isMissing ? DASH : metric.format(value)}
+          {metric.formatValue(value)}
         </span>
         {isMissing ? null : <span className="text-[11px] text-muted-foreground">{metric.unit}</span>}
       </p>
