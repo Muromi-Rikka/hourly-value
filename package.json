@@ -1,7 +1,7 @@
 {
   "name": "hourly-value",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "packageManager": "pnpm@12.4.2",
   "description": "全球最低工资标准购买力可视化 — 以人民币为基准的交互式数据探索",
   "author": {
