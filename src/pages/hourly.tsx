@@ -4,8 +4,10 @@ import { ArrowRight, ExternalLink, Search } from "lucide-react";
 import * as React from "react";
 import type { DataTableColumn } from "@/components/data-table";
 import type { HourlyMetric, HourlyPowerEntry } from "@/data/hourly-power";
+import type { WageCaliber } from "@/data/wages";
 import type { HourlySearch } from "@/routes/hourly";
 
+import { CaliberSwitcher } from "@/components/caliber-switcher";
 import { CountryFlag } from "@/components/country-flag";
 import { CoverageBadge } from "@/components/coverage-badge";
 import { ExploreView } from "@/components/explore-view";
@@ -20,16 +22,16 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { cardVariants } from "@/components/ui/card";
 import {
   commonCodes,
-  commonHourlyPower,
+  commonHourlyPowerFor,
   HOURLY_METRICS,
-  hourlyPower,
+  hourlyPowerByCaliber,
   hourlyPowerOf,
   metricFor,
   workWeeks,
 } from "@/data/hourly-power";
 import { SCOPE_CHIPS } from "@/data/methodology";
-import { basisLabel } from "@/data/wages";
-import { cnyHour, DASH, dateOnly, hourNumber, localAmount, round1 } from "@/lib/format";
+import { basisLabel, CALIBER_LABEL, CALIBER_NOTE, monthlyBasisLabel } from "@/data/wages";
+import { cny, cnyHour, DASH, dateOnly, hourNumber, localAmount, round1 } from "@/lib/format";
 import { regionAverages, regionColor } from "@/lib/region";
 import { cn } from "@/lib/utilities";
 import { hourlyRoute } from "@/routes/hourly";
@@ -138,8 +140,9 @@ export function Hourly() {
     void navigate({ search: previous => ({ ...previous, ...patch }) });
   }, [navigate]);
 
-  const a = hourlyPowerOf(search.a ?? DEFAULT_A) ?? hourlyPowerOf(DEFAULT_A)!;
-  const b = hourlyPowerOf(search.b ?? DEFAULT_B) ?? hourlyPowerOf(DEFAULT_B)!;
+  const caliber: WageCaliber = search.caliber === "monthly" ? "monthly" : "hourly";
+  const a = hourlyPowerOf(search.a ?? DEFAULT_A, caliber) ?? hourlyPowerOf(DEFAULT_A, caliber)!;
+  const b = hourlyPowerOf(search.b ?? DEFAULT_B, caliber) ?? hourlyPowerOf(DEFAULT_B, caliber)!;
   const metric = metricFor(search.metric as HourlyMetric["key"]) ?? HOURLY_METRICS[1];
   const isCommonOnly = search.scope === "common";
   const scope: "all" | "common" = isCommonOnly ? "common" : "all";
@@ -147,7 +150,7 @@ export function Hourly() {
   const [query, setQuery] = React.useState("");
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 
-  const options = isCommonOnly ? commonHourlyPower : hourlyPower;
+  const options = isCommonOnly ? commonHourlyPowerFor(caliber) : hourlyPowerByCaliber[caliber];
 
   // 「五项齐备」范围下，URL 带进来的选中国家可能不在 options 里：原生 <select> 没有匹配
   // option 会渲染成空框（country-select.tsx:24 的 current 也会取不到 → 国旗一起消失）。
@@ -193,7 +196,7 @@ export function Hourly() {
     setSearch({ scope: undefined });
   };
 
-  const shareHref = `/hourly?a=${a.countryCode}&b=${b.countryCode}&metric=${metric.key}&scope=${scope}`;
+  const shareHref = `/hourly?a=${a.countryCode}&b=${b.countryCode}&metric=${metric.key}&scope=${scope}&caliber=${caliber}`;
 
   const ranked = React.useMemo(
     () =>
@@ -248,6 +251,12 @@ export function Hourly() {
               </span>
             ))}
           </div>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <CaliberSwitcher onChange={next => setSearch({ caliber: next === "monthly" ? "monthly" : undefined })} value={caliber} />
+            <span className="text-xs text-muted-foreground">
+              {CALIBER_NOTE[caliber]}
+            </span>
+          </div>
         </AnimatedContent>
       </section>
 
@@ -279,7 +288,7 @@ export function Hourly() {
                 valueKey={metric.key}
               />
             )}
-            chartCaption={`${metric.label} · 数值越大${metric.higherIsBetter ? "表示" : "越不表示"}购买力强${
+            chartCaption={`${metric.label} · ${CALIBER_LABEL[caliber]} · 数值越大${metric.higherIsBetter ? "表示" : "越不表示"}购买力强${
               metric.higherIsBetter ? "，越高越好" : "，越低越好"
             }`}
             chartControls={<MetricSwitcher activeKey={metric.key} onChange={key => setSearch({ metric: key })} />}
@@ -298,7 +307,7 @@ export function Hourly() {
             onColumnFiltersChange={setColumnFilters}
             renderExpanded={row => <DetailPanel entry={row} />}
             rowLabel={entry => entry.country}
-            tableKey={metric.key}
+            tableKey={`${metric.key}-${caliber}`}
             title="各国一小时购买力矩阵"
             titleTag="h2"
             toolbar={(
@@ -409,11 +418,17 @@ export function Hourly() {
 }
 
 function DetailPanel({ entry }: { entry: HourlyPowerEntry }) {
+  const hourlyEntry = hourlyPowerOf(entry.countryCode, "hourly");
+  const monthlyEntry = hourlyPowerOf(entry.countryCode, "monthly");
   return (
     <div className="border-l-2 border-primary/30 pl-4">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div>
-          <p className="text-xs font-medium text-muted-foreground">当地最低时薪</p>
+          <p className="text-xs font-medium text-muted-foreground">
+            当前口径最低时薪（
+            {CALIBER_LABEL[entry.caliber]}
+            ）
+          </p>
           <p className="text-sm">
             {localAmount(entry.localWage, entry.localUnit)}
             {" = "}
@@ -421,17 +436,27 @@ function DetailPanel({ entry }: { entry: HourlyPowerEntry }) {
             /小时
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
-            工资公布单位：
+            公布单位：
             {basisLabel(entry.hoursBasis, entry.statutoryHours)}
             {entry.isProxy ? " · 代理值" : ""}
           </p>
         </div>
         <div>
+          <p className="text-xs font-medium text-muted-foreground">本币月最低工资</p>
+          <p className="text-sm">
+            {localAmount(entry.localMonthly, entry.localMonthlyUnit)}
+            {" = "}
+            {cny(entry.cnyMonthly)}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">{monthlyBasisLabel(entry)}</p>
+        </div>
+        <div>
           <p className="text-xs font-medium text-muted-foreground">工时折算</p>
           <p className="text-sm">
-            {entry.statutoryWeeklyHours === null
-              ? "来源未明确周工时"
-              : `法定每周 ${entry.statutoryWeeklyHours} 小时`}
+            法定每周
+            {" "}
+            {entry.statutoryWeeklyHours}
+            {" 小时"}
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             {workWeeks(entry, entry.modelyHours) === null
@@ -439,21 +464,34 @@ function DetailPanel({ entry }: { entry: HourlyPowerEntry }) {
               : `买 Model Y 约 ${round1(workWeeks(entry, entry.modelyHours) ?? 0)} 个工作周`}
           </p>
         </div>
-        <div>
+        <div className="sm:col-span-2 lg:col-span-3">
+          <p className="text-xs font-medium text-muted-foreground">两种口径对照</p>
+          <div className="mt-1 grid gap-1 sm:grid-cols-2">
+            <p className="text-sm">
+              官方时薪口径：
+              <span className="stat-number text-primary">
+                {hourlyEntry === undefined ? DASH : cnyHour(hourlyEntry.cnyHour)}
+              </span>
+              /小时
+            </p>
+            <p className="text-sm">
+              月薪折算口径：
+              <span className="stat-number text-primary">
+                {monthlyEntry === undefined ? DASH : cnyHour(monthlyEntry.cnyHour)}
+              </span>
+              /小时
+            </p>
+          </div>
+        </div>
+        <div className="sm:col-span-2 lg:col-span-3">
           <p className="text-xs font-medium text-muted-foreground">生效日期</p>
           <p className="text-sm">{dateOnly(entry.effectiveDate)}</p>
         </div>
-        <div className="sm:col-span-2 lg:col-span-3">
-          <p className="text-xs font-medium text-muted-foreground">来源</p>
-          <a
-            className="inline-flex items-center gap-1 break-all text-sm text-primary underline underline-offset-2"
-            href={entry.wageSourceUrl}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            {entry.wageSource}
-            <ExternalLink className="h-3 w-3 shrink-0" />
-          </a>
+        <div className="space-y-1 sm:col-span-2 lg:col-span-3">
+          <p className="text-xs font-medium text-muted-foreground">数据来源</p>
+          <SourceLink label="时薪" source={entry.wageSource} url={entry.wageSourceUrl} />
+          <SourceLink label="月薪" source={entry.monthlySource} url={entry.monthlySourceUrl} />
+          <SourceLink label="法定周工时" source={entry.weeklyHoursSource} url={entry.weeklyHoursSourceUrl} />
         </div>
         <div className="sm:col-span-2 lg:col-span-3">
           <p className="text-xs font-medium text-muted-foreground">各指标口径</p>
@@ -495,6 +533,26 @@ function MetricSwitcher({ activeKey, onChange }: { activeKey: HourlyMetric["key"
 
 function numberOrDash(value: null | number): string {
   return value === null ? DASH : hourNumber(value);
+}
+
+function SourceLink({ label, source, url }: { label: string; source: string; url: string }) {
+  return (
+    <p className="text-sm">
+      <span className="text-muted-foreground">
+        {label}
+        ：
+      </span>
+      <a
+        className="inline-flex items-center gap-1 break-all text-primary underline underline-offset-2"
+        href={url}
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        {source}
+        <ExternalLink className="h-3 w-3 shrink-0" />
+      </a>
+    </p>
+  );
 }
 
 function TableToolbar({

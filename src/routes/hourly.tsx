@@ -1,14 +1,18 @@
 import { createRoute, lazyRouteComponent } from "@tanstack/react-router";
+
+import type { WageCaliber } from "@/data/wages";
+
 import { routeHead } from "@/lib/seo";
 import { rootRoute } from "@/routes/__root";
 
 /**
- * `/hourly` 的 URL 状态：对比国家、当前排行指标、数据范围。
+ * `/hourly` 的 URL 状态：对比国家、当前排行指标、工资口径、数据范围。
  * 全部进 query，刷新与复制链接都能还原同一屏内容。
  */
 export interface HourlySearch {
   a?: string;
   b?: string;
+  caliber?: WageCaliber;
   metric?: string;
   scope?: "all" | "common";
 }
@@ -21,6 +25,7 @@ const hourlyRoute = createRoute({
   validateSearch: (search: Record<string, unknown>): HourlySearch => ({
     a: typeof search.a === "string" ? search.a : undefined,
     b: typeof search.b === "string" ? search.b : undefined,
+    caliber: search.caliber === "monthly" ? "monthly" : undefined,
     metric: typeof search.metric === "string" ? search.metric : undefined,
     scope: search.scope === "common" ? "common" : undefined,
   }),

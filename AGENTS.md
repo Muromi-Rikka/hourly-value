@@ -32,9 +32,11 @@ WageRuler     HourlyCompare  方法论+全部      RankBarChart + TooltipShell
             src/data/*.ts — 5 套数据集，页面直接 import，无 API
 ```
 
-**Router**: TanStack Router (`@tanstack/react-router`) — NOT react-router-dom. Routes defined as `createRoute()` objects in `src/routes/*.tsx`, assembled into a tree in `src/router.tsx`. All non-index routes are lazy: `component: lazyRouteComponent(() => import("@/pages/x"), "X")`. `scrollRestoration: true`. `/hourly` uses `validateSearch` to keep the compared pair, the active metric and the scope in the query string; its page reads them via `hourlyRoute.useSearch()` — shareable and refresh-safe.
+**Router**: TanStack Router (`@tanstack/react-router`) — NOT react-router-dom. Routes defined as `createRoute()` objects in `src/routes/*.tsx`, assembled into a tree in `src/router.tsx`. All non-index routes are lazy: `component: lazyRouteComponent(() => import("@/pages/x"), "X")`. `scrollRestoration: true`. `/hourly` uses `validateSearch` to keep the compared pair, the active metric, the wage caliber and the scope in the query string; `/explore` keeps the caliber there too. Both pages read it via `xxxRoute.useSearch()` — shareable and refresh-safe.
 
 **Data**: `src/data/*.ts` — five datasets (`wages`, `iphone-index`/`iphone-duo-index`, `bigmac`/`bigmac-ppp`, `commodity-index`, `modely-index`). Each exports an entry interface plus pre-sorted arrays. `hourly-power.ts` joins them by `countryCode` into `HourlyPowerEntry` and owns the single metric registry (`HOURLY_METRICS`) that drives the wallet, the comparison, the matrix table and the ranking chart. Pages import directly. No runtime API calls, no server state.
+
+**Two wage calibers**: every wage-derived number exists in two variants, `hourly` (官方公布的法定最低时薪) and `monthly` (官方月薪 ÷ 月工时，月工时 = `statutoryWeeklyHours × 52 / 12`). `src/data/wages.ts` owns both `localWage`/`cnyEquivalent` (hourly) and `localMonthly`/`cnyMonthly`/`localWageFromMonthly`/`cnyHourFromMonthly` (monthly) plus a provenance triple per country (时薪来源 / 月薪来源 / 法定周工时来源). Countries that set no monthly minimum wage get `monthlyWageIsDerived: true` and their monthly is derived from the hourly — so both calibers agree there by construction. The four index modules expose caliber-injectable builders (`buildBigMacPpp` / `buildCommodityIndex` / `buildIPhoneIndex` / `buildModelYIndex`, each taking a wage picker) and export the `hourly` result under the legacy names; `hourly-power.ts` composes `hourlyPowerByCaliber` from them. **The caliber is a dataset switch, not a metric flag**: `HOURLY_METRICS` is caliber-agnostic and reads whichever entry it is handed, so switching caliber keeps every page internally consistent.
 
 **Missing data is `null`, never `0`**: a missing price or wage must produce `null` so the row sorts last and renders as `—`. Writing `0` fabricates an observation — a country with no data would look like the cheapest.
 
@@ -50,8 +52,9 @@ src/
 │   ├── rank-bar-chart.tsx  # 5 指数共用排行条形图 (Recharts, 区域着色, 底部图例)
 │   ├── tooltip-shell.tsx   # 指数 tooltip 统一外壳 (国旗+排名+区域)
 │   ├── index-tooltips.tsx  # 5 指数 tooltip 唯一实现（落地页/探索页共用）
-│   ├── explore-view.tsx    # 探索页骨架 (图表 + DataTable + 展开行 + 可选 header/工具条)
+│   ├── explore-view.tsx    # 探索页骨架 (图表 + DataTable + 展开行 + 可选 headerExtra/工具条)
 │   ├── data-table.tsx      # TanStack Table 封装 (DataTableColumn<T>, 过滤/排序/展开)
+│   ├── caliber-switcher.tsx # 工资口径切换 (官方时薪口径 / 月薪折算口径)
 │   ├── hourly-wallet.tsx   # 一小时钱包 (单国摘要，按 吃/用/大件/工资基准 分层)
 │   ├── hourly-compare.tsx  # A/B 逐指标对比 (受控，URL 状态由页面管)
 │   ├── country-select.tsx  # 国家选择器 (原生 <select>，零新依赖)
@@ -61,8 +64,8 @@ src/
 │   ├── region-legend.tsx   # 图表底部区域图例
 │   └── react-bits/         # 动效组件 (GSAP/motion；均有 reduced-motion 守卫)
 ├── data/                   # 5 套静态数据集 + 2 个派生/文案模块
-│   ├── wages.ts            # WageEntry + 27 records + sortedByWage（cnyEquivalent 由汇率表计算，保留 1 位小数）
-│   ├── hourly-power.ts     # 跨指数统一行 HourlyPowerEntry + HOURLY_METRICS + comparePair/verdictOf/workWeeks
+│   ├── wages.ts            # WageEntry + 27 records + sortedByWage；双口径 (cnyEquivalent / cnyHourFromMonthly) + 三组来源，全部由汇率表与法定周工时派生
+│   ├── hourly-power.ts     # hourlyPowerByCaliber + HourlyPowerEntry + HOURLY_METRICS + comparePair/verdictOf/workWeeks
 │   ├── methodology.ts      # 站内口径文案 (首页口径卡与「关于」页共用)
 │   ├── exchange-rates.ts   # AUTO-GENERATED 汇率表 (ratesUpdatedAt / cnyPerUnit)
 │   ├── iphone-index.ts / iphone-duo-index.ts
@@ -152,7 +155,9 @@ All user-facing text is in **Chinese (Simplified)**. Country names, labels, plac
 
 | File | Purpose |
 |---|---|
-| `src/data/*.ts` | 5 套数据集: wages / iphone(-duo) / bigmac(-ppp) / commodity / modely；`hourly-power.ts` 跨指数联结 + `methodology.ts` 口径文案 |
+| `src/data/*.ts` | 5 套数据集: wages / iphone(-duo) / bigmac(-ppp) / commodity / modely；`hourly-power.ts` 跨指数联结（按 `WageCaliber` 出两份数据集）+ `methodology.ts` 口径文案 |
+| `src/data/wages.ts` | 双口径工资唯一来源：`localWage`/`cnyEquivalent`（时薪）+ `localMonthly`/`cnyHourFromMonthly`（月薪折算）+ 每国三组来源；`CALIBER_LABEL`/`monthlyBasisLabel()` 也在这里 |
+| `src/components/caliber-switcher.tsx` | 工资口径切换器；口径进 URL query（`caliber=monthly`），刷新/分享可还原 |
 | `src/lib/format.ts` | 全站数值显示口径的唯一出口；新增指标时先在这里定格式 |
 | `src/data/exchange-rates.ts` | AUTO-GENERATED 汇率表（勿手改；`pnpm rates` 重新生成），各数据集人民币值的唯一换算依据 |
 | `scripts/fetch-rates.mjs` | 构建/开发前拉取 ECB 汇率（Frankfurter 主源 + open.er-api.com 备源 + 离线降级） |
@@ -225,3 +230,6 @@ The ESLint config transitively pulls `@vitest/eslint-plugin` (from `@renton/esli
 12. **Hours over days**: Cross-country comparisons use hours. Days/weeks are derived views and must state their assumption (每天 8 小时 / 法定周工时).
 13. **One metric definition**: a new cross-index metric goes into `HOURLY_METRICS` with its label, 口径 note, direction and formatters — never inline a second definition in a page.
 14. **No opaque composite score**: report per-metric spreads and pairwise ratios; never average heterogeneous metrics into a single rank.
+15. **Two wage calibers, one derivation**: wage-derived values live in both `hourly` and `monthly` variants. Never hardcode a caliber's number — derive it (`wages.ts` owns the formulas) and pick the dataset via `hourlyPowerByCaliber[caliber]` / `hourlyPowerOf(code, caliber)`. The caliber is a dataset switch, so `HOURLY_METRICS` must stay caliber-agnostic.
+16. **Every wage number needs a source**: hourly, monthly and statutory-week provenance are three separate fields (`source`/`sourceUrl`, `monthlySource`/`monthlySourceUrl`, `weeklyHoursSource`/`weeklyHoursSourceUrl`). A number that no cited source supports must be labelled as a project assumption in `note` — never silently attributed to an official page.
+17. **法定周工时 is required for all countries** (it is the sole basis of the monthly caliber's 月工时). When the law sets no full-time week (DE/GB/CA/US/IE…), fill the country's standard full-time week and say so in `weeklyHoursSource`.

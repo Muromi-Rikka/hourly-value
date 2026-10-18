@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, ExternalLink, Info } from "lucide-react";
 
+import type { WageEntry } from "@/data/wages";
+
 import { CountryFlag } from "@/components/country-flag";
 import { MethodNotes } from "@/components/method-notes";
 import { AnimatedContent } from "@/components/react-bits/AnimatedContent/AnimatedContent";
@@ -91,8 +93,9 @@ export function About() {
       <AnimatedContent distance={30} duration={0.6}>
         <section className="section max-w-prose space-y-3 pb-10 text-sm leading-relaxed text-pretty text-muted-foreground">
           <p>
-            所有数据均以各国家/地区政府官方公布的法定最低时薪为基准。
-            对于按月设定最低工资的国家（如西班牙、比利时、智利），按法定工时数折算为时薪。
+            所有数据均以各国家/地区政府官方公布的法定最低工资为基准，提供「官方时薪口径」与「月薪折算口径」两套可切换的换算。
+            只设时薪的国家直接采用官方时薪；按月/日/周公布的国家在时薪口径下按来源写明的工时折算，
+            月薪折算口径则统一用官方月薪 ÷（法定周工时 × 52 / 12）。
           </p>
           <p>
             人民币折算使用构建时自动拉取的最新市场参考汇率（详见下方「汇率来源与更新」），
@@ -178,18 +181,12 @@ export function About() {
       <AnimatedContent delay={0.1} distance={20} duration={0.5}>
         <section className="section">
           <h2 className="minor-title mb-5">最低工资数据来源</h2>
+          <p className="mb-5 max-w-prose text-xs leading-relaxed text-pretty text-muted-foreground">
+            每个国家/地区逐条列出三组来源：法定时薪、最低月工资（标注是否由时薪推算）、法定周工时。
+          </p>
           <ul className="space-y-4">
             {wages.map((entry, index) => (
-              <SourceRow
-                index={index}
-                item={{
-                  countryCode: entry.countryCode,
-                  name: entry.country,
-                  source: entry.source,
-                  sourceUrl: entry.sourceUrl,
-                }}
-                key={entry.countryCode}
-              />
+              <WageSourceRow entry={entry} index={index} key={entry.countryCode} />
             ))}
           </ul>
         </section>
@@ -350,6 +347,56 @@ function SourceRow({ index, item }: { index: number; item: SourceItem }) {
           访问来源
           <ExternalLink className="h-3 w-3" />
         </a>
+      </div>
+      <Separator className="mt-4" />
+    </li>
+  );
+}
+
+function SourceRowLink({ label, source, url }: { label: string; source: string; url: string }) {
+  return (
+    <p className="flex flex-wrap items-baseline gap-x-2 text-xs text-muted-foreground">
+      <span className="text-foreground">
+        {label}
+        ：
+        {source}
+      </span>
+      <a
+        className="inline-flex items-center gap-1 text-primary underline decoration-primary/50 underline-offset-2 hover:text-primary/80"
+        href={url}
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        来源
+        <ExternalLink className="h-3 w-3" />
+      </a>
+    </p>
+  );
+}
+
+/**
+ * 最低工资逐国来源行：一行内并列时薪 / 月薪 / 法定周工时三组来源
+ */
+function WageSourceRow({ entry, index }: { entry: WageEntry; index: number }) {
+  return (
+    <li>
+      <div className="flex items-start gap-3">
+        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+          {index + 1}
+        </span>
+        <div className="min-w-0 space-y-1.5">
+          <p className="flex items-center gap-2 text-base font-medium">
+            <CountryFlag className="h-5 w-5" countryCode={entry.countryCode} />
+            {entry.country}
+          </p>
+          <SourceRowLink label="时薪" source={entry.source} url={entry.sourceUrl} />
+          <SourceRowLink
+            label={entry.monthlyWageIsDerived ? "月薪（推算自时薪）" : "月薪"}
+            source={entry.monthlySource}
+            url={entry.monthlySourceUrl}
+          />
+          <SourceRowLink label="法定周工时" source={entry.weeklyHoursSource} url={entry.weeklyHoursSourceUrl} />
+        </div>
       </div>
       <Separator className="mt-4" />
     </li>

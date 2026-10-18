@@ -1,4 +1,5 @@
 import type { IPhoneEntry } from "@/data/iphone";
+import type { WageEntry } from "@/data/wages";
 import type { Region } from "@/lib/region";
 
 import { iphones } from "@/data/iphone";
@@ -37,28 +38,35 @@ export interface IPhoneIndexEntry {
 
 const wageByCode = new Map(wages.map(w => [w.countryCode, w]));
 
-export const iphoneIndex: IPhoneIndexEntry[] = iphones.map((phone: IPhoneEntry) => {
-  const wage = wageByCode.get(phone.countryCode);
-  const hourlyWage = wage?.cnyEquivalent ?? null;
-  const hoursToBuy = hourlyWage === null || hourlyWage <= 0
-    ? null
-    : Math.round((phone.cnyEquivalent / hourlyWage) * 10) / 10;
-  return {
-    country: phone.country,
-    countryCode: phone.countryCode,
-    hourlyWage,
-    hoursToBuy,
-    iphonePrice: phone.cnyEquivalent,
-    iphoneSource: phone.source,
-    iphoneSourceUrl: phone.sourceUrl,
-    localCurrency: phone.localCurrency,
-    localPrice: phone.localPrice,
-    region: phone.region,
-    taxNote: phone.taxNote,
-    wageSource: wage?.source ?? "",
-    wageSourceUrl: wage?.sourceUrl ?? "",
-  };
-});
+/**
+ * 工资口径可注入：`pickCnyHour` 决定用哪一套时薪（官方时薪口径 / 月薪折算口径）。
+ */
+export function buildIPhoneIndex(pickCnyHour: (wage: WageEntry) => null | number): IPhoneIndexEntry[] {
+  return iphones.map((phone: IPhoneEntry) => {
+    const wage = wageByCode.get(phone.countryCode);
+    const hourlyWage = wage ? pickCnyHour(wage) : null;
+    const hoursToBuy = hourlyWage === null || hourlyWage <= 0
+      ? null
+      : Math.round((phone.cnyEquivalent / hourlyWage) * 10) / 10;
+    return {
+      country: phone.country,
+      countryCode: phone.countryCode,
+      hourlyWage,
+      hoursToBuy,
+      iphonePrice: phone.cnyEquivalent,
+      iphoneSource: phone.source,
+      iphoneSourceUrl: phone.sourceUrl,
+      localCurrency: phone.localCurrency,
+      localPrice: phone.localPrice,
+      region: phone.region,
+      taxNote: phone.taxNote,
+      wageSource: wage?.source ?? "",
+      wageSourceUrl: wage?.sourceUrl ?? "",
+    };
+  });
+}
+
+export const iphoneIndex: IPhoneIndexEntry[] = buildIPhoneIndex(wage => wage.cnyEquivalent);
 
 /**
  * Sorted by hoursToBuy ascending (fewest hours = cheapest). Nulls (no data) go last.

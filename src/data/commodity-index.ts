@@ -1,4 +1,5 @@
 import type { CommodityItem } from "@/data/commodity";
+import type { WageEntry } from "@/data/wages";
 import type { Region } from "@/lib/region";
 
 import { commodities, COMMODITY_SOURCE } from "@/data/commodity";
@@ -45,6 +46,37 @@ const wageByCode = new Map(wages.map(w => [w.countryCode, w]));
  */
 const usdToCny = cnyPerUnit["美元"];
 
+/**
+ * 工资口径可注入：`pickCnyHour` 决定用哪一套时薪（官方时薪口径 / 月薪折算口径）。
+ * 两种口径的口径差异只体现在这里，公式本身只有一处。
+ */
+export function buildCommodityIndex(pickCnyHour: (wage: WageEntry) => null | number): CommodityIndexEntry[] {
+  return commodities
+    .map((item) => {
+      const wage = wageByCode.get(item.countryCode);
+      const hourlyWage = wage ? pickCnyHour(wage) : null;
+      const bUSD = Math.round(basketUSD(item) * 100) / 100;
+      const bCNY = Math.round(bUSD * usdToCny * 100) / 100;
+      // 无工资数据时必须是 null：0 会被排到"最便宜"一侧，等于伪造一个观测值
+      const hours = hourlyWage === null || hourlyWage <= 0
+        ? null
+        : Math.round((bCNY / hourlyWage) * 100) / 100;
+
+      return {
+        basketCNY: bCNY,
+        basketUSD: bUSD,
+        commoditySource: COMMODITY_SOURCE.name,
+        country: item.country,
+        countryCode: item.countryCode,
+        hourlyWage,
+        hoursToBuy: hours,
+        region: item.region,
+        wageSource: wage?.source ?? "",
+        wageSourceUrl: wage?.sourceUrl ?? "",
+      };
+    });
+}
+
 function basketUSD(item: CommodityItem): number {
   return (
     item.flour1kg * 5
@@ -59,30 +91,7 @@ function basketUSD(item: CommodityItem): number {
   );
 }
 
-export const commodityIndex: CommodityIndexEntry[] = commodities
-  .map((item) => {
-    const wage = wageByCode.get(item.countryCode);
-    const hourlyWage = wage?.cnyEquivalent ?? null;
-    const bUSD = Math.round(basketUSD(item) * 100) / 100;
-    const bCNY = Math.round(bUSD * usdToCny * 100) / 100;
-    // 无工资数据时必须是 null：0 会被排到"最便宜"一侧，等于伪造一个观测值
-    const hours = hourlyWage === null || hourlyWage <= 0
-      ? null
-      : Math.round((bCNY / hourlyWage) * 100) / 100;
-
-    return {
-      basketCNY: bCNY,
-      basketUSD: bUSD,
-      commoditySource: COMMODITY_SOURCE.name,
-      country: item.country,
-      countryCode: item.countryCode,
-      hourlyWage,
-      hoursToBuy: hours,
-      region: item.region,
-      wageSource: wage?.source ?? "",
-      wageSourceUrl: wage?.sourceUrl ?? "",
-    };
-  });
+export const commodityIndex: CommodityIndexEntry[] = buildCommodityIndex(wage => wage.cnyEquivalent);
 
 /**
  * Sorted by hours ascending (fewest hours = most affordable). Nulls (no data) go last.

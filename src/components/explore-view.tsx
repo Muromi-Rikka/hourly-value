@@ -34,6 +34,10 @@ interface ExploreViewProperties<T extends RowData> {
    */
   getRowId?: (row: T) => string;
   /**
+   * 标题与说明下方的整页级控制（如工资口径切换器），表格/图表两个视图都可见
+   */
+  headerExtra?: React.ReactNode;
+  /**
    * 表格空状态时的「清除筛选」回调；不传则不渲染按钮
    */
   onClearFilters?: () => void;
@@ -76,6 +80,7 @@ export function ExploreView<T extends RowData>({
   defaultSort,
   description,
   getRowId,
+  headerExtra,
   onClearFilters,
   onColumnFiltersChange,
   renderExpanded,
@@ -102,6 +107,13 @@ export function ExploreView<T extends RowData>({
         <AnimatedContent delay={0.1} distance={20} duration={0.5}>
           <p className="mt-3 max-w-lg text-sm leading-relaxed text-pretty text-muted-foreground">{description}</p>
         </AnimatedContent>
+        {headerExtra
+          ? (
+              <AnimatedContent delay={0.1} distance={20} duration={0.5}>
+                <div className="mt-4">{headerExtra}</div>
+              </AnimatedContent>
+            )
+          : null}
       </div>
 
       <AnimatedContent delay={0.1} distance={40} duration={0.6} threshold={0.05}>

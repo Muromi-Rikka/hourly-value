@@ -1,10 +1,10 @@
-import type { HoursBasis } from "@/data/wages";
+import type { HoursBasis, WageCaliber, WageEntry } from "@/data/wages";
 import type { Region } from "@/lib/region";
 
-import { sortedByBigMacPerHour } from "@/data/bigmac-ppp";
-import { commodityIndex } from "@/data/commodity-index";
-import { iphoneIndex } from "@/data/iphone-index";
-import { modelyIndex } from "@/data/modely-index";
+import { buildBigMacPpp } from "@/data/bigmac-ppp";
+import { buildCommodityIndex } from "@/data/commodity-index";
+import { buildIPhoneIndex } from "@/data/iphone-index";
+import { buildModelYIndex } from "@/data/modely-index";
 import { wages } from "@/data/wages";
 import {
   bigMacCount,
@@ -18,6 +18,9 @@ import {
 /**
  * 「一小时购买力」的统一行：把工资与四类消费指标按 countryCode 联结到一行。
  * 五套指数各自的口径不变，这里只做联结与派生，不重算任何来源数据。
+ *
+ * 每一行属于一种工资口径（`caliber`）：`hourly` 用官方时薪，`monthly` 用月薪折算时薪。
+ * 除口径本身外，其余字段（国家、月薪事实、来源）两口径完全一致。
  */
 export interface HourlyPowerEntry {
   /**
@@ -29,9 +32,21 @@ export interface HourlyPowerEntry {
    */
   bigMacPerHour: null | number;
   /**
-   * 人民币折算时薪 —— 这是工资"水平"，不是购买力
+   * 本行所属的工资口径
+   */
+  caliber: WageCaliber;
+  /**
+   * 该口径下的人民币折算时薪 —— 这是工资"水平"，不是购买力
    */
   cnyHour: number;
+  /**
+   * 月薪折算口径的人民币时薪（两口径对照展示用，与本行 `caliber` 无关）
+   */
+  cnyHourFromMonthly: number;
+  /**
+   * 展示用人民币月薪（官方或推算）
+   */
+  cnyMonthly: number;
   country: string;
   countryCode: string;
   /**
@@ -49,73 +64,142 @@ export interface HourlyPowerEntry {
    */
   isProxy: boolean;
   localCurrency: string;
+  /**
+   * 展示用本币月薪（官方或推算）
+   */
+  localMonthly: number;
+  localMonthlyUnit: string;
   localUnit: string;
   localWage: number;
+  /**
+   * 月薪折算口径的本币时薪（两口径对照展示用）
+   */
+  localWageFromMonthly: number;
   modelyDays: null | number;
   modelyHours: null | number;
+  /**
+   * 月工时 = 法定周工时 × 52 / 12
+   */
+  monthlyHours: number;
+  monthlySource: string;
+  monthlySourceUrl: string;
+  /**
+   * 官方公布的最低月工资（本币）；null = 该国无法定月薪
+   */
+  monthlyWage: null | number;
+  /**
+   * true = 展示的月薪由时薪推算
+   */
+  monthlyWageIsDerived: boolean;
   region: Region;
   /**
    * 换算时薪所用的工时数（按月/按日设定的国家才有）
    */
   statutoryHours: null | number;
   /**
-   * 法定周工时上限；来源未明确时为 null，不做外推
+   * 法定周工时
    */
-  statutoryWeeklyHours: null | number;
+  statutoryWeeklyHours: number;
   wageSource: string;
   wageSourceUrl: string;
+  weeklyHoursSource: string;
+  weeklyHoursSourceUrl: string;
 }
 
-const bigMacByCode = new Map(sortedByBigMacPerHour.map(entry => [entry.countryCode, entry]));
-const basketByCode = new Map(commodityIndex.map(entry => [entry.countryCode, entry.hoursToBuy]));
-const iphoneByCode = new Map(iphoneIndex.map(entry => [entry.countryCode, entry.hoursToBuy]));
-const modelyByCode = new Map(modelyIndex.map(entry => [entry.countryCode, entry]));
+const cnyHourPicker: Record<WageCaliber, (wage: WageEntry) => number> = {
+  hourly: wage => wage.cnyEquivalent,
+  monthly: wage => wage.cnyHourFromMonthly,
+};
 
-export const hourlyPower: HourlyPowerEntry[] = wages.map((wage) => {
-  const modely = modelyByCode.get(wage.countryCode);
-  const basketHours = basketByCode.get(wage.countryCode) ?? null;
-  const bigMacPerHour = bigMacByCode.get(wage.countryCode)?.bigMacPerHour ?? null;
-  const iphoneHours = iphoneByCode.get(wage.countryCode) ?? null;
-  const modelyHours = modely?.hoursToBuy ?? null;
-  const coverage = 1
-    + [basketHours, bigMacPerHour, iphoneHours, modelyHours].filter(value => value !== null).length;
+const localHourPicker: Record<WageCaliber, (wage: WageEntry) => number> = {
+  hourly: wage => wage.localWage,
+  monthly: wage => wage.localWageFromMonthly,
+};
 
-  return {
-    basketHours,
-    bigMacPerHour,
-    cnyHour: wage.cnyEquivalent,
-    country: wage.country,
-    countryCode: wage.countryCode,
-    coverage,
-    effectiveDate: wage.effectiveDate,
-    hoursBasis: wage.hoursBasis,
-    iphoneHours,
-    isProxy: wage.isProxy,
-    localCurrency: wage.localCurrency,
-    localUnit: wage.localUnit,
-    localWage: wage.localWage,
-    modelyDays: modely?.daysToBuy ?? null,
-    modelyHours,
-    region: wage.region,
-    statutoryHours: wage.statutoryHours,
-    statutoryWeeklyHours: wage.statutoryWeeklyHours,
-    wageSource: wage.source,
-    wageSourceUrl: wage.sourceUrl,
-  };
-});
+function buildHourlyPower(caliber: WageCaliber): HourlyPowerEntry[] {
+  const pickCny = cnyHourPicker[caliber];
+  const pickLocal = localHourPicker[caliber];
 
-const powerByCode = new Map(hourlyPower.map(entry => [entry.countryCode, entry]));
+  const bigMacByCode = new Map(buildBigMacPpp(pickLocal).map(entry => [entry.countryCode, entry]));
+  const basketByCode = new Map(buildCommodityIndex(pickCny).map(entry => [entry.countryCode, entry.hoursToBuy]));
+  const iphoneByCode = new Map(buildIPhoneIndex(pickCny).map(entry => [entry.countryCode, entry.hoursToBuy]));
+  const modelyByCode = new Map(buildModelYIndex(pickCny).map(entry => [entry.countryCode, entry]));
 
-export function hourlyPowerOf(countryCode: string): HourlyPowerEntry | undefined {
-  return powerByCode.get(countryCode);
+  return wages.map((wage) => {
+    const modely = modelyByCode.get(wage.countryCode);
+    const basketHours = basketByCode.get(wage.countryCode) ?? null;
+    const bigMacPerHour = bigMacByCode.get(wage.countryCode)?.bigMacPerHour ?? null;
+    const iphoneHours = iphoneByCode.get(wage.countryCode) ?? null;
+    const modelyHours = modely?.hoursToBuy ?? null;
+    const coverage = 1
+      + [basketHours, bigMacPerHour, iphoneHours, modelyHours].filter(value => value !== null).length;
+
+    return {
+      basketHours,
+      bigMacPerHour,
+      caliber,
+      cnyHour: pickCny(wage),
+      cnyHourFromMonthly: wage.cnyHourFromMonthly,
+      cnyMonthly: wage.cnyMonthly,
+      country: wage.country,
+      countryCode: wage.countryCode,
+      coverage,
+      effectiveDate: wage.effectiveDate,
+      hoursBasis: wage.hoursBasis,
+      iphoneHours,
+      isProxy: wage.isProxy,
+      localCurrency: wage.localCurrency,
+      localMonthly: wage.localMonthly,
+      localMonthlyUnit: wage.localMonthlyUnit,
+      localUnit: wage.localUnit,
+      localWage: pickLocal(wage),
+      localWageFromMonthly: wage.localWageFromMonthly,
+      modelyDays: modely?.daysToBuy ?? null,
+      modelyHours,
+      monthlyHours: wage.monthlyHours,
+      monthlySource: wage.monthlySource,
+      monthlySourceUrl: wage.monthlySourceUrl,
+      monthlyWage: wage.monthlyWage,
+      monthlyWageIsDerived: wage.monthlyWageIsDerived,
+      region: wage.region,
+      statutoryHours: wage.statutoryHours,
+      statutoryWeeklyHours: wage.statutoryWeeklyHours,
+      wageSource: wage.source,
+      wageSourceUrl: wage.sourceUrl,
+      weeklyHoursSource: wage.weeklyHoursSource,
+      weeklyHoursSourceUrl: wage.weeklyHoursSourceUrl,
+    };
+  });
+}
+
+/**
+ * 两种工资口径的完整数据集。指标注册表 HOURLY_METRICS 与口径无关：
+ * 切换口径 = 切换数据集，排行、矩阵、钱包、对比随之整体联动。
+ */
+export const hourlyPowerByCaliber: Record<WageCaliber, HourlyPowerEntry[]> = {
+  hourly: buildHourlyPower("hourly"),
+  monthly: buildHourlyPower("monthly"),
+};
+
+/**
+ * 默认（官方时薪）口径，保留旧名以兼容单指数页面
+ */
+export const hourlyPower: HourlyPowerEntry[] = hourlyPowerByCaliber.hourly;
+
+const powerByCaliber: Record<WageCaliber, Map<string, HourlyPowerEntry>> = {
+  hourly: new Map(hourlyPowerByCaliber.hourly.map(entry => [entry.countryCode, entry])),
+  monthly: new Map(hourlyPowerByCaliber.monthly.map(entry => [entry.countryCode, entry])),
+};
+
+export function hourlyPowerOf(countryCode: string, caliber: WageCaliber = "hourly"): HourlyPowerEntry | undefined {
+  return powerByCaliber[caliber].get(countryCode);
 }
 
 /**
  * 五指数齐备的国家集合。
  *
  * 由数据推导而非硬编码：任一数据集新增覆盖国家都会自动进入。
- * 截至 2026-09 为 23 个 —— iPhone 缺希腊、以色列（无官方在线商城），
- * 物资篮缺卢森堡（来源站整站无数据）、印度（缺牛肉价）。
+ * 覆盖率与口径无关（口径只改数值，不改数据有无），故两口径共用同一集合。
  */
 export const commonCodes: string[] = hourlyPower
   .filter(entry => entry.coverage === 5)
@@ -124,7 +208,11 @@ export const commonCodes: string[] = hourlyPower
 
 const commonSet = new Set(commonCodes);
 
-export const commonHourlyPower = hourlyPower.filter(entry => commonSet.has(entry.countryCode));
+export function commonHourlyPowerFor(caliber: WageCaliber): HourlyPowerEntry[] {
+  return hourlyPowerByCaliber[caliber].filter(entry => commonSet.has(entry.countryCode));
+}
+
+export const commonHourlyPower: HourlyPowerEntry[] = commonHourlyPowerFor("hourly");
 
 /**
  * 指标分组：钱包卡片与对比表按这个顺序分层
@@ -170,6 +258,7 @@ export interface HourlyMetric {
 /**
  * 全站「一小时购买力」的唯一指标定义。
  * 钱包、对比、矩阵表、排行图都从这里取标签与格式化，避免各页面各写一套。
+ * 所有指标都读取**当前口径**的工资，切换口径时整页联动。
  */
 export const HOURLY_METRICS: HourlyMetric[] = [
   {
@@ -181,7 +270,7 @@ export const HOURLY_METRICS: HourlyMetric[] = [
     higherIsBetter: true,
     key: "cnyHour",
     label: "人民币时薪",
-    note: "各国法定最低时薪按构建时市场汇率折算。这只是工资水平，不等于购买力。",
+    note: "当前工资口径下各国最低工资按构建时市场汇率折算的人民币时薪。这只是工资水平，不等于购买力。",
     unit: "元/小时",
   },
   {
@@ -193,7 +282,7 @@ export const HOURLY_METRICS: HourlyMetric[] = [
     higherIsBetter: true,
     key: "bigMacPerHour",
     label: "1 小时能买巨无霸",
-    note: "当地最低时薪 ÷ 当地巨无霸售价，全程本币相除，不经过汇率。",
+    note: "当前口径下的最低时薪 ÷ 当地巨无霸售价，全程本币相除，不经过汇率。",
     unit: "个/小时",
   },
   {
@@ -205,7 +294,7 @@ export const HOURLY_METRICS: HourlyMetric[] = [
     higherIsBetter: false,
     key: "basketHours",
     label: "买基础物资篮",
-    note: "固定 9 件食品篮（米面油肉蛋奶糖盐）总价 ÷ 人民币时薪。价格快照与汇率更新日期不同。",
+    note: "固定 9 件食品篮（米面油肉蛋奶糖盐）总价 ÷ 当前口径人民币时薪。价格快照与汇率更新日期不同。",
     unit: "小时",
   },
   {
@@ -217,7 +306,7 @@ export const HOURLY_METRICS: HourlyMetric[] = [
     higherIsBetter: false,
     key: "iphoneHours",
     label: "买 iPhone 18 Pro",
-    note: "Apple 官方商城本币标价折算人民币后 ÷ 时薪。各地区含税口径不同。",
+    note: "Apple 官方商城本币标价折算人民币后 ÷ 当前口径时薪。各地区含税口径不同。",
     unit: "小时",
   },
   {
@@ -229,7 +318,7 @@ export const HOURLY_METRICS: HourlyMetric[] = [
     higherIsBetter: false,
     key: "modelyHours",
     label: "买 Model Y",
-    note: "特斯拉官网本币标价折算人民币后 ÷ 时薪。跨地区请以小时比较，天数只是按每天 8 小时的换算。",
+    note: "特斯拉官网本币标价折算人民币后 ÷ 当前口径时薪。跨地区请以小时比较，天数只是按每天 8 小时的换算。",
     unit: "小时",
   },
 ];
@@ -293,7 +382,7 @@ export function verdictOf(rows: CompareRow[]): null | string {
  * 购买 X 需要多少个法定工作周。缺周工时口径时返回 null。
  */
 export function workWeeks(entry: HourlyPowerEntry, neededHours: null | number): null | number {
-  if (neededHours === null || entry.statutoryWeeklyHours === null || entry.statutoryWeeklyHours === 0) {
+  if (neededHours === null || entry.statutoryWeeklyHours === 0) {
     return null;
   }
   return neededHours / entry.statutoryWeeklyHours;
@@ -309,3 +398,5 @@ function favorRatio(metric: HourlyMetric, a: null | number, b: null | number): n
   }
   return metric.higherIsBetter ? a / b : b / a;
 }
+
+export { CALIBER_LABEL, type WageCaliber } from "@/data/wages";

@@ -53,6 +53,11 @@ export function HourlyWallet({ children, className, entry }: HourlyWalletPropert
             {" "}
             {localAmount(entry.localWage, entry.localUnit)}
           </p>
+          <p className="mt-1">
+            {entry.monthlyWageIsDerived ? "月最低工资（推算）" : "月最低工资"}
+            {" "}
+            {localAmount(entry.localMonthly, entry.localMonthlyUnit)}
+          </p>
           <p className={cn("mt-1", entry.isProxy && "text-primary")}>
             {entry.isProxy ? "代理值 · 无全国统一标准" : "全国统一法定标准"}
           </p>
@@ -113,8 +118,9 @@ function MetricTile({ entry, metric }: { entry: HourlyPowerEntry; metric: Hourly
  */
 function secondaryLine(entry: HourlyPowerEntry, metric: HourlyMetric): string {
   const value = metric.get(entry);
-  const weeks = workWeeks(entry, value);
-  if (weeks !== null && entry.statutoryWeeklyHours !== null) {
+  // 只有「工时」类指标才谈得上折算成工作周；巨无霸是「个数」，除以周工时会得出无意义的数字
+  const weeks = metric.unit === "小时" ? workWeeks(entry, value) : null;
+  if (weeks !== null) {
     return `≈ ${round1(weeks)} 个法定工作周（每周 ${entry.statutoryWeeklyHours} 小时）`;
   }
   if (metric.key === "modelyHours" && entry.modelyDays !== null) {

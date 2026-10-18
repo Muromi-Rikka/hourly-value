@@ -1,4 +1,5 @@
 import type { ModelYEntry } from "@/data/modely";
+import type { WageEntry } from "@/data/wages";
 import type { Region } from "@/lib/region";
 
 import { modelys } from "@/data/modely";
@@ -41,33 +42,40 @@ export interface ModelYIndexEntry {
 
 const wageByCode = new Map(wages.map(w => [w.countryCode, w]));
 
-export const modelyIndex: ModelYIndexEntry[] = modelys.map((car: ModelYEntry) => {
-  const wage = wageByCode.get(car.countryCode);
-  const hourlyWage = wage?.cnyEquivalent ?? null;
-  const hoursToBuy = hourlyWage === null || hourlyWage <= 0
-    ? null
-    : Math.round((car.cnyEquivalent / hourlyWage) * 10) / 10;
-  // 天数是按每天 8 小时派生的辅助值，跨地区比较应以 hoursToBuy 为准
-  const daysToBuy = hoursToBuy === null
-    ? null
-    : Math.ceil(hoursToBuy / 8);
-  return {
-    country: car.country,
-    countryCode: car.countryCode,
-    daysToBuy,
-    hourlyWage,
-    hoursToBuy,
-    localCurrency: car.localCurrency,
-    localPrice: car.localPrice,
-    modelyPrice: car.cnyEquivalent,
-    modelySource: car.source,
-    modelySourceUrl: car.sourceUrl,
-    region: car.region,
-    taxNote: car.taxNote,
-    wageSource: wage?.source ?? "",
-    wageSourceUrl: wage?.sourceUrl ?? "",
-  };
-});
+/**
+ * 工资口径可注入：`pickCnyHour` 决定用哪一套时薪（官方时薪口径 / 月薪折算口径）。
+ */
+export function buildModelYIndex(pickCnyHour: (wage: WageEntry) => null | number): ModelYIndexEntry[] {
+  return modelys.map((car: ModelYEntry) => {
+    const wage = wageByCode.get(car.countryCode);
+    const hourlyWage = wage ? pickCnyHour(wage) : null;
+    const hoursToBuy = hourlyWage === null || hourlyWage <= 0
+      ? null
+      : Math.round((car.cnyEquivalent / hourlyWage) * 10) / 10;
+    // 天数是按每天 8 小时派生的辅助值，跨地区比较应以 hoursToBuy 为准
+    const daysToBuy = hoursToBuy === null
+      ? null
+      : Math.ceil(hoursToBuy / 8);
+    return {
+      country: car.country,
+      countryCode: car.countryCode,
+      daysToBuy,
+      hourlyWage,
+      hoursToBuy,
+      localCurrency: car.localCurrency,
+      localPrice: car.localPrice,
+      modelyPrice: car.cnyEquivalent,
+      modelySource: car.source,
+      modelySourceUrl: car.sourceUrl,
+      region: car.region,
+      taxNote: car.taxNote,
+      wageSource: wage?.source ?? "",
+      wageSourceUrl: wage?.sourceUrl ?? "",
+    };
+  });
+}
+
+export const modelyIndex: ModelYIndexEntry[] = buildModelYIndex(wage => wage.cnyEquivalent);
 
 /**
  * Sorted by hoursToBuy ascending (fewest hours = cheapest). Nulls (no data) go last.

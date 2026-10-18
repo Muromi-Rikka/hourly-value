@@ -1,3 +1,4 @@
+import type { WageEntry } from "@/data/wages";
 import type { Region } from "@/lib/region";
 
 import { bigmac } from "@/data/bigmac";
@@ -41,26 +42,35 @@ const currencySymbol: Record<string, string> = {
 
 const wageByCode = new Map(wages.map(w => [w.countryCode, w]));
 
-const bigmacPpp: BigMacPurchasingPower[] = bigmac
-  .map((entry) => {
-    const wage = wageByCode.get(entry.countryCode);
-    if (!wage) {
-      return null;
-    }
-    const bigMacPerHour = Math.round((wage.localWage / entry.localPrice) * 10) / 10;
-    const symbol = currencySymbol[wage.localCurrency] ?? "";
-    return {
-      bigMacPerHour,
-      country: entry.country,
-      countryCode: entry.countryCode,
-      localPrice: entry.localPrice,
-      localPriceFormatted: entry.localPriceFormatted,
-      localWage: wage.localWage,
-      localWageFormatted: `${symbol}${wage.localWage.toLocaleString()}/h`,
-      region: entry.region,
-    };
-  })
-  .filter((entry): entry is BigMacPurchasingPower => entry !== null);
+/**
+ * 工资口径可注入：`pickLocalHourly` 决定用哪一套**本币**时薪
+ * （官方时薪口径 / 月薪折算口径）。巨无霸全程本币相除，故取本币值而非人民币值。
+ */
+export function buildBigMacPpp(pickLocalHourly: (wage: WageEntry) => number): BigMacPurchasingPower[] {
+  return bigmac
+    .map((entry) => {
+      const wage = wageByCode.get(entry.countryCode);
+      if (!wage) {
+        return null;
+      }
+      const localHourly = pickLocalHourly(wage);
+      const bigMacPerHour = Math.round((localHourly / entry.localPrice) * 10) / 10;
+      const symbol = currencySymbol[wage.localCurrency] ?? "";
+      return {
+        bigMacPerHour,
+        country: entry.country,
+        countryCode: entry.countryCode,
+        localPrice: entry.localPrice,
+        localPriceFormatted: entry.localPriceFormatted,
+        localWage: localHourly,
+        localWageFormatted: `${symbol}${localHourly.toLocaleString()}/h`,
+        region: entry.region,
+      };
+    })
+    .filter((entry): entry is BigMacPurchasingPower => entry !== null);
+}
+
+const bigmacPpp: BigMacPurchasingPower[] = buildBigMacPpp(wage => wage.localWage);
 
 /**
  * Sorted by bigMacPerHour descending (most Big Macs per hour first).
